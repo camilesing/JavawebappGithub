@@ -1,0 +1,347 @@
+/**
+ * 创建时间：2011-12-7 下午04:03:59
+ */
+package com.youngor.oa.workflow.ITzichanbaoxiao;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jxl.Workbook;
+import jxl.write.Blank;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import weaver.hrm.HrmUserVarify;
+import net.sf.json.JSONObject;
+
+import com.youngor.oa.dao.DAO;
+import com.youngor.oa.hr.HrDataProvider;
+
+/**
+ * <p>
+ * Title: TODO 请添加类简要说明。
+ * </p>
+ * <p>
+ * Description: TODO 请根据对业务需求的实现情况，添加类功能详细说明。
+ * </p>
+ * <p>
+ * Copyright: 宁波雅戈尔服饰有限公司，2011版权所有。
+ * </p>
+ * 
+ * @author youngorwin7
+ * @version 1.0
+ * 
+ */
+public class export_excel extends HrDataProvider {
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String makeData(HttpServletRequest request,
+			HttpServletResponse response) {
+
+		/*String userId = String.valueOf(HrmUserVarify.getUser(request, response).getUID());
+		if(null==userId)
+			return null;*/
+		
+		String filePath = "/opt/";
+			
+			/*File dir=new File(filePath);
+			if(!dir.exists())
+				dir.mkdir();*/
+			try {
+				
+			String fileName=export_excel(request,filePath);
+			
+			File newFile = new File(fileName);
+			FileInputStream hFile = new FileInputStream(newFile);
+			int len = hFile.available(); // 得到文件大小
+			byte data[] = new byte[len];
+			response.reset();
+
+			response.setHeader("Content-disposition","attachment; filename="+new String("IT资产费用报表.xls".getBytes("GBK"),"ISO8859_1") );// 下载方式，下载，不用浏览器打开
+			response.setContentType("application/vnd.ms-excel");
+
+			OutputStream toClient = response.getOutputStream();
+
+			int i;
+			while ((i = hFile.read(data)) != -1) {
+				toClient.write(data, 0, i);
+			}
+			toClient.flush(); // 强制清出缓冲区
+			toClient.close();
+
+			hFile.close();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+	}
+	
+	public String export_excel(HttpServletRequest request,String filePath){
+		
+		String fileName = filePath + "IT资产费用报表.xls";
+		DAO dao = DAO.getDefaultDAO();
+		
+		try {
+			WritableWorkbook book = Workbook.createWorkbook(new File(fileName));
+			// 生成名为"第一页”的工作表，参数0表示这是第一页
+			
+			//---- IT耗材申购  FORMTABLE_MAIN_194   IT资产维修  FORMTABLE_MAIN_198  IT资产报销  FORMTABLE_MAIN_199
+			
+			//	------------------------各个工作表创建------------------------
+			String excel_name=request.getParameter("excel_name");
+			
+			
+			if(null==excel_name)
+				return null;
+			else if(excel_name.equals("all")){
+				
+				create_excel("FORMTABLE_MAIN_194","IT耗材申购",0,request,book);
+				create_excel("FORMTABLE_MAIN_198","IT资产维修",1,request,book);
+				create_excel("FORMTABLE_MAIN_190","IT耗材购置",2,request,book);
+				create_excel("FORMTABLE_MAIN_199","IT耗材报销",3,request,book);
+			}
+			else {
+				if(excel_name.equals("FORMTABLE_MAIN_194"))
+					create_excel("FORMTABLE_MAIN_194","IT耗材申购",0,request,book);
+				
+				else if(excel_name.equals("FORMTABLE_MAIN_198"))
+					create_excel("FORMTABLE_MAIN_198","IT资产维修",0,request,book);
+				
+				else if(excel_name.equals("FORMTABLE_MAIN_190"))
+					create_excel("FORMTABLE_MAIN_190","IT耗材购置",0,request,book);
+				
+				else if(excel_name.equals("FORMTABLE_MAIN_199"))
+					create_excel("FORMTABLE_MAIN_199","IT耗材报销",0,request,book);
+				
+			}
+			
+			book.write();
+			book.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return fileName;
+	}
+	
+	public void create_excel(String table,String sheet_name,int sheet_num,HttpServletRequest request,WritableWorkbook book){
+		
+		Controller crl=new Controller();
+		DAO dao = DAO.getDefaultDAO();
+		
+		Label cell ; String sql="",sqrq="",zje="",dz="",begin_date="",end_date="",gd_begin_date="",gd_end_date="",tmzsq="",sql_where=" 1=1",order_by="",dl="";
+		String[] sheet_title = null;String[] sheet_cell=null;
+		
+		WritableSheet sheet = book.createSheet(sheet_name, sheet_num);
+		sql=crl.getsql(table);
+		try{
+		
+		if(table.equals("FORMTABLE_MAIN_194")){
+						
+			zje=request.getParameter("zje_1");
+			begin_date=request.getParameter("begin_date_1");
+			end_date=request.getParameter("end_date_1");
+			
+			dl=request.getParameter("dl_1");
+			tmzsq=request.getParameter("tmzsq_1");
+			tmzsq=java.net.URLDecoder.decode(tmzsq,"UTF-8");
+			
+			String[] sheet_title_temp={"序号","流程编号","申请日期","申请人","部门","申请理由","大类","物品名称","单价","数量","金额","条码纸申请","当前节点"};
+			String[] sheet_cell_temp={"BH","SQRQ","SQR_LASTNAME","DEPARTMENTNAME","LY","DL","WPMC","DJ","SL","JE","TMZSQ","CUR_STAT"};
+			
+			sheet_title = new String[sheet_title_temp.length];
+			sheet_cell = new String[sheet_cell_temp.length];
+			
+			System.arraycopy(sheet_title_temp, 0, sheet_title, 0, sheet_title_temp.length);
+			System.arraycopy(sheet_cell_temp, 0, sheet_cell, 0, sheet_cell_temp.length);
+			
+		}
+		else if(table.equals("FORMTABLE_MAIN_198")){
+			
+			zje=request.getParameter("zje_2");
+			begin_date=request.getParameter("begin_date_2");
+			end_date=request.getParameter("end_date_2");
+			dl=request.getParameter("dl_2");
+			
+			String[] sheet_title_temp={"序号","流程编号","申请日期","报修人","部门","大类","资产名称","故障与维修项目","维修费用","实际维修日期","当前节点"};
+			String[] sheet_cell_temp={"BH","SQRQ","BXR_LASTNAME","DEPARTMENTNAME","DL","ZCMC","GZYWXRQ","JE","SJ","CUR_STAT"};
+			
+			sheet_title = new String[sheet_title_temp.length];
+			sheet_cell = new String[sheet_cell_temp.length];
+			
+			System.arraycopy(sheet_title_temp, 0, sheet_title, 0, sheet_title_temp.length);
+			System.arraycopy(sheet_cell_temp, 0, sheet_cell, 0, sheet_cell_temp.length);
+			
+		}
+		else if(table.equals("FORMTABLE_MAIN_199")){
+			
+			zje=request.getParameter("zje_3");
+			begin_date=request.getParameter("begin_date_3");
+			end_date=request.getParameter("end_date_3");
+			dz=request.getParameter("dz_3");
+			dz=java.net.URLDecoder.decode(dz,"UTF-8"); 
+			
+			gd_begin_date=request.getParameter("gd_begin_date_3");
+			gd_end_date=request.getParameter("gd_end_date_3");
+			
+			String[] sheet_title_temp={"序号","流程编号","申请日期","申请人","申请部门","资产名称","单价","数量","金额","电子报销","当前节点","归档日期"};
+			String[] sheet_cell_temp={"BH","SQRQ","ZCSGR_LASTNAME","DEPARTMENTNAME","ZCMC","DJ","SL","JE","DZ","CUR_STAT","RECEIVEDATE"};
+			
+			sheet_title = new String[sheet_title_temp.length];
+			sheet_cell = new String[sheet_cell_temp.length];
+			
+			System.arraycopy(sheet_title_temp, 0, sheet_title, 0, sheet_title_temp.length);
+			System.arraycopy(sheet_cell_temp, 0, sheet_cell, 0, sheet_cell_temp.length);		
+			
+			
+		}
+		else if(table.equals("FORMTABLE_MAIN_190")){
+			
+			zje=request.getParameter("zje_4");
+			begin_date=request.getParameter("begin_date_4");
+			end_date=request.getParameter("end_date_4");
+			dl=request.getParameter("dl_4");
+			
+			gd_begin_date=request.getParameter("gd_begin_date_4");
+			gd_end_date=request.getParameter("gd_end_date_4");
+			
+			String[] sheet_title_temp={"序号","流程编号","申请日期","申请人","申请部门","大类","资产名称","型号","单价","数量","金额","使用人","当前节点","归档日期"};
+			String[] sheet_cell_temp={"BH","SQRQ","ZDR_LASTNAME","DEPARTMENTNAME","DL","ZCMC","XINGHAO","DANJIA","SL","JE","SHIYONGR","CUR_STAT","RECEIVEDATE"};
+			
+			sheet_title = new String[sheet_title_temp.length];
+			sheet_cell = new String[sheet_cell_temp.length];
+		
+			System.arraycopy(sheet_title_temp, 0, sheet_title, 0, sheet_title_temp.length);
+			System.arraycopy(sheet_cell_temp, 0, sheet_cell, 0, sheet_cell_temp.length);
+			
+		}
+		
+		if(null==begin_date||begin_date.trim().equals(""))
+			begin_date="0001-01-01";		
+				
+		if(null==end_date||end_date.trim().equals(""))
+			end_date="9999-01-01";
+			
+		if(null==gd_begin_date||gd_begin_date.trim().equals(""))
+			gd_begin_date="0001-01-01";
+		
+		if(null==gd_end_date||gd_end_date.trim().equals(""))
+			gd_end_date="9999-01-01";
+		
+		if(null==zje||zje.trim().equals(""))
+			;
+		else
+			sql_where=sql_where+" and zje<=to_number('"+zje+"')";
+					
+			 
+		if(null==tmzsq||tmzsq.trim().equals("")||tmzsq.trim().equals("不限")||tmzsq.trim().equals("99"))
+			;
+		else
+			sql_where=sql_where+" and tmzsq='"+tmzsq+"' ";
+		
+		if(null==dl||dl.trim().equals("")||dl.trim().equals("不限")||dl.trim().equals("99"))
+			;
+		else
+			sql_where=sql_where+" and SELECTVALUE='"+dl+"' ";
+		
+		if(null==dz||dz.trim().equals("")||dz.trim().equals("不限")||dz.trim().equals("99"))
+			;
+		else
+			sql_where=sql_where+" and dz='"+dz+"' ";
+		
+		
+		if(table.equals("FORMTABLE_MAIN_199")||table.equals("FORMTABLE_MAIN_190")){
+			
+			sql_where=sql_where+" and to_date(RECEIVEDATE,'YYYY-MM-DD') between to_date('"+gd_begin_date+"','YYYY-MM-DD')  and to_date('"+gd_end_date+"','YYYY-MM-DD')";
+
+		}
+		
+		sql_where=sql_where+" and to_date(sqrq,'YYYY-MM-DD') between to_date('"+begin_date+"','YYYY-MM-DD')  and to_date('"+end_date+"','YYYY-MM-DD')";
+			
+		order_by=" order by SQRQ desc,BH";
+			
+		sql=sql+sql_where+order_by;			
+			
+		List<Map<String,Object>> list = dao.getJdbcTemplate().queryForList(sql, new HashMap());
+		Map<String,Object> map =new  HashMap();		
+			
+		BigDecimal sum_zje=new BigDecimal(0);
+		BigDecimal sum_sl=new BigDecimal(0);
+			
+		for(Map<String,Object> map_temp :list ){
+			if(null==map_temp.get("je"))
+				;
+			else
+				sum_zje=sum_zje.add((BigDecimal)(map_temp.get("je")));
+				
+			if(null==map_temp.get("sl"))
+				;
+			else
+				sum_sl=sum_sl.add((BigDecimal)(map_temp.get("sl")));
+				
+		}
+		
+		map.put("JE", sum_zje);
+		map.put("SL", sum_sl);
+		map.put("BH", "合计栏");
+			
+		list.add(0, map);
+		
+			// Label(x,y,z)其中x代表单元格的第x+1列 col，第y+1行 row, 单元格的内容是z		
+		int x=0,y=0,xuh=1;
+		for(int i=0;i<sheet_title.length;i++){
+			cell = new Label(x++,y,sheet_title[i]);
+	 	   	sheet.addCell(cell); 
+		}
+			
+		for(Map<String,Object> map_temp:list){
+			
+			x=0; y++;
+			
+			cell = new Label(x++,y,String.valueOf(xuh++) );
+	 	   	sheet.addCell(cell);
+	 		   	
+			for(int i=0;i<sheet_cell.length;i++){
+				if(map_temp.get(sheet_cell[i])==null)
+					x++;
+				else{
+					if(sheet_cell[i].equals("RECEIVEDATE")){
+						if(String.valueOf(map_temp.get(sheet_cell[i])).equals("9999-01-01"))
+							cell = new Label(x++,y,"");						
+						else
+							cell = new Label(x++,y,String.valueOf(map_temp.get(sheet_cell[i])).replaceAll("<br>", "\012") );
+					}
+					else 					
+						cell = new Label(x++,y,String.valueOf(map_temp.get(sheet_cell[i])).replaceAll("<br>", "\012") );
+					
+					sheet.addCell(cell);
+				}
+								
+			}
+				
+		}	
+		
+		list.clear();map.clear();
+		
+	 }
+	catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+  }
+
+	
+}

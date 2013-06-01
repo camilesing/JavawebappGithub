@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/49/trunk/JavaWebapp/src/com/authority/common/jackjson
+END
+CustomDateTimeSerializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/3/trunk/JavaWebapp/src/com/authority/common/jackjson/CustomDateTimeSerializer.java
+END
+JackJson.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/3/trunk/JavaWebapp/src/com/authority/common/jackjson/JackJson.java
+END
+CustomDateSerializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/3/trunk/JavaWebapp/src/com/authority/common/jackjson/CustomDateSerializer.java
+END
+CustomDateTimeDeserializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/3/trunk/JavaWebapp/src/com/authority/common/jackjson/CustomDateTimeDeserializer.java
+END
+CustomDateDeserializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/3/trunk/JavaWebapp/src/com/authority/common/jackjson/CustomDateDeserializer.java
+END

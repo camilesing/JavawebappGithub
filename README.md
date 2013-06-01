@@ -1,4 +1,0 @@
-Javawebapp
-==========
-
-Javawebapp for personal

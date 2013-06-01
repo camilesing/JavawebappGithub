@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/40/trunk/JavaWebapp/WebRoot/WEB-INF/views/user
+END
+module.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/module.jsp
+END
+findpwd.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/findpwd.jsp
+END
+resetpwd.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/resetpwd.jsp
+END
+webmessage_print.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webmessage_print.jsp
+END
+changepwd.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/changepwd.jsp
+END
+webjxjhkcxxb.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webjxjhkcxxb.jsp
+END
+role.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/role.jsp
+END
+myinfo.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/myinfo.jsp
+END
+webmessage_swf.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/40/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webmessage_swf.jsp
+END
+webfilemanager.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/11/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webfilemanager.jsp
+END
+user.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/user.jsp
+END
+webqudview.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webqudview.jsp
+END
+webmessage.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/39/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webmessage.jsp
+END
+field.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/field.jsp
+END
+webfunctiontest.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/23/trunk/JavaWebapp/WebRoot/WEB-INF/views/user/webfunctiontest.jsp
+END

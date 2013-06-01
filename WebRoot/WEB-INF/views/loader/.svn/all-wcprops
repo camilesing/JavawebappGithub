@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader
+END
+login.bak.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/login.bak.jsp
+END
+login.LAB.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/login.LAB.jsp
+END
+login.yepnope.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/login.yepnope.jsp
+END
+header.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/header.jsp
+END
+lab.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/lab.jsp
+END
+yepnope.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/3/trunk/JavaWebapp/WebRoot/WEB-INF/views/loader/yepnope.jsp
+END

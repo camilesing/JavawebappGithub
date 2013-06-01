@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/51/trunk/JavaWebapp/src/sqlmap
+END
+BaseUserRoleMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseUserRoleMapper.xml
+END
+BaseUsersMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseUsersMapper.xml
+END
+WebJxjhkcxxb.xml
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/WebJxjhkcxxb.xml
+END
+BaseRolesMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseRolesMapper.xml
+END
+common_exp.xml
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/51/trunk/JavaWebapp/src/sqlmap/common_exp.xml
+END
+common_SqlMap.xml
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/common_SqlMap.xml
+END
+BaseFieldsMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseFieldsMapper.xml
+END
+CommonModulesMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/CommonModulesMapper.xml
+END
+BaseRoleModuleMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseRoleModuleMapper.xml
+END
+WebMessageMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/WebMessageMapper.xml
+END
+WebQudviewMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/WebQudviewMapper.xml
+END
+BaseModulesMapper.xml
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/3/trunk/JavaWebapp/src/sqlmap/BaseModulesMapper.xml
+END
