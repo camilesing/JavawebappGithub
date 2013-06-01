@@ -18,7 +18,7 @@ public class Test {
 		HelloIOC helloioc = applicationContext.getBean("HelloIOC", HelloIOC.class);
 		helloioc.hello();
 		
-		
+		System.out.println("");
 		/*Test test = applicationContext.getBean("Test", Test.class);
 		test.helloiocimp.hello();*/
 	}
