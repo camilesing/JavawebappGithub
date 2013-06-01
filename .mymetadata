@@ -5,7 +5,7 @@
   id="myeclipse.1339570574489"
   context-root="/JavawebappGithub"
   j2ee-spec="6.0"
-  archive="JavaWebapp.war">
+  archive="JavawebappGithub.war">
   <attributes>
     <attribute name="webrootdir" value="WebRoot" />
   </attributes>
