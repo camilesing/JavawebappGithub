@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-module
   type="WEB"
-  name="JavaWebapp"
+  name="JavawebappGithub"
   id="myeclipse.1339570574489"
-  context-root="/JavaWebapp"
+  context-root="/JavawebappGithub"
   j2ee-spec="6.0"
   archive="JavaWebapp.war">
   <attributes>
