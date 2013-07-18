@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -31,7 +32,14 @@ public class MainTest {
 		test1();
 		//DigestUtils.md5Hex(DigestUtils.md5Hex(password){account});
 		String str = "";
-		System.out.println(DigestUtils.md5Hex("123456"));
+		System.out.println("123456 MD5:"+DigestUtils.md5Hex("123456"));
+		String test = "b8a2ba63d7da46bb02321ab4f93043d056454app_keyjip544720130515094913formatjsonfrom_date2013-04-03 13:46:10length0methodtaobao.logistics.station.order.querypartner_idtop-apitools-zhejiangshizuservice_provider_codexiaoyoujusession966d334ff66b64714dd168ed75b7b4a5aaf93dfc48a9e542f1102637c199df35sign_methodmd5start0station_id7357status3timestamp2013-7-3 13:45:57to_date2013-07-03 13:46:09user_id1703074920v2.0b8a2ba63d7da46bb02321ab4f93043d056454";
+		System.out.println("test _MD5:"+DigestUtils.md5Hex(test));
+		
+		String inputtime = "20130";
+		System.out.println("inputtime:"+StringUtils.substring(inputtime, 0, 8));
+		
+		
 		System.out.println(DigestUtils.shaHex(str));
 		System.out.println(DigestUtils.sha256Hex(str));
 		System.out.println(DigestUtils.sha384Hex(str));
