@@ -18,8 +18,8 @@
 	.x-grid-record-orange table{color: orange;}    
    </style>
    <script type="text/javascript">
-    function report(tab){				
-		    	
+    function report(tab){		
+	 	
     	Ext.onReady(function(){
 			Ext.BLANK_IMAGE_URL = 'resources/extjs/resources/images/default/s.gif';
 			Ext.QuickTips.init();
@@ -70,7 +70,7 @@
 			
 		});
     	
-	};
+	}
     
     </script>
     

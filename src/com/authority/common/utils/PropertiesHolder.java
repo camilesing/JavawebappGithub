@@ -18,9 +18,9 @@ import com.authority.common.utils.PropertiesHelper;
  * PropertiesHolder初始化
  * 
  * <b>spring初始化:</b>
- * &lt;bean class="cn.org.rapid_framework.util.holder.PropertiesHolder">
- * 		&lt;property name="properties" ref="applicationProperties"/>
- * &lt;/bean>
+ * <bean class="com.authority.common.utils.PropertiesHolder">
+ * 		<property name="properties" ref="applicationProperties" />
+ * </bean>
  * 
  * <b>java API初始化:</b>
  * new PropertiesHolder().setProperties(cache)

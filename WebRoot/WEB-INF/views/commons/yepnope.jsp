@@ -31,7 +31,9 @@
 			complete : function() {
 				Ext.QuickTips.init();
 				Ext.form.Field.prototype.msgTarget = 'title';//qtip,title,under,side
-				Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+				Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+					expires: new Date(new Date().getTime()+(1000*60*60*24*365)), //一年后
+				}));
 				ctx = "${ctx}";
 				Ext.BLANK_IMAGE_URL = '${ctx}/resources/extjs/resources/images/default/s.gif';
 				}

@@ -335,7 +335,7 @@ yepnope({
 	};
 	
 	filemanager.showUploadDialog = function(){
-		
+		alert("${pageContext.session.id}");
 		new Ext.Window({
 			width : 650,
 			title : '上传示例',
@@ -345,12 +345,13 @@ yepnope({
 				xtype : 'SWFUploader',
 				border : false,
 				fileSize : 1024 * 550,// 限制文件大小550MB
-				uploadUrl : filemanager.uploadFiles_url+";jsessionid=${pageContext.session.id}",
+				uploadUrl : filemanager.uploadFiles_url+"",
 				flashUrl : filemanager.flashUrl,
 				filePostName : 'file', // 后台接收参数
 				fileTypes : '*.*',// 可上传文件类型 "*.log;*.txt"
 				postParams : {
-					node : filemanager.store.baseParams['node']
+					node : filemanager.store.baseParams['node'],
+					jsessionid:'${pageContext.session.id}'
 				}
 			}]
 		}).show();

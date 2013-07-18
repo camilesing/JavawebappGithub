@@ -213,6 +213,7 @@ Share.map = function (value, mapping, defaultText) {
 Share.swapStyle = function (themeCss) {
     // Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
     // 设置主题
+	//alert(Ext.state.Manager.get('Cxjava_theme'));
     var theme = themeCss === undefined ? Ext.state.Manager.get('Cxjava_theme') : themeCss;
     if (theme && theme != '') {
         // 实际改变风格样式的处理

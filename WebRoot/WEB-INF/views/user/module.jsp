@@ -5,6 +5,7 @@
 <script type="text/javascript">
 Ext.ns("Ext.Authority.modules"); // 自定义一个命名空间
 module = Ext.Authority.modules; // 定义命名空间的别名
+
 module = {
 	all : ctx + '/module/all',// 加载所有
 	save : ctx + "/module/save",//保存
