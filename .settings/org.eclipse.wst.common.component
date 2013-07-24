@@ -3,7 +3,7 @@
     <wb-module deploy-name="JavawebappGithub">
         <wb-resource deploy-path="/" source-path="/WebRoot"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="/JavawebappGithub"/>
         <property name="java-output-path" value="/JavawebappGithub/WebRoot/WEB-INF/classes"/>
+        <property name="context-root" value="/JavaWebapp"/>
     </wb-module>
 </project-modules>
