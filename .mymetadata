@@ -3,7 +3,7 @@
   type="WEB"
   name="JavawebappGithub"
   id="myeclipse.1339570574489"
-  context-root="/JavaWebapp"
+  context-root="/Javawebapp"
   j2ee-spec="6.0"
   archive="JavawebappGithub.war">
   <attributes>
