@@ -9,6 +9,11 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		int id = Integer.parseInt("12"+"13");
+		
+		System.out.println(id);
+		
+		
 		// TODO Auto-generated method stub
 		String html="Tomcat服务器监控1.3版 for Win,Linux(原创)";		
 		

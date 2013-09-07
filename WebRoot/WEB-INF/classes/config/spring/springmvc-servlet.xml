@@ -108,6 +108,7 @@
 			<mvc:mapping path="/qudview*" />
 			<mvc:mapping path="/message**/**" />
 			<mvc:mapping path="/filemanager**/**" />
+			<mvc:mapping path="/pdaaction**/**"/>
 			<bean class="com.authority.web.interseptor.LoginInterceptor"></bean>
 		</mvc:interceptor>
 	</mvc:interceptors>

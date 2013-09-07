@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="GMQ_XIANGBQ_SUBR0"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="535"
+		 pageHeight="800"
+		 columnWidth="535"
+		 columnSpacing="0"
+		 leftMargin="0"
+		 rightMargin="0"
+		 topMargin="0"
+		 bottomMargin="0"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="PARAM_M_PRODUCT_ID" isForPrompting="false" class="java.math.BigDecimal"/>
+	<parameter name="PARAM_COLOR_CODE" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="PARAM_BOXNO" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="objectid" isForPrompting="true" class="java.lang.Integer">
+		<parameterDescription><![CDATA[objectid]]></parameterDescription>
+	</parameter>
+	<queryString><![CDATA[select C_SUPPLIER_ID, NAME, B_PO_BOXNO_ID, BOXNO, ORDERNO, M_PRODUCT_ID, M_PRODUCT_NAME, M_PRODUCT_VALUE, COLOR_CODE, COLOR_VALUE, decode(QTY,999,SIZE_CODE+100,SIZE_CODE) SIZE_CODE, decode(QTY,999,QTY-999,QTY)  QTY from (
+select C_SUPPLIER_ID, NAME, B_PO_BOXNO_ID, BOXNO, ORDERNO, M_PRODUCT_ID, M_PRODUCT_NAME, M_PRODUCT_VALUE, COLOR_CODE, COLOR_VALUE, SIZE_CODE, sum(QTY) QTY from (
+select distinct d.C_SUPPLIER_ID,g.name,B.B_PO_BOXNO_ID,a.BOXNO,a.ORDERNO,B.M_PRODUCT_ID,d.NAME M_PRODUCT_NAME,D.VALUE M_PRODUCT_VALUE,e.VALUE1_CODE color_code,e.value1 color_value,TO_CHAR(h.code) size_code,h.qty qty
+from B_PO_BOXNO a  
+left join  B_PO_BOXITEM b on A.ID=B.B_PO_BOXNO_ID  
+left join M_PRODUCT d on A.M_PRODUCT_ID=D.ID
+left join M_ATTRIBUTESETINSTANCE e on B.M_ATTRIBUTESETINSTANCE_ID=E.ID
+left join B_SO f on A.B_SO_ID =F.ID 
+left join C_STORE g on g.IFSTOCK='N' and g.ISSTOP = 'N' and g.ISCENTER ='Y' and F.C_DEST_ID=G.ID
+left join henlo_size h on to_number(h.code)>to_number(substr(nvl(d.SIZE_RANGE,'02-01'),4,2)) and 
+to_number(h.code)<to_number(substr(nvl(d.SIZE_RANGE,'02-01'),4,2))+8-to_number(substr(nvl(d.SIZE_RANGE,'02-01'),4,2))+to_number(substr(nvl(d.SIZE_RANGE,'02-01'),1,2))
+where a.id=$P{objectid} AND 
+B.M_PRODUCT_ID=$P{PARAM_M_PRODUCT_ID} AND 
+e.VALUE1_CODE = $P{PARAM_COLOR_CODE}
+union all
+select distinct d.C_SUPPLIER_ID,g.name,B.B_PO_BOXNO_ID,a.BOXNO,a.ORDERNO,B.M_PRODUCT_ID,d.NAME M_PRODUCT_NAME,D.VALUE M_PRODUCT_VALUE,e.VALUE1_CODE color_code,e.value1 color_value,TO_CHAR(h.code) size_code,0 qty
+from B_PO_BOXNO a  
+left join  B_PO_BOXITEM b on A.ID=B.B_PO_BOXNO_ID  
+left join M_PRODUCT d on A.M_PRODUCT_ID=D.ID
+left join M_ATTRIBUTESETINSTANCE e on B.M_ATTRIBUTESETINSTANCE_ID=E.ID
+left join B_SO f on A.B_SO_ID =F.ID 
+left join C_STORE g on g.IFSTOCK='N' and g.ISSTOP = 'N' and g.ISCENTER ='Y' and F.C_DEST_ID=G.ID
+left join henlo_size h on to_number(h.code)>=to_number(substr(nvl(d.SIZE_RANGE,'02-01'),1,2)) and 
+to_number(h.code)<=to_number(substr(nvl(d.SIZE_RANGE,'02-01'),4,2))
+where a.id=$P{objectid} AND 
+B.M_PRODUCT_ID=$P{PARAM_M_PRODUCT_ID} AND 
+e.VALUE1_CODE = $P{PARAM_COLOR_CODE}
+union all 
+select d.C_SUPPLIER_ID,g.name,B.B_PO_BOXNO_ID,a.BOXNO,a.ORDERNO,B.M_PRODUCT_ID,d.NAME M_PRODUCT_NAME,D.VALUE M_PRODUCT_VALUE,e.VALUE1_CODE color_code,e.value1 color_value,e.value2_code size_code,b.qty
+from B_PO_BOXNO a  
+left join  B_PO_BOXITEM b on A.ID=B.B_PO_BOXNO_ID  
+left join M_PRODUCT d on A.M_PRODUCT_ID=D.ID
+left join M_ATTRIBUTESETINSTANCE e on B.M_ATTRIBUTESETINSTANCE_ID=E.ID
+left join B_SO f on A.B_SO_ID =F.ID 
+left join C_STORE g on g.IFSTOCK='N' and g.ISSTOP = 'N' and g.ISCENTER ='Y' and F.C_DEST_ID=G.ID
+where  a.id=$P{objectid} AND 
+B.M_PRODUCT_ID=$P{PARAM_M_PRODUCT_ID} AND 
+e.VALUE1_CODE = $P{PARAM_COLOR_CODE}
+) group by C_SUPPLIER_ID, NAME, B_PO_BOXNO_ID, BOXNO, ORDERNO, M_PRODUCT_ID, M_PRODUCT_NAME, M_PRODUCT_VALUE, COLOR_CODE, COLOR_VALUE, SIZE_CODE
+order by C_SUPPLIER_ID, NAME, B_PO_BOXNO_ID, BOXNO, ORDERNO, M_PRODUCT_ID, M_PRODUCT_NAME, M_PRODUCT_VALUE, COLOR_CODE, COLOR_VALUE, SIZE_CODE
+)]]></queryString>
+
+	<field name="C_SUPPLIER_ID" class="java.math.BigDecimal"/>
+	<field name="NAME" class="java.lang.String"/>
+	<field name="B_PO_BOXNO_ID" class="java.math.BigDecimal"/>
+	<field name="BOXNO" class="java.lang.String"/>
+	<field name="ORDERNO" class="java.lang.String"/>
+	<field name="M_PRODUCT_ID" class="java.math.BigDecimal"/>
+	<field name="M_PRODUCT_NAME" class="java.lang.String"/>
+	<field name="M_PRODUCT_VALUE" class="java.lang.String"/>
+	<field name="COLOR_CODE" class="java.lang.String"/>
+	<field name="COLOR_VALUE" class="java.lang.String"/>
+	<field name="SIZE_CODE" class="java.math.BigDecimal"/>
+	<field name="QTY" class="java.math.BigDecimal"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="33"  isSplitAllowed="true" >
+				<crosstab >
+					<reportElement
+						x="0"
+						y="0"
+						width="535"
+						height="32"
+						key="crosstab-1"/>
+					<crosstabHeaderCell>						<cellContents mode="Transparent">
+					<box></box>
+				<staticText>
+					<reportElement
+						x="0"
+						y="0"
+						width="29"
+						height="14"
+						key="staticText-1"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="微软雅黑" pdfFontName="msyhbd.ttf" size="10" isPdfEmbedded ="true" pdfEncoding ="Identity-H"/>
+					</textElement>
+				<text><![CDATA[尺码]]></text>
+				</staticText>
+						</cellContents>
+					</crosstabHeaderCell>					<rowGroup name="M_PRODUCT_ID" width="29" totalPosition="End">
+						<bucket>
+							<bucketExpression class="java.math.BigDecimal"><![CDATA[$F{M_PRODUCT_ID}]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+						<cellContents mode="Transparent">
+					<box></box>
+				<staticText>
+					<reportElement
+						x="0"
+						y="0"
+						width="29"
+						height="22"
+						key="staticText-1"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="微软雅黑" pdfFontName="msyhbd.ttf" size="12" isPdfEmbedded ="true" pdfEncoding ="Identity-H"/>
+					</textElement>
+				<text><![CDATA[数量]]></text>
+				</staticText>
+						</cellContents>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+						<cellContents mode="Transparent">
+					<box></box>
+						</cellContents>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="SIZE_CODE" height="14" totalPosition="End" headerPosition="Center">
+						<bucket>
+							<bucketExpression class="java.math.BigDecimal"><![CDATA[$F{SIZE_CODE}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+						<cellContents mode="Transparent">
+					<box></box>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="28"
+						height="14"
+						key="textField"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="微软雅黑" pdfFontName="msyhbd.ttf" size="10" isPdfEmbedded ="true" pdfEncoding ="Identity-H"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{SIZE_CODE}.intValue()>100?"":$V{SIZE_CODE}.toString()]]></textFieldExpression>
+				</textField>
+						</cellContents>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+						<cellContents mode="Transparent">
+					<box>					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+</box>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="29"
+						height="14"
+						key="textField"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="微软雅黑" pdfFontName="msyhbd.ttf" size="10" isPdfEmbedded ="true" pdfEncoding ="Identity-H"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["合计"]]></textFieldExpression>
+				</textField>
+						</cellContents>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+
+					<measure name="QTY_Sum" class="java.math.BigDecimal" calculation="Sum">
+						<measureExpression><![CDATA[$F{QTY}]]></measureExpression>
+					</measure>
+					<crosstabCell width="28" height="22">
+						<cellContents mode="Transparent">
+					<box></box>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="28"
+						height="22"
+						key="textField"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="宋体" pdfFontName="STSong-Light" size="19" isPdfEmbedded ="true" pdfEncoding ="UniGB-UCS2-H"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{QTY_Sum}.intValue()==0?"":$V{QTY_Sum}.toString()]]></textFieldExpression>
+				</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="29" height="22" columnTotalGroup="SIZE_CODE">
+						<cellContents mode="Transparent">
+					<box></box>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="29"
+						height="22"
+						key="textField"/>
+					<box>					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="微软雅黑" pdfFontName="msyhbd.ttf" size="14" isPdfEmbedded ="true" pdfEncoding ="Identity-H"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$V{QTY_Sum}]]></textFieldExpression>
+				</textField>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="28" height="1" rowTotalGroup="M_PRODUCT_ID">
+						<cellContents mode="Transparent">
+					<box></box>
+						</cellContents>
+					</crosstabCell>
+					<crosstabCell width="29" height="1" rowTotalGroup="M_PRODUCT_ID" columnTotalGroup="SIZE_CODE">
+						<cellContents mode="Transparent">
+					<box></box>
+						</cellContents>
+					</crosstabCell>
+					<whenNoDataCell>						<cellContents mode="Transparent">
+					<box></box>
+						</cellContents>
+					</whenNoDataCell>					</crosstab>
+			</band>
+		</summary>
+</jasperReport>

@@ -33,6 +33,7 @@ import com.authority.pojo.BaseUsers;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExceptionReturn;
 import com.authority.pojo.ExtReturn;
+import com.authority.pojo.PdaReturn;
 import com.authority.pojo.Tree;
 import com.authority.service.BaseModulesService;
 import com.authority.service.BaseUsersService;
@@ -149,6 +150,51 @@ public class LoginController {
 				return new ExtReturn(false, "用户名或者密码错误!");
 			} else {
 				return new ExtReturn(false, result);
+			}
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}
+	}
+	
+	/**
+	 * 用户登录_PDA
+	 */
+	@RequestMapping(value = "/login_pda", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_pda(@RequestParam String account, @RequestParam String password, HttpSession session, HttpServletRequest request) {
+		try {
+			if (StringUtils.isBlank(account)) {
+				return new PdaReturn("N", "帐号不能为空！");
+			}
+			if (StringUtils.isBlank(password)) {
+				return new PdaReturn("N", "密码不能为空！");
+			}
+			Criteria criteria = new Criteria();
+			criteria.put("account", account);
+			criteria.put("passwordIn", password);
+			criteria.put("loginip", this.getIpAddr(request));
+			String result = this.baseUsersService.selectByBaseUser(criteria);
+			if ("01".equals(result)) {
+				BaseUsers baseUser = (BaseUsers) criteria.get("baseUser");
+				session.setAttribute(WebConstants.CURRENT_USER, baseUser);
+				
+				String user_role="";
+				String sql_role="select A.ROLE_NAME from BASE_ROLES a,BASE_USER_ROLE b where A.ROLE_ID=B.ROLE_ID and B.USER_ID=?";
+				Object[] args={baseUser.getUserId()};
+				if(null==(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class))
+					;
+				else
+					user_role=(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class);
+				
+				session.setAttribute(WebConstants.CURRENT_USER_ROLE, user_role);				
+				
+				logger.info("{}登陆成功", baseUser.getRealName());
+				return new PdaReturn("Y","登陆成功");
+			} else if ("00".equals(result)) {
+				return new PdaReturn("N","用户名或者密码错误!");
+			} else {
+				return new PdaReturn("N",result);
 			}
 		} catch (Exception e) {
 			logger.error("Exception: ", e);

@@ -177,6 +177,8 @@ index.msgsend = function () {
 };
 
 index.showMessage = function(data) {
+	var dwrtest = HenloController.webtest("param");
+	alert(dwrtest);
     var message = decodeURI(decodeURI(data.msg));
     if(message!=''){
     	index.msgPanel.expand(true);

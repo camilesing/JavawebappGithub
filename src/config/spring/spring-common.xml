@@ -42,7 +42,15 @@
   	<bean id="njdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
   		<constructor-arg index="0" ref="druid" />
   	</bean>
+  	
+  	<bean id="jt_access_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
+  		<property name="dataSource" ref="proxool_henlo_access" /> 
+  	</bean>
 
+	<bean id="jt_oracle_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
+  		<property name="dataSource" ref="proxool_henlo_oracle" /> 
+  	</bean>
+	
 	<!-- define the SqlSessionFactory class="org.mybatis.spring.SqlSessionFactoryBean" -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="druid" />
@@ -75,6 +83,7 @@
 	<!-- Dwr Comet 配置 -->
 	<bean id="chatService" class="test.controls.ChatService"/>
 	<bean id="chatMessageClient" class="test.controls.ChatMessageClient"/>
+	<bean id="HenloController" class="com.henlo.process.HenloController" />
 
 	<!-- RESTFUL Webservice 客户端 -->
 	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">

@@ -82,6 +82,47 @@
 		<!-- 如果侦察线程发现闲置连接，则会使用这个SQL语句来对这些连接进行检查 -->
 		<property name="houseKeepingTestSql" value="SELECT CURRENT_DATE FROM DUAL" />
 	</bean>
+	
+	<!-- proxool_henlo_oracle配置 -->
+	<bean id="proxool_henlo_oracle" class="org.logicalcobwebs.proxool.ProxoolDataSource" >
+		<property name="driver" value="${henlo.oracle.jdbc.driverClassName}" />
+		<property name="driverUrl" value="${henlo.oracle.jdbc.url}" />
+		<property name="user" value="${henlo.oracle.jdbc.username}" />
+		<property name="password" value="${henlo.oracle.jdbc.password}" />
+		<!--数据源的别名 -->
+		<property name="alias" value="proxool_henlo_oracle_alias" />
+		<!-- 空闲连接个数 默认为0 -->
+		<property name="prototypeCount" value="4" />
+		<!--最小连接数(默认5个) -->
+		<property name="minimumConnectionCount" value="5" />
+		<!--最大连接数(默认15个),超过了这个连接数,再有请求时,就排在队列中等候,最大的等待请求数由maximum-new-connections决定 -->
+		<property name="maximumConnectionCount" value="30" />
+		<!-- 如果侦察线程发现闲置连接，则会使用这个SQL语句来对这些连接进行检查 -->
+		<property name="houseKeepingTestSql" value="SELECT CURRENT_DATE FROM DUAL" />
+	</bean>
+	
+	
+	<!-- proxool配置 -->
+	<bean id="proxool_henlo_access" class="org.logicalcobwebs.proxool.ProxoolDataSource" >
+		<property name="driver" value="${access.jdbc.driverClassName}" />
+		<property name="driverUrl" value="${access.jdbc.url}" />
+		<property name="user" value="" />
+		<property name="password" value="" />
+		<!--数据源的别名 -->
+		<property name="alias" value="proxool_henlo_access_alias" />
+		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程.
+		所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟 -->  
+        <property name="maximumActiveTime" value="600000"/>
+        <!-- 最少保持的空闲连接数 -->  
+        <property name="prototypeCount" value="0"/>
+        <!-- 最大连接数 -->  
+        <property name="maximumConnectionCount" value="1"/>
+        <!-- 最小连接数 -->  
+        <property name="minimumConnectionCount" value="1"/>
+        <!-- 创建新的最大并发连接数 -->  
+        <property name="simultaneousBuildThrottle" value="2"/> 
+         <property name="houseKeepingTestSql" value="select CURRENT_DATE"/>       
+	</bean>
 
 	<!-- dbcp配置 -->
 	<bean id="dbcp" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">

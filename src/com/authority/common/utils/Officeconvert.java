@@ -343,11 +343,11 @@ public class Officeconvert {
 	
 	public static void main(String[] args){
 		
-		String sourceFile="D:\\1.doc";
+		String sourceFile="D:\\1.docx";
 		String pdfdestFile = "D:\\1.pdf";
 		String swfdestFile ="D:\\test.swf";
 		Officeconvert officeconvert = new Officeconvert();
-		//officeconvert.office2PDF(sourceFile, pdfdestFile);
+		officeconvert.office2PDF(sourceFile, pdfdestFile);
 		officeconvert.convertFileToSwf(pdfdestFile, swfdestFile); 
 		//Officeconvert.png2swf(sourceFile, destFile);
 		

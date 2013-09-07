@@ -31,9 +31,6 @@ public class TaskTest {
 	
 	public void test(){
 		
-		String sql="select count(*) from WEB_QUDVIEW";
-		System.out.println("select count(*) from WEB_QUDVIEW :"+jdbcTemplate.queryForInt(sql));
-		
 		
 	}
 	
