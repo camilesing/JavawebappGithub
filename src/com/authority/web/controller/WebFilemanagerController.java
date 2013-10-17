@@ -84,7 +84,7 @@ public class WebFilemanagerController {
 	 */
 	@RequestMapping(value="/getdirectories",method = RequestMethod.POST)	
 	public void getDirectories( PrintWriter writer,HttpSession session, HttpServletRequest request) throws IOException {
-		String rootPath = request.getSession().getServletContext().getRealPath("/upload");
+		String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
 		File file = new File(rootPath);
 		if(!file.exists()){
 			file.mkdirs();
@@ -114,7 +114,7 @@ public class WebFilemanagerController {
 	@RequestMapping(value="/getfiles",method = RequestMethod.POST)	
 	@ResponseBody
 	public Object getfiles( HttpSession session, HttpServletRequest request) throws IOException {
-		String rootPath = request.getSession().getServletContext().getRealPath("/upload");
+		String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
 		File file = new File(rootPath);
 		if(!file.exists()){
 			file.mkdirs();
@@ -136,7 +136,7 @@ public class WebFilemanagerController {
 	public Object deleteFiles( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
 			System.out.println("CURRENT_USER"+request.getSession().getAttribute(WebConstants.CURRENT_USER));
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			String[] paths =request.getParameterValues("paths");
 			File file = new File(rootPath);
 			if(!file.exists()){
@@ -182,7 +182,7 @@ public class WebFilemanagerController {
 			String fileMD5=FileDigest.getFileMD5(file.getInputStream());
 			logger.info(fileMD5);
 			// 保存的地址
-			String savePath = request.getSession().getServletContext().getRealPath("/upload");
+			String savePath = request.getSession().getServletContext().getRealPath("/resources/upload");
 			// 上传的文件名 //需要保存
 			String uploadFileName = file.getOriginalFilename();
 			// 获取文件后缀名 //需要保存
@@ -236,7 +236,7 @@ public class WebFilemanagerController {
 		ServletOutputStream output = null;
 		try {
 			// 保存的地址
-			String savePath = request.getSession().getServletContext().getRealPath("/upload");			
+			String savePath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			
 			String finalPath=new String(request.getParameter("path").getBytes("ISO-8859-1"),"UTF-8");
 			
@@ -274,7 +274,7 @@ public class WebFilemanagerController {
 		InputStream input = null;
 		ServletOutputStream output = null;
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
 			String[] paths =request.getParameterValues("paths");
 			File file = new File(rootPath);
 			if(!file.exists()){
@@ -318,7 +318,7 @@ public class WebFilemanagerController {
 	public Object createFolder( HttpSession session, HttpServletRequest request) throws IOException{
 		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			String node=request.getParameter("node");
 			if(null==node||node.startsWith("xnode-"))
 				node="";
@@ -338,7 +338,7 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object getSpaceInfo( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			
 			File spacefile=new File(rootPath);
 			
@@ -357,7 +357,7 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object paste( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			String source = request.getParameter("source");
 			String node=request.getParameter("node");
 			if(null==node||node.startsWith("xnode-"))
@@ -413,7 +413,7 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object rename( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
 			String filename = request.getParameter("filename");
 			String newname  = request.getParameter("newname");
 			

@@ -24,10 +24,18 @@
 	xiangjy = {
 		all : ctx + '/portal_for_gmq/xiangjy/all',// 加载所有
 		save : ctx + "/portal_for_gmq/xiangjy/save",//保存	
+		barcode : ctx + "/portal_for_gmq/xiangjy/barcode",//获取实际条码
+		boxqty  : ctx + "/portal_for_gmq/xiangjy/boxqty",//获取装箱数量
+		boxcheck : ctx + "/portal_for_gmq/xiangjy/boxcheck",//获取箱被检验状态
+		standard : ctx + "/portal_for_gmq/xiangjy/standard",//读取装箱数量、款号、颜色等控制参数
+		boxproductcolor : ctx + "/portal_for_gmq/xiangjy/boxproductcolor",//读取箱号对应 款号、颜色等信息
 		pagesizes:eval('(${fields.pagesizes==null?"{}":fields.pagesizes})'),
 		pageSize : 100, // 每页显示的记录数
 		BOXNO : '',
-		report : ctx + '/portal_for_gmq/xiangjy/henlo_ireport_xiangjy',   //报表打印
+		BOXNO_CT : '0' ,
+		standard_str : '',
+		productcolor : '',
+		report : ctx + '/portal_for_gmq/xiangjy/henlo_ireport_xiangjy'   //报表打印
 	};
 
 	/** 改变页的combo */
@@ -45,6 +53,17 @@
 					else{
 						xiangjy.store.load();
 						Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+						Share.AjaxRequest({
+							url : xiangjy.boxqty,
+							showMsg : false,
+							params : {
+								data : BOXNO
+							},
+							callback : function(json) {
+								BOXNO_CT = json.msg		
+								
+							}
+						});						
 					}
 					
 				}
@@ -78,8 +97,83 @@
 						xiangjy.printAction.enable();
 					xiangjy.disableFun();
 					if(store.getCount()>0){
-						xiangjy.alwaysFun();
-						Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+						//读取箱被检验状态
+						Share.AjaxRequest({
+							url : xiangjy.boxcheck,
+							showMsg : false,
+							params : {
+								BOXNO : xiangjy.BOXNO
+							},
+							callback : function(json) {
+								if(json.success){
+									var boxcheckstatus = json.msg;	
+									var strs= new Array();
+									strs=boxcheckstatus.split(",");
+									if(strs[0]=="2"){
+										Ext.Msg.alert('提示', '<font color=red >箱号对应销售单已经提交! </font>');
+										xiangjy.store.removeAll();
+					                	return ;										
+									}else if(strs[1]=="2"){
+										Ext.Msg.confirm('提示', '该箱已经被检验,是否重新检验! \n（确认？）', function(btn, text) {
+											if (btn == 'yes') {
+												xiangjy.alwaysFun();
+												Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+											}else{
+												xiangjy.store.removeAll();
+												return;
+											}
+										});
+									}else{
+										xiangjy.alwaysFun();
+										Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+									}
+								}															
+							}
+						});
+						
+						//读取装箱数量、款号、颜色等控制参数
+						Share.AjaxRequest({
+							url : xiangjy.standard,
+							showMsg : false,
+							params : {
+								BOXNO : xiangjy.BOXNO
+							},
+							callback : function(json) {
+								if(json.success){
+									xiangjy.standard_str = json.msg.split(",");	
+								}
+							}
+						});
+						//读取箱号对应 款号、颜色等信息
+						Share.AjaxRequest({
+							url : xiangjy.boxproductcolor,
+							showMsg : false,
+							params : {
+								BOXNO : xiangjy.BOXNO
+							},
+							callback : function(json) {
+								if(json.success){
+									xiangjy.productcolor = json.msg.split(",");	
+								}
+							}
+						});					
+						//装箱标准
+						Share.AjaxRequest({
+							url : xiangjy.boxqty,
+							showMsg : false,
+							params : {
+								BOXNO : xiangjy.BOXNO
+							},
+							callback : function(json) {
+								if(json.success){
+									xiangjy.BOXNO_CT = json.msg;	
+								}								
+								if(xiangjy.BOXNO_CT=='0'){
+									Ext.Msg.alert('提示', '<font color=red >获取装箱标准为空或为0，不能自动提交 </font>');
+								}								
+							}
+						});
+						
 					}
 					
 				}
@@ -249,28 +343,82 @@
 		var view = xiangjy.grid.getView();
 		var insert = 1;
 		var qursl=0;
-		for (var i = 0; i < view.getRows().length; i++) {
-			if(e==store.getAt(i).get('M_PRODUCT_ALIAS_NO')){
-				if(Ext.isEmpty(store.getAt(i).get('QTY_QR')))
-					;
-				else
-					qursl = parseInt(store.getAt(i).get('QTY_QR'));
-				store.getAt(i).set('QTY_QR',qursl+1);
+		var qty_qr_total = 0;
+		var qty_total = 0;
+		//发送Ajax请求 获取真正的条码
+		Share.AjaxRequest({
+			url : xiangjy.barcode,
+			showMsg : false,
+			params : {
+				data : e
+			},
+			falseFun:  function(json){
 				Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
-				insert=0;
-				break;
+				Ext.getCmp('M_PRODUCT_ALIAS_NO').focus();
+				return;
+			},
+			callback : function(json) {
+				if(!json.success){
+					Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
+					return;
+				}
+				var strs= new Array();
+				strs=json.msg.split(","); // 30869,1315253C5038,50,黑色				
+				e = strs[1];
+				//开始检测该条码是否被允许
+				if(xiangjy.productcolor.length>0){
+					if(xiangjy.standard_str[1]=="1")
+						if (xiangjy.productcolor[0] != strs[0]) {
+							Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
+							Ext.getCmp('M_PRODUCT_ALIAS_NO').focus();
+                            return;
+                        }
+					
+					if(xiangjy.standard_str[2]=="1")
+						if (xiangjy.productcolor[1] != strs[2]) {
+							Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
+							Ext.getCmp('M_PRODUCT_ALIAS_NO').focus();
+                            return;
+                        }
+				}
+				
+				for (var i = 0; i < view.getRows().length; i++) {
+					qty_qr_total=qty_qr_total+parseInt(store.getAt(i).get('QTY_QR'));
+					qty_total=qty_total+parseInt(store.getAt(i).get('QTY'));
+					if(e==store.getAt(i).get('M_PRODUCT_ALIAS_NO')){
+						if(Ext.isEmpty(store.getAt(i).get('QTY_QR')))
+							;
+						else
+							qursl = parseInt(store.getAt(i).get('QTY_QR'));
+						store.getAt(i).set('QTY_QR',qursl+1);
+						Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
+						insert=0;
+						break;
+					}
+				}
+				if(insert==1&&!Ext.isEmpty(Ext.util.Format.trim(e))){
+					var rec = new (store.recordType)();
+					rec.set('BOXNO',xiangjy.BOXNO);
+					rec.set('B_PO_BOXNO_ID','');
+					rec.set('M_PRODUCT_ALIAS_NO',e);	
+					rec.set('QTY',0);
+					rec.set('QTY_QR',1);
+					store.insert(0,rec);
+					Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
+				}
+				Ext.getCmp('M_PRODUCT_ALIAS_NO').focus();
+				//检测要不要自动提交
+				if(qty_qr_total+1>xiangjy.BOXNO_CT&&xiangjy.BOXNO_CT>0){
+					xiangjy.saveFun();
+					return;
+				}
+				//当确认数量超出原装箱总数时，给出提示。
+                if (qty_qr_total+1 > qty_total) {
+                	Ext.Msg.alert('提示', '<font color=red >确认数量 大于 原始数量 </font>');
+                	return ;
+                }	
 			}
-		}
-		if(insert==1&&!Ext.isEmpty(Ext.util.Format.trim(e))){
-			var rec = new (store.recordType)();
-			rec.set('BOXNO',xiangjy.BOXNO);
-			rec.set('B_PO_BOXNO_ID','');
-			rec.set('M_PRODUCT_ALIAS_NO',e);	
-			rec.set('QTY',0);
-			rec.set('QTY_QR',1);
-			store.insert(0,rec);
-			Ext.getCmp('M_PRODUCT_ALIAS_NO').setValue('');
-		}
+		});		
 	} 
 
 	xiangjy.delFun = function() {
@@ -316,41 +464,47 @@
 		}
 		evt.param = Ext.encode(data);
 		
-		if(qty<qty_qr){
-			Ext.Msg.alert('提示', '<font color=red >确认数量 大于 原始数量,请重新审查！ </font>');
-			return;			
-		} 
-		else if(confirm==1){
-			Ext.Msg.confirm('提示', '确定要提交记录?(原始数量: <font color=red>'+qty+'</font> 确认数量 ：<font color=red>'+qty_qr+'</font>)', function(btn, text) {
-				if (btn == 'yes') {
-					Share.AjaxRequest({
-						url : xiangjy.save,
-						params : {
-							data : Ext.encode(data)
-						},
-						callback : function(json) {
-							xiangjy.alwaysFun();
-							xiangjy.store.reload();
-							Ext.getCmp('BOXNO').focus(1000);
-							Ext.getCmp('BOXNO').selectText();
-						}
-					});
-				}
-			});
-		}else {
-			Share.AjaxRequest({
-				url : xiangjy.save,
-				params : {
-					data : Ext.encode(data)
-				},
-				callback : function(json) {
-					xiangjy.alwaysFun();
-					xiangjy.store.reload();
-					Ext.getCmp('BOXNO').focus(1000);
-					Ext.getCmp('BOXNO').selectText();
-				}
-			});
-		}		
+		if(qty!=qty_qr){
+			Ext.Msg.alert('提示', '<font color=red >确认数量 与 原始数量 不一致！ 不允许提交 </font>');
+			return;
+		}
+		
+		if(confirm==1){
+			if(window.confirm('确定要提交记录?原始数量与确认数量，明细有不一致')){
+
+             }else{
+                return false;
+            }
+		}
+		
+		if(xiangjy.BOXNO_CT>0&&qty_qr!=xiangjy.BOXNO_CT){
+			if (xiangyj.standard_str[0]=="1"){
+				alert("确认数量与装箱数量不同");
+				return false;
+			}else{
+				if(window.confirm('确定要提交记录?装箱标准: '+xiangjy.BOXNO_CT+' 确认数量 ：'+qty_qr+'')){
+
+				}else{
+	                return false;
+	            }
+			}
+			
+		}
+		
+		
+		Share.AjaxRequest({
+			url : xiangjy.save,
+			params : {
+				data : Ext.encode(data)
+			},
+			callback : function(json) {
+				xiangjy.alwaysFun();
+				xiangjy.store.reload();
+				Ext.getCmp('BOXNO').focus(1000);
+				Ext.getCmp('BOXNO').selectText();
+			}
+		});
+		
 		
 	};
 	/** ireport print function*/
@@ -383,7 +537,7 @@
 				}
 			}
 		});
-
+		//BX1309060000008
 			
 	}
 });

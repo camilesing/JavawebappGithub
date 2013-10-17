@@ -56,7 +56,7 @@ public class GMQPdaActionController {
 	public Object login_store(HttpSession session, HttpServletRequest request) {
 		try {
 			
-			String query = "select id,name  from c_store where C_STOREATTRIB6_ID=17  and isstop='N' order by name";
+			String query = "select id,name  from c_store a where isstop='N'  and exists(select 'x' from C_STOREATTRIBVALUE b where a.C_STOREATTRIB6_ID=b.id and upper(b.name) ='PDA'  )  order by name";
 			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
 			int total = list.size();
 			if(list.size()==0){

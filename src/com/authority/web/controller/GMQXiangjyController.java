@@ -90,6 +90,97 @@ public class GMQXiangjyController  {
 	}
 	
 	/**
+	 * 箱当前检验状态
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/boxcheck")
+	@ResponseBody
+	public Object boxcheck(HttpSession session, HttpServletRequest request) {
+		String BOXNO= request.getParameter("BOXNO").toString();
+		if(BOXNO!=null){
+			String query = "select nvl(C.STATUS,1)||','||nvl(B.TEST_STATUS,'1') STATUS from M_ISSUE_BOX a,B_PO_BOXNO b,m_sale c where A.B_PO_BOXNO_ID=b.id and A.M_SALE_ID=c.id and B.BOXNO='"+BOXNO+"'";
+			String status = "1,1";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			if(list.size()==0){
+			}else{				
+				status = list.get(0).get("STATUS").toString();
+			}			
+			return new ExtReturn(true, status);
+		}
+		return new ExtReturn(false, "失败！");
+	}
+	
+	/**
+	 * 参数控制： 装箱数量控制、款号控制、色号控制
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/standard")
+	@ResponseBody
+	public Object standard(HttpSession session, HttpServletRequest request) {
+		String query = "select nvl(ad_param_value(37, 'gmq.1004', 'true'),'true') boxqty  from dual ";
+		String[] standard = {"1","0","0"};
+		//装箱数量控制
+		List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+		if(list.size()==0){
+		}else{				
+			String boxqty = list.get(0).get("BOXQTY").toString();
+			if(boxqty.equals("false")){
+				standard[0]="0";
+			}
+		}
+		//装箱款号 、色号控制
+		query = "select nvl(ad_param_value(37, 'gmq.1007', '0'),'0') item from dual";
+		list = jdbcTemplate.queryForList(query);
+		if(list.size()==0){
+			
+		}else{
+			String item = list.get(0).get("ITEM").toString();
+			if(item.equals("1")){
+				standard[1] = "1";
+			}else if(item.equals("2")){
+				standard[1] = "1";
+				standard[2] = "1";
+			}			
+		}		
+		
+		String obj = standard[0]+","+standard[1]+","+standard[2];
+		
+		return new ExtReturn(true, obj);
+	}
+	
+	/**
+	 * 读取箱号所对应的参数信息
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/boxproductcolor")
+	@ResponseBody
+	public Object boxproductcolor(HttpSession session, HttpServletRequest request) {
+		String BOXNO= request.getParameter("BOXNO").toString();
+		if(BOXNO!=null){
+			String query = "select A.M_PRODUCT_ID,c.VALUE,c.NAME " +
+					"from B_PO_BOXNO a,B_SO_MATCHSIZE b,M_COLOR c "+
+					"where A.B_SO_MATCHSIZE_ID = B.ID and B.M_COLOR_ID=C.ID and a.BOXNO='"+BOXNO+"'";
+			
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			String productcolor ="";
+			if(list.size()==0){
+			}else{				
+				productcolor = list.get(0).get("M_PRODUCT_ID").toString()+","+
+							   list.get(0).get("VALUE").toString()+","+
+							   list.get(0).get("NAME").toString();
+			}			
+			return new ExtReturn(true, productcolor);
+		}
+		return new ExtReturn(false, "失败！");
+	}
+	
+	/**
 	 * 查找所有的消息
 	 */
 	@RequestMapping(value="/all", method = RequestMethod.POST)
@@ -100,13 +191,12 @@ public class GMQXiangjyController  {
 		String FROM = request.getParameter("FROM")==null?"":request.getParameter("FROM").toString();
 		Map<String,Object> paramMap=new HashMap<String, Object>();
 		
-		String query_list = "select B.B_PO_BOXNO_ID,a.BOXNO,b.M_PRODUCTALIAS_ID, C.NO  M_PRODUCT_ALIAS_NO,B.M_PRODUCT_ID,d.NAME M_PRODUCT_NAME,D.VALUE M_PRODUCT_VALUE,e.VALUE1_CODE color_code,e.value1 color_value,e.value2_code size_code,b.qty,0 QTY_QR "+
+		String query_list = "select B.B_PO_BOXNO_ID,a.BOXNO,b.M_PRODUCTALIAS_ID, C.NO  M_PRODUCT_ALIAS_NO,B.M_PRODUCT_ID,d.NAME M_PRODUCT_NAME,D.VALUE M_PRODUCT_VALUE,e.VALUE1_CODE color_code,e.value1 color_value,e.value2_code size_code,b.qty,0 QTY_QR,nvl(A.TEST_STATUS,'1') TEST_STATUS "+
 				"from B_PO_BOXNO a   "+
 				"left join  B_PO_BOXITEM b on A.ID=B.B_PO_BOXNO_ID "+  
 				"left join M_PRODUCT_ALIAS c on B.M_PRODUCTALIAS_ID=C.ID "+
 				"left join M_PRODUCT d on B.M_PRODUCT_ID=D.ID "+
-				"left join M_ATTRIBUTESETINSTANCE e on B.M_ATTRIBUTESETINSTANCE_ID=E.ID "+
-				"where nvl(A.TEST_STATUS,'1')='1' ";
+				"left join M_ATTRIBUTESETINSTANCE e on B.M_ATTRIBUTESETINSTANCE_ID=E.ID where 1=1 ";
 		if(BOXNO==null||BOXNO.equals(""))
 			BOXNO=".";
 		
@@ -167,6 +257,31 @@ public class GMQXiangjyController  {
 		return new ExtReturn(false, "失败！");
 	}
 	
+	
+	@RequestMapping("/barcode")
+	@ResponseBody
+	public Object barcode(HttpSession session, HttpServletRequest request){
+		String M_PRODUCT_ALIAS_NO = request.getParameter("data").toString();
+		M_PRODUCT_ALIAS_NO = M_PRODUCT_ALIAS_NO==null?"":M_PRODUCT_ALIAS_NO;
+		String query = "select max(NO) NO from M_PRODUCT_ALIAS where ( nvl(forcode,no)= '"+M_PRODUCT_ALIAS_NO+"' or no='"+M_PRODUCT_ALIAS_NO+"' ) ";
+		String barcode = jdbcTemplate.queryForObject(query, String.class);
+		
+		M_PRODUCT_ALIAS_NO = barcode;
+		
+		if(M_PRODUCT_ALIAS_NO!=null&&!M_PRODUCT_ALIAS_NO.equals("")){
+			//获取对应的款号、颜色等信息
+			query = "select a.M_PRODUCT_ID ||','||a.NO ||','||b.VALUE1_CODE||','||b.VALUE1 productcolor "+
+					"from M_PRODUCT_ALIAS a ,M_ATTRIBUTESETINSTANCE b "+
+					"where a.M_ATTRIBUTESETINSTANCE_ID=b.id and A.NO='"+M_PRODUCT_ALIAS_NO+"'";
+			M_PRODUCT_ALIAS_NO = jdbcTemplate.queryForObject(query, String.class);		
+			
+			return new ExtReturn(true, M_PRODUCT_ALIAS_NO);
+		}else{
+			return new ExtReturn(false, "条码有误");
+		}
+		
+	}
+	
 		
 	/**
 	 * 检验结果提交
@@ -177,10 +292,14 @@ public class GMQXiangjyController  {
 		try {
 			//更新 B_PO_BOXITEM 表
 			String data = request.getParameter("data");
+			String USERID = request.getParameter("USERID");
+			if(USERID==null){
+				USERID="";
+			}
 			List list  = JSON.parseArray(data);
 			String result = "00";
 			if(list.size()>0)
-				result = gmqxiangjyservice.save(list);
+				result = gmqxiangjyservice.save(list,USERID);
 			
 			if ("01".equals(result)) {
 				return new ExtReturn(true, "更新成功！");

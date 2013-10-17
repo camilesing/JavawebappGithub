@@ -128,7 +128,7 @@ public class WebFunctiontestController {
 			String fileMD5=FileDigest.getFileMD5(file.getInputStream());
 			logger.info(fileMD5);
 			// 保存的地址
-			String savePath = request.getSession().getServletContext().getRealPath("/upload");
+			String savePath = request.getSession().getServletContext().getRealPath("/resources/upload");
 			// 上传的文件名 //需要保存
 			String uploadFileName = file.getOriginalFilename();
 			// 获取文件后缀名 //需要保存

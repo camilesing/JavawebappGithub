@@ -141,6 +141,17 @@
 		<listener-class>com.authority.web.listener.SystemInitListener</listener-class>
 	</listener>
 	
+	<!-- CXFService  -->
+	<servlet>
+	    <servlet-name>CXFService</servlet-name>
+	    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>CXFService</servlet-name>
+	    <url-pattern>/Openmas_Webservice/*</url-pattern>
+	</servlet-mapping>
+		
 	
 	<!-- Error Page定义 -->
 	<error-page>
@@ -217,6 +228,9 @@
 	<welcome-file-list>
 		<welcome-file>/WEB-INF/views/login.jsp</welcome-file>
 	</welcome-file-list>
+	
+	
+	
 	
 	<session-config>
 		<session-timeout>30</session-timeout>

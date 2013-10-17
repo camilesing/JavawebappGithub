@@ -9,6 +9,12 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		String[] standard = {"true","0","0"};
+		
+		System.out.println("standard:"+standard[0]+","+standard[1]);
+		
+		
 		int id = Integer.parseInt("12"+"13");
 		
 		System.out.println(id);

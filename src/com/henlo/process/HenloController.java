@@ -8,6 +8,7 @@ import java.util.Map;
 
 import nds.query.QueryEngine;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.record.formula.IntPtg;
 import org.json.simple.JSONObject;
 import org.springframework.context.ApplicationContext;
@@ -31,11 +32,12 @@ public class HenloController {
 	public String handle(String tablename,String b_plan_id,String param){
 		queryengine = QueryEngine.getInstance();
 		String message = "失败";		
+		String sty_stock = "";
 		JSONObject json = new JSONObject();
 		try{		
 			
-			String insert_ = "insert into HENLOCONTROLLER(ID, SQLCOMMAND, ADDTIME ) select sys_guid(),'BEGIN……',sysdate from dual";
-			queryengine.executeUpdate(insert_);
+			/*String insert_ = "insert into HENLOCONTROLLER(ID, SQLCOMMAND, ADDTIME ) select sys_guid(),'BEGIN……',sysdate from dual";
+			queryengine.executeUpdate(insert_);*/
 			
 			if(tablename.toUpperCase().equals("M_ISSUE_APPLY")&&param.trim().length()>1){
 				int total_begin = 0,total_end = 0;
@@ -54,76 +56,64 @@ public class HenloController {
 				
 				String update = "",insert ="",query="";
 				
-				for (Object obj_param : list_param_m_item) {
-					Map<String,Object> map_param_m_item_child = (Map<String, Object>) obj_param;
-	//				System.out.println("docno:"+map_param_m_item_child.get("docno"));
-					String qty_ady = map_param_m_item_child.get("qty_ady").toString().trim();
-					String m_product_alias_id = map_param_m_item_child.get("m_product_alias_id").toString();
-					String stycolorstore = map_param_m_item_child.get("sty").toString()+map_param_m_item_child.get("color").toString()+map_param_m_item_child.get("store").toString();
-					String store = map_param_m_item_child.get("store").toString();
-					String sty =  map_param_m_item_child.get("sty").toString();
-					String color = map_param_m_item_child.get("color").toString();
-					total_begin ++ ;
-					for (Object obj_param_box : list_param_box_m_item) { // 箱数数据信息
-						Map<String,Object> map_param_box_m_item_child = (Map<String, Object>) obj_param_box;
-						String stycolorstore_box = map_param_box_m_item_child.get("sty").toString()+map_param_box_m_item_child.get("color").toString()+map_param_box_m_item_child.get("store").toString(); //款号+色号+经销商
+				//检测是否已经被提交
+				query = "select count(*) cnt from M_ISSUE_APPLY where status=2 and id='"+b_plan_id+"'";
+				String cnt = queryengine.doQueryOne(query).toString();
+				if(!cnt.equals("0")){
+					message = "该单据已经提交！请不要重复提交";
+				}else{
+					
+					for (Object obj_param : list_param_m_item) {
+						Map<String,Object> map_param_m_item_child = (Map<String, Object>) obj_param;
+		//				System.out.println("docno:"+map_param_m_item_child.get("docno"));
+						String qty_ady = map_param_m_item_child.get("qty_ady").toString().trim();
+						String m_product_alias_id = map_param_m_item_child.get("m_product_alias_id").toString(); //实际该值为表ID
+						String store = map_param_m_item_child.get("store").toString();
+						String sty =  map_param_m_item_child.get("sty").toString();
+						String color = map_param_m_item_child.get("color").toString();
+						String docNo = map_param_m_item_child.get("docNo").toString(); //订单编号
+						String b_so_matchsize_id = map_param_m_item_child.get("b_so_matchsize_id").toString(); //配码ID
+						String stycolorstoredocNomatchsize = sty+color+store+docNo+b_so_matchsize_id;
 						
-						String boxqty = map_param_box_m_item_child.get("qty_ady").toString().trim();
-						
-						int stockqty = Integer.parseInt(qty_ady)*Integer.parseInt(boxqty); //当前页面提交的库存量
-						
-						if(stycolorstore.equals(stycolorstore_box)){
-							//读取系统中现有的已配量
-							query = "select nvl(qty*boxqty,0) qtyyp from M_ISSUE_APPLYITEM A " +
-									"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') ";
+						total_begin ++ ;
+						for (Object obj_param_box : list_param_box_m_item) { // 箱数数据信息
+							Map<String,Object> map_param_box_m_item_child = (Map<String, Object>) obj_param_box;
+							//款号+色号+经销商+订单号+配码ID
+							String stycolorstoredocNomatchsize_box = map_param_box_m_item_child.get("sty").toString()+map_param_box_m_item_child.get("color").toString()+map_param_box_m_item_child.get("store").toString()+map_param_box_m_item_child.get("docNo").toString()+map_param_box_m_item_child.get("b_so_matchsize_id").toString();
 							
-							int qtyyp =Integer.parseInt(String.valueOf(queryengine.doQueryOne(query)==null?"0":queryengine.doQueryOne(query)));
+							String boxqty = map_param_box_m_item_child.get("qty_ady").toString().trim();
 							
-							//经销商已经匹配上了，开始执行更新操作   款号、色号、经销商、商品
-							update ="update M_ISSUE_APPLYITEM a set A.QTY='"+qty_ady+"' " +
-									"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and A.M_PRODUCTALIAS_ID='"+m_product_alias_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-							
-							update ="update M_ISSUE_APPLYITEM a set A.QTY='"+qty_ady+"' " +
-									"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' ";							
-							
-							if(queryengine.executeUpdate(update)>0)
-								total_end++;
-							
-							//真正的库存改变量 ,有增有减
-							int realstockqtychange = stockqty -qtyyp;
-							
-							//更新库存  款号、色号、 商品
-							update ="update M_ISSUE_APPLYITEM a set A.STOCKQTY=A.STOCKQTY-to_number('"+realstockqtychange+"') "+
-									"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and A.M_PRODUCTALIAS_ID='"+m_product_alias_id+"' and "+
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-						//	queryengine.executeUpdate(update);
-							
-							//更新箱数 款号、色号、经销商
-							update ="update M_ISSUE_APPLYITEM a set a.BOXQTY= '" + boxqty+"' "+
-									"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-							queryengine.executeUpdate(update);
-							
-							break;
+							if(stycolorstoredocNomatchsize.equals(stycolorstoredocNomatchsize_box)){
+								
+								update ="update M_ISSUE_APPLYITEM a set A.QTY='"+qty_ady+"' " +
+										"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' ";							
+								
+								if(queryengine.executeUpdate(update)>0)
+									total_end++;							
+								
+								//更新箱数 款号、色号、经销商、订单号
+								update ="update M_ISSUE_APPLYITEM a set a.BOXQTY= '" + boxqty+"' "+
+										"where  A.M_ISSUE_APPLY_ID= '"+b_plan_id+"' and " +
+										"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
+										"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
+										"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"') and " +
+										"exists( select 'x' from B_SO d where a.b_so_id=d.id and d.docno='"+docNo+"') and "+
+										"a.B_SO_MATCHSIZE_ID='"+b_so_matchsize_id+"'";
+								queryengine.executeUpdate(update);
+								
+								break;
+							}
 						}
 					}
+									
+					message = "更新成功";	
 				}
-								
-				 message = "更新成功";	
-			}else if (tablename.toUpperCase().equals("M_ISSUE_TASKITEM")&&param.trim().length()>1) {
+				
+			} else if (tablename.toUpperCase().equals("M_ISSUE_TASKITEM")&&param.trim().length()>1) {
 				int total_begin = 0,total_end = 0;
 				Map<String,Object> map_evt = (Map<String, Object>) JSON.parseArray("["+param.trim()+"]").get(0);
 				Map<String,Object> map_param = JSON.parseObject(map_evt.get("param").toString());
 				Map<String,Object> map_param_box = JSON.parseObject(map_evt.get("param_box").toString());
-				
-	//			System.out.println(map_param.get("m_item").toString());
 				
 				List list_param_m_item = JSON.parseArray(map_param.get("m_item").toString());
 				
@@ -131,68 +121,54 @@ public class HenloController {
 				
 				String update = "",insert ="",query="";
 				
-				for (Object obj_param : list_param_m_item) {
-					Map<String,Object> map_param_m_item_child = (Map<String, Object>) obj_param;
-	//				System.out.println("docno:"+map_param_m_item_child.get("docno"));
-					String qty_ady = map_param_m_item_child.get("qty_ady").toString().trim();
-					String m_product_alias_id = map_param_m_item_child.get("m_product_alias_id").toString();
-					String stycolorstore = map_param_m_item_child.get("sty").toString()+map_param_m_item_child.get("color").toString()+map_param_m_item_child.get("store").toString();
-					String store = map_param_m_item_child.get("store").toString();
-					String sty =  map_param_m_item_child.get("sty").toString();
-					String color = map_param_m_item_child.get("color").toString();
-					total_begin ++ ;
-					for (Object obj_param_box : list_param_box_m_item) { // 箱数数据信息
-						Map<String,Object> map_param_box_m_item_child = (Map<String, Object>) obj_param_box;
-						String stycolorstore_box = map_param_box_m_item_child.get("sty").toString()+map_param_box_m_item_child.get("color").toString()+map_param_box_m_item_child.get("store").toString(); //款号+色号+经销商
+				//检测是否已经被提交
+				query = "select count(*) cnt from M_ISSUE_TASK where status=2 and id='"+b_plan_id+"'";
+				String cnt = queryengine.doQueryOne(query).toString();
+				if(!cnt.equals("0")){
+					message = "该单据已经提交！请不要重复提交";
+				}else{
+					for (Object obj_param : list_param_m_item) {
+						Map<String,Object> map_param_m_item_child = (Map<String, Object>) obj_param;
+						String qty_ady = map_param_m_item_child.get("qty_ady").toString().trim();
+						String m_product_alias_id = map_param_m_item_child.get("m_product_alias_id").toString();
+						String store = map_param_m_item_child.get("store").toString();
+						String sty =  map_param_m_item_child.get("sty").toString();
+						String color = map_param_m_item_child.get("color").toString();
+						String docNo = map_param_m_item_child.get("docNo").toString(); //订单编号
+						String b_so_matchsize_id = map_param_m_item_child.get("b_so_matchsize_id").toString(); //配码ID
+						String stycolorstoredocNomatchsize = sty+color+store+docNo+b_so_matchsize_id;
 						
-						String boxqty = map_param_box_m_item_child.get("qty_ady").toString().trim();
-						
-						int stockqty = Integer.parseInt(qty_ady)*Integer.parseInt(boxqty); //当前页面提交的库存量
-						
-						if(stycolorstore.equals(stycolorstore_box)){
-							//读取系统中现有的已配量
-							query = "select nvl(qty*boxqty,0) qtyyp from M_ISSUE_TASKITEM A " +
-									"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') ";
+						total_begin ++ ;
+						for (Object obj_param_box : list_param_box_m_item) { // 箱数数据信息
+							Map<String,Object> map_param_box_m_item_child = (Map<String, Object>) obj_param_box;
+							//款号+色号+经销商+订单号+配码ID
+							String stycolorstoredocNomatchsize_box = map_param_box_m_item_child.get("sty").toString()+map_param_box_m_item_child.get("color").toString()+map_param_box_m_item_child.get("store").toString()+map_param_box_m_item_child.get("docNo").toString()+map_param_box_m_item_child.get("b_so_matchsize_id").toString(); 
 							
-							int qtyyp =Integer.parseInt(String.valueOf(queryengine.doQueryOne(query)==null?"0":queryengine.doQueryOne(query)));
+							String boxqty = map_param_box_m_item_child.get("qty_ady").toString().trim();
 							
-							//经销商已经匹配上了，开始执行更新操作   款号、色号、经销商、商品
-							update ="update M_ISSUE_TASKITEM a set A.QTY='"+qty_ady+"' " +
-									"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and A.M_PRODUCTALIAS_ID='"+m_product_alias_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-							
-							update ="update M_ISSUE_TASKITEM a set A.QTY='"+qty_ady+"' " +
-									"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' ";							
-							
-							if(queryengine.executeUpdate(update)>0)
-								total_end++;
-							
-							//真正的库存改变量 ,有增有减
-							int realstockqtychange = stockqty -qtyyp;
-							
-							//更新库存  款号、色号、 商品
-							update ="update M_ISSUE_TASKITEM a set A.STOCKQTY=A.STOCKQTY-to_number('"+realstockqtychange+"') "+
-									"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and A.M_PRODUCTALIAS_ID='"+m_product_alias_id+"' and "+
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-						//	queryengine.executeUpdate(update);
-							
-							//更新箱数 款号、色号、经销商
-							update ="update M_ISSUE_TASKITEM a set a.BOXQTY= '" + boxqty+"' "+
-									"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and " +
-									"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
-									"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
-									"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"')";
-							queryengine.executeUpdate(update);
-							
-							break;
+							if(stycolorstoredocNomatchsize.equals(stycolorstoredocNomatchsize_box)){
+								update ="update M_ISSUE_TASKITEM a set A.QTY='"+qty_ady+"' " +
+										"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and A.id='"+m_product_alias_id+"' ";							
+								
+								if(queryengine.executeUpdate(update)>0)
+									total_end++;
+								
+								//更新箱数      款号、色号、经销商、订单号
+								update ="update M_ISSUE_TASKITEM a set a.BOXQTY= '" + boxqty+"' "+
+										"where  A.M_ISSUE_TASK_ID= '"+b_plan_id+"' and " +
+										"exists( select 'x' from C_CUSTOMER b where A.C_CUSTOMER_ID=B.ID and B.NAME='"+store+"') and " +
+										"exists( select 'x' from M_PRODUCT b where A.M_PRODUCT_ID=B.ID and B.NAME='"+sty+"' ) and " +
+										"exists( select 'x' from m_attributesetinstance c where a.m_attributesetinstance_id = C.ID and c.value1_code||c.value1='"+color+"') and "+
+										"exists( select 'x' from B_SO d where a.b_so_id=d.id and d.docno='"+docNo+"') and " +
+										"a.B_SO_MATCHSIZE_ID='"+b_so_matchsize_id+"'";
+								queryengine.executeUpdate(update);
+								
+								break;
+							}
 						}
 					}
+					 message = "更新成功";
 				}
-				 message = "更新成功";	
 			}
 		}catch(Exception e){
 			
@@ -200,6 +176,7 @@ public class HenloController {
 		}
 		
 		json.put("message", message);
+		json.put("sty_stock", sty_stock);
 		
 		return json.toString();
 	}

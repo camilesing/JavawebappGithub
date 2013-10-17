@@ -44,16 +44,61 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public String save(List list) {
-		String query="",update ="",insert = "",delete="",B_PO_BOXNO_ID_="",procedure="";
+	public String save(List list,String USERID) {
+		String query="",update ="",insert = "",delete="",B_PO_BOXNO_ID_="",procedure="",boxqty="";
 		int result = 0;
 		String msg ="";
 		String IS_CHANG ="N";
+		Boolean check = true;
 		try{
+			//检测箱数量是否有超标
+			query = "select nvl(ad_param_value(37, 'gmq.1004', 'true'),'true') standard  from dual ";
+			String standard = "true";
+			List<Map<String,Object>> list_standard = jdbcTemplate.queryForList(query);
+			if(list.size()==0){
+			}else{
+				standard = list_standard.get(0).get("STANDARD").toString();
+			}			
+			if(standard.equals("true")){
+				int qty_submit=0,qty_standard=0;
+				for (Object object : list) {
+					Map<String,Object> list_child = JSON.parseObject(object.toString());
+					String BOXNO = list_child.get("BOXNO")==null?"":list_child.get("BOXNO").toString();
+					String QTY_QR =list_child.get("QTY_QR")==null?"0":list_child.get("QTY_QR").toString();
+					if(check){
+						query = "select BOX_QTY from M_PRODUCT where id=( select M_PRODUCT_ID from B_PO_BOXNO where  boxno='"+BOXNO+"')";
+						boxqty = jdbcTemplate.queryForObject(query,String.class);
+						qty_standard = Integer.parseInt(boxqty);
+						check = false;
+					}
+					qty_submit = qty_submit + Integer.parseInt(QTY_QR);
+				}
+				
+				if(qty_submit>qty_standard){
+					msg = "失败！不允许超出装箱标准";
+					return result > 0 ? "01" : msg;
+				}
+				check = true ;
+			}
+			
+			
 			// ============更新 配货发货箱 =========BEGIN
 			for (Object object : list) {
 				Map<String,Object> list_child = JSON.parseObject(object.toString());
 				String BOXNO = list_child.get("BOXNO")==null?"":list_child.get("BOXNO").toString();
+				//检测该箱号是否已经被形成销售单出库
+				if(check){
+					query = "select count(*) from M_ISSUE_BOX a,B_PO_BOXNO b,m_sale c " +
+							"where A.B_PO_BOXNO_ID=b.id and A.M_SALE_ID=c.id and nvl(C.STATUS,1)='2' and B.BOXNO='"+BOXNO+"'";
+					int check_cnt = jdbcTemplate.queryForInt(query);
+					if(check_cnt==0){
+						check =false;
+					}else{
+						msg = "失败！该箱对应销售单已经提交";
+						return result > 0 ? "01" : msg;
+					}
+				}
+				
 				String B_PO_BOXNO_ID  = list_child.get("B_PO_BOXNO_ID")==null?"":list_child.get("B_PO_BOXNO_ID").toString();
 				if(B_PO_BOXNO_ID!=null&&!B_PO_BOXNO_ID.equals(""))
 					B_PO_BOXNO_ID_=B_PO_BOXNO_ID;
@@ -84,8 +129,12 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 				}
 			}
 			//更新B_PO_BOXNO 
-			update = "update B_PO_BOXNO set TEST_STATUS=2 where ID="+B_PO_BOXNO_ID_;
+			update = "update B_PO_BOXNO set TEST_STATUS=2,TEST_USER='"+USERID+"',TEST_DATE=sysdate where ID="+B_PO_BOXNO_ID_;
 			result = jdbcTemplate.update(update);
+			
+			//更新明细汇总
+			update = "update B_PO_BOXNO a set (A.TOT_LINES,A.TOT_QTY)=(select count(*),sum(qty) from b_po_boxitem  b where a.id=B.B_PO_BOXNO_ID ) where ID="+B_PO_BOXNO_ID_;
+			result = jdbcTemplate.update(update); 
 			
 			//更新M_ISSUE_BOX
 			if(IS_CHANG.equals("Y")){

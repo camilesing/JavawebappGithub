@@ -9,5 +9,5 @@ public interface GMQXiangjyService {
 	
 	List<Map<String, Object>> query_list(Map<String,Object> param);
 	
-	String save(List list);
+	String save(List list, String USERID);
 }

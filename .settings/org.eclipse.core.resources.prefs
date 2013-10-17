@@ -1,5 +1,6 @@
-#Wed Jul 24 15:14:52 CST 2013
+#Wed Sep 11 17:03:59 CST 2013
 eclipse.preferences.version=1
+encoding//src/com/authority/service/impl/SmsServiceImpl.java=gbk
 encoding//src/config/others/config.properties=UTF-8
 encoding//src/config/others/messages_en_US.properties=UTF-8
 encoding/<project>=UTF-8

@@ -1,15 +1,35 @@
 package com.authority.common.utils;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.mail.Authenticator;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
+
 
 /**
  * Web层相关的实用工具类
@@ -126,6 +146,144 @@ public class WebUtils {
 		metaData.put("columns", list_column);
 		
 		return metaData;
+	}
+	
+	/**
+	 * 取得客户端真实ip
+	 * 
+	 * @param request
+	 * @return 客户端真实ip
+	 */
+	public static String getIpAddr(HttpServletRequest request) {
+		String ip = request.getHeader("X-Forwarded-For");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_CLIENT_IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+		}
+		return ip;
+	}
+	
+	/**
+	 * 配置文件信息操作
+	 */
+	//根据key读取value  
+	 public String readValue(String filePath,String key) {  
+		 	Properties props = new Properties();  
+	        try {  
+	  //       InputStream in = new BufferedInputStream (new FileInputStream(filePath));  
+		        InputStream in = this.getClass().getClassLoader().getResourceAsStream(filePath); 
+		        props.load(in);  
+		        String value = props.getProperty (key);  
+//	            System.out.println(key+value);  
+	            return value;  
+	        } catch (Exception e) {  
+	         e.printStackTrace();  
+	         return null;  
+	    }  
+	 }  
+	   
+	 //读取properties的全部信息  
+	 public void readProperties(String filePath) {  
+	     Properties props = new Properties();  
+	        try {  
+	         InputStream in = this.getClass().getClassLoader().getResourceAsStream(filePath);  
+	         props.load(in);  
+	            Enumeration en = props.propertyNames();  
+	             while (en.hasMoreElements()) {  
+	              String key = (String) en.nextElement();  
+	                    String Property = props.getProperty (key);  
+//	                    System.out.println(key+Property);  
+	                }  
+	        } catch (Exception e) {  
+	         e.printStackTrace();  
+	        }  
+	    }  
+	  
+	    //写入properties信息  
+	 public void writeProperties(String filePath,String parameterName,String parameterValue) {  
+	     Properties prop = new Properties();  
+	     try {  
+	    	 	InputStream fis = new FileInputStream(filePath);  
+	            //从输入流中读取属性列表（键和元素对）  
+	            prop.load(fis);  
+	            //调用 Hashtable 的方法 put。使用 getProperty 方法提供并行性。  
+	            //强制要求为属性的键和值使用字符串。返回值是 Hashtable 调用 put 的结果。  
+	            OutputStream fos = new FileOutputStream(filePath);  
+	            prop.setProperty(parameterName, parameterValue);  
+	            //以适合使用 load 方法加载到 Properties 表中的格式，  
+	            //将此 Properties 表中的属性列表（键和元素对）写入输出流  
+	            prop.store(fos, "Update '" + parameterName + "' value");  
+	        } catch (IOException e) {
+	         System.err.println("Visit "+filePath+" for updating "+parameterName+" value error");  
+	        }  
+	    }
+	 
+	 public boolean execSend(String address, String title, String body) throws Exception {
+			Properties props = new Properties(); 
+			// 定义邮件服务器的地址
+			WebUtils web = new WebUtils();
+			props.put("mail.smtp.host", web.readValue("config.properties","email.host"));	
+			props.put("mail.smtp.port", "25"); 
+			props.put("mail.smtp.auth", "true");			
+						
+			final String emailAccount=web.readValue("config.properties","email.account");
+			final String emailPassword=web.readValue("config.properties","email.password");
+			
+			
+			// 取得Session
+			Session session = Session.getDefaultInstance(props, new Authenticator() {
+				public PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(emailAccount, emailPassword);
+				}
+			});
+			MimeMessage message = new MimeMessage(session);
+			// 邮件标题
+			message.setSubject(title);
+			// 发件人的邮件地址
+			message.setFrom(new InternetAddress(emailAccount));
+			// 接收邮件的地址
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(address));
+			// 邮件发送的时间日期
+			message.setSentDate(new Date());
+			// 新建一个MimeMultipart对象用来存放BodyPart对象 related意味着可以发送html格式的邮件
+			Multipart mp = new MimeMultipart("related");
+			// 新建一个存放信件内容的BodyPart对象
+			BodyPart bodyPart = new MimeBodyPart();// 正文
+			// 给BodyPart对象设置内容和格式/编码方式
+			bodyPart.setContent(body, "text/html;charset=utf-8");
+			// 将BodyPart加入到MimeMultipart对象中
+			mp.addBodyPart(bodyPart);
+			// 设置邮件内容
+			message.setContent(mp);
+			// 发送邮件
+			Transport.send(message);
+			return true;
+		}
+	    
+	 public static void main(String[] args) {  
+        
+		 WebUtils web = new WebUtils();
+		 String address="chenfeng@cugroup.com";
+		 String title="服务任务指派[技术中心产品开发平台]";
+		 String body ="测试";
+		 try {
+			web.execSend(address, title, body);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}			
+        
 	}
 	
 }

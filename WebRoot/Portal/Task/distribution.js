@@ -218,7 +218,7 @@ DIST.prototype={
 //        evt.permission="r";
 //        evt.isclob=true;
 //        this._executeCommandEvent(evt);
-        var tableName = 'M_ISSUE_APPLY';
+        var tableName = 'M_ISSUE_TASKITEM';
         var bPlanId = b_plan_id;
         HenloController.handle(tableName,bPlanId,Object.toJSON(evt), function(r){
             var result= r.evalJSON();
@@ -514,7 +514,6 @@ DIST.prototype={
         //var ret=data.jsonResult.evalJSON();
     	//加入订单信息
     	jQuery("#msg").html(Docinfo);
-    	
         var ret = retDate.jsonResult.evalJSON();
       // alert(Object.toJSON(ret.ISAUTOSUBSAL));
         this.manuStr="";
@@ -763,7 +762,7 @@ DIST.prototype={
                                     var barCode=colorArr[p].stores[pp].docnos[ppp].tag.barCode[w];
                                     if(w<colorArr[p].stores[pp].docnos[ppp].tag.size.length-1){
                                     	v1+=isNaN(parseInt(itemMetrixTr,10))?0:parseInt(itemMetrixTr,10);
-                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"订单配码' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtK\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" name='"+barCode+"' title='"+itemMetrixTr+"' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
+                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"订单配码' valign=\"top\" bgcolor=\"#eeeeee\" class=\"td-right-txtK\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" name='"+barCode+"' title='"+itemMetrixTr+"' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
                                     }else{
                                     	boxCnt=itemMetrixTr!='non'?itemMetrixTr:"";
                                     	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"订单配码' valign=\"top\" bgcolor=\"#FFCCFF\" class=\"td-right-txtK\" style=\"background-color:#FFCCFF\">"+boxCnt+"</td>";
@@ -923,7 +922,7 @@ DIST.prototype={
     	return (p+1)*(pp+1)*(ppp+1)-1;
     },
     init_data_for_bankcolor:function(){
-    	 //对拥有负库存的款号标色
+    	  //对拥有负库存的款号标色
 	     var array = sty_stock.split(",");
 	     if(array.length>1){
         	for(var i=0;i<array.length-1;i++){
@@ -1003,7 +1002,6 @@ DIST.prototype={
     	//采用数据库取值方式
 		this.dataForQtyRem = data_Rem.json_Rem.evalJSON();
 		this.dataForQtyDest= data_Rem.json_Dest.evalJSON();
-    	
     },
     /**
      * 当编辑一个单元格已配数据时，列已配数合计跟着改变。并更新总款合计数
@@ -1941,10 +1939,11 @@ DIST.prototype={
 	               		var b_so_matchsize_id = jQuery(this).attr("b_so_matchsize_id");
                    		var boxCount = parseInt(jQuery("#"+boxSty+"-"+boxColor+"-"+boxStore+"-"+docno+"-"+b_so_matchsize_id+"-boxcnt").val(),10);
                		 	var qtyAlChange=nowQty-oldQtyAl;//改变的数量
+               		 	//var barCodeCanDist=dist.get_barcode_can_dist(jQuery(this).attr("barCode"),jQuery(this).attr("docType"));//可分配量
 	                    var barCodeRemDist=dist.get_barcode_rem_dist(jQuery(this).attr("barCode"),jQuery(this).attr("docType"));
 	                    if(qtyAlChange*boxCount>barCodeRemDist&&qtyAlChange>0) { //||qtyAlChange>barCodeCanDist
-	                    	dist.tonext=1;
-	                    	dist.i=this;
+	                    	//dist.tonext=1;
+	                    	//dist.i=this;
 	                        alert("当前可配量已小于0！请重新分配！");
 	                        this.value = oldQtyAl;
 	                        //jQuery(this).focus();
@@ -1952,7 +1951,7 @@ DIST.prototype={
 	                        return;
 	                    }else{
 	                    	if(barCodeRemDist>=0){
-	                    		jQuery("td[barCode='"+jQuery(this).attr("barCode")+"库存']").removeClass("red");
+	                    		jQuery("#"+boxSty+" td[barCode='"+jQuery(this).attr("barCode")+"库存']").removeClass("red");
 	                    	}
 	                    }
 	                    var cellData={};
@@ -2020,12 +2019,13 @@ DIST.prototype={
 	               		//判断配码箱数是否超标
 	               		var docNoBoxCnt = parseInt(jQuery(this).attr("qtyCan"),10); //获取订单箱数
 	               		if(nowQty>docNoBoxCnt){
-	               			//dist.i=this;
-		      				//dist.tonext=1;
+	               			dist.i=this;
+		      				dist.tonext=1;
 		      				alert("配码箱数超标("+docNoBoxCnt+"),请重新输入！");
 		      				jQuery(this).val(oldQtyAl);
 		      				return;
 	               		}
+	               		
 	               		//判断配码总数量是否超标 2013.9.16
                			var cellData={};	                    
 	                    cellData.sty=jQuery(this).attr("sty");
@@ -2037,8 +2037,8 @@ DIST.prototype={
 		      			var eCnt = parseInt(e.html(),10);
 		      			var boxqty_total = parseInt(e.attr("boxqty_total"));
 		      			if(eCnt*nowQty>boxqty_total){
-		      				//dist.i=this;
-		      				//dist.tonext=1;
+		      				dist.i=this;
+		      				dist.tonext=1;
 		      				alert("配码总数量超标("+eCnt*nowQty+"/"+boxqty_total+",请重新输入！(箱)");
 		      				jQuery(this).val(oldQtyAl);
 		      				e.html(eCnt+"");
@@ -2056,10 +2056,11 @@ DIST.prototype={
 	               			}else{
 	               				var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
 		               			var size = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
+		               			//获取可用余量
+		               			//var barCodeChangeCanDist=dist.get_barcode_can_dist(baCode,"FWD");
 		               			//获取可用库存
 		               			var barCodeChangeRemDist=dist.get_barcode_rem_dist(baCode,"FWD");
 		               			var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
-		               			
 		               			if(sizeValueChange>barCodeChangeRemDist&&sizeValueChange>0) { //||sizeValueChange>barCodeChangeCanDist
 		               				dist.tonext=1;
 			                    	dist.i=this;
@@ -2069,42 +2070,42 @@ DIST.prototype={
 			                        dwr.util.selectRange(this,0,100);
 			                        return;
 			                    }else{
-									if(barCodeChangeRemDist>=0){
+			                    	if(barCodeChangeRemDist>=0){
 			                    		jQuery("#"+boxSty+" td[barCode='"+jQuery(this).attr("barCode")+"库存']").removeClass("red");
 			                    	}
-								}
+			                    }
 		               		}
 	               		}
 	               		for(var index=0;index<parseInt(x_index);index++){
-	               				var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
-		               			var size = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
-	               				var sizeValue = parseInt(jQuery("#"+boxSty+"-"+index+"-"+y_index).val(),10);
-	               				sizeValue = isNaN(sizeValue)?0:sizeValue;
-	               				var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
-	               			 	var cellData={};
-			                    cellData.color = jQuery(this).attr("color");
-			                    cellData.barCode=baCode;
-			                    cellData.docNo = jQuery(this).attr("docNo");
-			                    cellData.store=jQuery(this).attr("store");
-			                    cellData.qtyId=jQuery(this).attr("qtyId");
-			                    cellData.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
-			                    cellData.qtyAl=sizeValue;
-			                    cellData.sty=boxSty;
-			                    cellData.docType="FWD";
-			                    cellData.box = '1';
-			                    cellData.size=size;
-			                    
-			                     //改变库存
-				      			var oldQtyCan = parseInt(jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(),10);
-				      			var nowQtyCan = oldQtyCan - sizeValueChange; 
-				      			jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(nowQtyCan+"");
-				      			//改变已配量
-				      			var oldQtyDest = parseInt(jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(),10);
-				      			var nowQtyDest = oldQtyDest + sizeValueChange; 
-				      			jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(nowQtyDest+"");
-			                   	dist.update_when_cell_real_change(cellData,sizeValueChange);
+	               			var sizeValue = parseInt(jQuery("#"+boxSty+"-"+index+"-"+y_index).val(),10);
+               				sizeValue = isNaN(sizeValue)?0:sizeValue;
+	               			var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
+	               			var size = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
+	               			var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
+	               			var cellData={};
+		                    cellData.color = jQuery(this).attr("color");
+		                    cellData.barCode=baCode;
+		                    cellData.docNo = jQuery(this).attr("docNo");
+		                    cellData.store=jQuery(this).attr("store");
+		                    cellData.qtyId=jQuery(this).attr("qtyId");
+		                    cellData.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
+		                    cellData.qtyAl=sizeValue;
+		                    cellData.sty=boxSty;
+		                    cellData.docType="FWD";
+		                    cellData.box = '1';
+		                    cellData.size=size;
+		                    
+		                     //改变库存
+			      			var oldQtyCan = parseInt(jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(),10);
+			      			var nowQtyCan = oldQtyCan - sizeValueChange; 
+			      			jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(nowQtyCan+"");
+			      			//改变已配量
+			      			var oldQtyDest = parseInt(jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(),10);
+			      			var nowQtyDest = oldQtyDest + sizeValueChange; 
+			      			jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(nowQtyDest+"");
+		                   	dist.update_when_cell_real_change(cellData,sizeValueChange);
 	               		}
-	               		//更新箱数
+	               		//更新单元格箱数
 	               		var cellDataBox={};
 	               		cellDataBox.sty=jQuery(this).attr("sty");
 	               		cellDataBox.color=jQuery(this).attr("color");
@@ -2147,15 +2148,15 @@ DIST.prototype={
      * @param realQtyAlChange 实际改变数量（相对于未编辑以前）
      */      
     update_when_cell_real_change:function(cellData,realQtyAlChange){
-    		//this.allQtyAl+=realQtyAlChange;//总已配
-    	var cellData1={};
-    	cellData1.sty=cellData.sty;
-        cellData1.color = cellData.color;	
+    	//this.allQtyAl+=realQtyAlChange;//总已配
+		var cellData1={};
+		cellData1.sty=cellData.sty;
+        cellData1.color = cellData.color;
 		cellData1.barCode=cellData.barCode;
         cellData1.docNo = cellData.docNo;
         cellData1.store=cellData.store;
-        cellData1.qtyAl=cellData.qtyAl; //现在的配货量
         cellData1.b_so_matchsize_id=cellData.b_so_matchsize_id;
+        cellData1.qtyAl=cellData.qtyAl; //现在的配货量
 		this.update_v2mdata_celldata(cellData1);//更新单元
         var cellData2={};
         cellData2.color = cellData.color;
@@ -2183,9 +2184,9 @@ DIST.prototype={
 				}
       		}
       		else{
-				//更新库存可配、余量可配
-		       	this.update_barcode_can_dist(cellData.barCode,cellData.docType,realQtyAlChange);
       			this.update_row_box_count(cellData2,realQtyAlChange,boxCnt);
+      			//更新库存可配、余量可配
+		       	this.update_barcode_can_dist(cellData.barCode,cellData.docType,realQtyAlChange);
       		}
       	}else{
       		this.update_row_box_count(cellData2,realQtyAlChange,boxCnt);

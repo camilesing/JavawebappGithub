@@ -728,7 +728,7 @@ yepnope({
 				'rowcontextmenu' : filemanager.onRowContextMenu,
 				'contextmenu' : function(e){e.stopEvent();},
 				'cellclick'   : function(grid, rowIndex, columnIndex, e){
-						filemanager.text_copy(grid, rowIndex, columnIndex, e);
+						// filemanager.text_copy(grid, rowIndex, columnIndex, e);
 				 }, 
 				 scope : this
 			},

@@ -36,7 +36,7 @@
         response.sendRedirect("/login.jsp");
         return;
     }
-    Table t=TableManager.getInstance().getTable("M_ISSUE_APPLY");
+    Table t=TableManager.getInstance().getTable("M_ISSUE_TASK");
      String directory=t.getSecurityDirectory();
     int permission=userWeb.getPermission(directory);
      //if((permission&nds.security.Directory.READ)==0){
@@ -46,8 +46,8 @@
 </script>  -->
 
 <%
-        //    return;
-       // }
+      //      return;
+     //   }
     String tableName=t.getName();
     int distributionTableId=t.getId();
     String comp=String.valueOf(QueryEngine.getInstance().doQueryOne("select VALUE from AD_PARAM where NAME='portal.company'"));
@@ -61,11 +61,11 @@
      }
 %>
 <%
-	String b_plan_id = request.getParameter("mIssueApplyId");
+	String b_plan_id = request.getParameter("mIssueTaskId");
 	//获取单据状态
-	String docnoState = String.valueOf(QueryEngine.getInstance().doQueryOne("select STATUS from M_ISSUE_APPLY where id="+b_plan_id));
+	String docnoState = String.valueOf(QueryEngine.getInstance().doQueryOne("select STATUS from M_ISSUE_TASK where id="+b_plan_id));
 	//查询款号、商品ID、商品名
-	List styleList = QueryEngine.getInstance().doQueryList("select distinct b.name,a.M_PRODUCT_ID,b.value from M_ISSUE_APPLYITEM a,m_product b where a.M_ISSUE_APPLY_ID="+b_plan_id+" and a.m_product_id=b.id order by b.name asc");
+	List styleList = QueryEngine.getInstance().doQueryList("select distinct b.name,a.M_PRODUCT_ID,b.value from M_ISSUE_TASKITEM a,m_product b where a.M_ISSUE_TASK_ID="+b_plan_id+" and a.m_product_id=b.id order by b.name asc");
 	
 	JSONObject data =new JSONObject();		
 	JSONObject jsonResult = new JSONObject();
@@ -108,7 +108,7 @@
 		data_m_product_child.put("color", m_product_color);
 	
 		//查询当前款号下的颜色
-		List colorList = QueryEngine.getInstance().doQueryList("select c.value1_code,c.value1  from M_ISSUE_APPLYITEM a,m_attributesetinstance c,m_product b where a.M_ISSUE_APPLY_ID='"+b_plan_id+"'"+
+		List colorList = QueryEngine.getInstance().doQueryList("select c.value1_code,c.value1  from M_ISSUE_TASKITEM a,m_attributesetinstance c,m_product b where a.M_ISSUE_TASK_ID='"+b_plan_id+"'"+
 						" and a.m_attributesetinstance_id=c.id and a.m_product_id=b.id and b.name='"+styList.get(0)+"' group by c.value1_code,c.value1");
 		
 		//查询当前款号下的装箱数量
@@ -126,7 +126,7 @@
 			m_product_color_child.put("c_store", color_c_store);
 
 			//取经销商List
-			List storeList = QueryEngine.getInstance().doQueryList("select d.id,d.name,t.docno,t.billdate,a.b_so_id||a.B_SO_MATCHSIZE_ID,sum(a.soqty*a.so_boxqty) boxqty_total,a.B_SO_MATCHSIZE_ID from b_so t,M_ISSUE_APPLYITEM a,m_attributesetinstance c,m_product b,C_CUSTOMER d where a.M_ISSUE_APPLY_ID="+b_plan_id+
+			List storeList = QueryEngine.getInstance().doQueryList("select d.id,d.name,t.docno,t.billdate,a.b_so_id||a.B_SO_MATCHSIZE_ID,sum(a.soqty*a.so_boxqty) boxqty_total,a.B_SO_MATCHSIZE_ID from b_so t,M_ISSUE_TASKITEM a,m_attributesetinstance c,m_product b,C_CUSTOMER d where a.M_ISSUE_TASK_ID="+b_plan_id+
 			         " and a.m_attributesetinstance_id=c.id and a.m_product_id=b.id and b.name='"+styList.get(0)+"' and c.value1_code ="+color.get(0)+
 			         " and a.c_customer_id = d.id and t.id=a.b_so_id group by d.name,d.id,t.docno,a.b_so_id||a.B_SO_MATCHSIZE_ID,t.billdate,a.B_SO_MATCHSIZE_ID");
 			for(int store=0;store<storeList.size();store++){
@@ -153,8 +153,8 @@
 				w_docno.put("q", docno_q);
 				w_docno.put("sotype", "FWD");
 				int boxQty = Integer.parseInt(boxQtyList.get(0).toString());
-				w_docno.put("b_so_matchsize_id",stoList.get(6));//配码ID
 				w_docno.put("xmlns", stoList.get(2));//订单号
+				w_docno.put("b_so_matchsize_id",stoList.get(6));//配码ID
 				w_docno.put("boxqty",boxQty);//装箱数量
 				//w_docno.put("b_so_id", stoList.get(2));
 				w_docno.put("boxqty_total", stoList.get(5));//配码总量
@@ -165,8 +165,8 @@
 				q_array.put("tag_c", array_tag_c);
 				
 				List colorcodeList  =  QueryEngine.getInstance().doQueryList("select a.* from (select c.value2_code as content "+
-						" from M_ISSUE_APPLYITEM a,m_product b,m_attributesetinstance c,m_size d"+
-						" where a.M_ISSUE_APPLY_ID='"+b_plan_id+"'"+
+						" from M_ISSUE_TASKITEM a,m_product b,m_attributesetinstance c,m_size d"+
+						" where a.M_ISSUE_TASK_ID='"+b_plan_id+"'"+
 						" and a.m_product_id=b.id and b.name = '"+styList.get(0)+"'"+
 						" and a.m_attributesetinstance_id=c.id"+
 						" and c.value2_id=d.ID"+
@@ -175,15 +175,15 @@
 				//查询当前款号下的颜色下的所有尺寸的计划量、已配量、库存、剩余量
 				List sizeList = QueryEngine.getInstance().doQueryList("select a.* from (select c.value2_code as content,a.m_productalias_id,"+
 						" sum(a.QTY) AS QTY_SO,sum(a.QTY*a.BOXQTY) AS DESTQTY,sum(a.SOQTY) AS QTYCAN,sum(a.STOCKQTY) as QTYREM,sum(a.QTY) AS QTY_ALLOT,a.id"+
-						" from M_ISSUE_APPLYITEM a,m_product b,m_attributesetinstance c,m_size d"+
-						" where a.M_ISSUE_APPLY_ID='"+b_plan_id+"'"+
+						" from M_ISSUE_TASKITEM a,m_product b,m_attributesetinstance c,m_size d"+
+						" where a.M_ISSUE_TASK_ID='"+b_plan_id+"'"+
 						" and a.m_product_id=b.id and b.name = '"+styList.get(0)+"' and c.value1_code = '"+color.get(0)+"' and a.c_customer_id="+stoList.get(0)+ " and a.b_so_id||a.B_SO_MATCHSIZE_ID="+stoList.get(4)+
 						" and a.m_attributesetinstance_id=c.id"+
 						" and c.value2_id=d.ID"+
 						" group by  c.value2_code,a.m_productalias_id,a.id order by c.value2_code ASC) a "+
 						" union all select distinct '箱数' ,to_number(b.ID||c.ID),null,null,a.SO_BOXQTY,null,a.BOXQTY,null from"+
-						" M_ISSUE_APPLYitem a,m_product b,m_attributesetinstance c,m_size d "+
-						" where a.M_ISSUE_APPLY_ID='"+b_plan_id+"'"+
+						" M_ISSUE_TASKITEM a,m_product b,m_attributesetinstance c,m_size d "+
+						" where a.M_ISSUE_TASK_ID='"+b_plan_id+"'"+
 						" and a.m_product_id=b.id and b.name = '"+styList.get(0)+"' and c.value1_code = '"+color.get(0)+"' and a.c_customer_id="+stoList.get(0)+ " and a.b_so_id||a.B_SO_MATCHSIZE_ID="+stoList.get(4)+
 						" and a.m_attributesetinstance_id=c.id"+
 						" and c.value2_id=d.ID");
@@ -198,13 +198,13 @@
 							if(colorcodeList.get(j).toString().equals(sizeCountList.get(0).toString())){
 								/**
 								String qtyRemSql = "select nvl(sum(sum(a.destqty)),0) as qtyrem from ("+
-								   "select a.M_ISSUE_APPLY_ID,sum(a.QTY*a.BOXQTY) as destqty,sum(a.STOCKQTY) as STOCKQTY"+
-						           " from M_ISSUE_APPLYitem a,m_product b,m_attributesetinstance c,m_size d"+
-						           " where a.M_ISSUE_APPLY_ID in (select distinct M_ISSUE_APPLY_ID from M_ISSUE_APPLYitem where STATUS = 1 and ISACTIVE='Y' and M_ISSUE_APPLY_ID <> '"+b_plan_id+"')"+
-						           " and a.m_product_id=b.id and b.name = '"+styList.get(0)+"' and a.c_customer_id="+stoList.get(0)+ "  and c.value1_code = '"+color.get(0)+"' and c.value2_code='"+sizeCountList.get(0)+"'"+
+								   "select a.M_ISSUE_TASK_ID,sum(a.QTY*a.BOXQTY) as destqty,sum(a.STOCKQTY) as STOCKQTY"+
+						           " from M_ISSUE_TASKITEM a,m_product b,m_attributesetinstance c,m_size d"+
+						           " where a.M_ISSUE_TASK_ID in (select distinct M_ISSUE_TASK_ID from M_ISSUE_TASKITEM where STATUS = 1 and ISACTIVE='Y' and M_ISSUE_TASK_ID <> '"+b_plan_id+"')"+
+						           " and a.m_product_id=b.id and b.name = '"+styList.get(0)+"' and c.value1_code = '"+color.get(0)+"' and c.value2_code='"+sizeCountList.get(0)+"'"+
 						           " and a.m_attributesetinstance_id=c.id"+
 						           " and c.value2_id=d.ID"+
-						           " group by a.M_ISSUE_APPLY_ID) a group by a.M_ISSUE_APPLY_ID";
+						           " group by a.M_ISSUE_TASK_ID) a group by a.M_ISSUE_TASK_ID";
 								*/
 								if(sizeCountList.get(0).toString().equals("箱数")){
 									JSONObject array_tag_c_child = new JSONObject();
@@ -226,6 +226,8 @@
 									JSONObject array_tag_c_child = new JSONObject();
 									array_tag_c.add(array_tag_c_child);
 									array_tag_c_child.put("content", sizeCountList.get(0));
+									//out.print(qtyR+"-----");
+									//out.print("+++"+qtyRemChiled+"+++");
 									array_tag_c_child.put("QTYREM",sizeCountList.get(5));
 									array_tag_c_child.put("m_product_alias_id", sizeCountList.get(1));
 									array_tag_c_child.put("QTY_SO", 9999);	
@@ -249,13 +251,12 @@
 	
 	data.put("jsonResult", jsonResult.toJSONString());
 
-	//只与本条订单做库存对比 
 	String query = " select distinct b.Name "+
-			" from M_ISSUE_APPLYITEM A,M_PRODUCT b "+ 
-			" where  A.M_PRODUCT_ID=B.ID and  "+
-			" A.M_ISSUE_APPLY_ID='"+b_plan_id+"'"+
-			" group by M_ISSUE_APPLY_ID,M_PRODUCTALIAS_ID,b.Name  "+
-			" having max(STOCKQTY)<sum(QTY*BOXQTY) ";
+	" from M_ISSUE_TASKITEM A,M_PRODUCT b "+ 
+	" where  A.M_PRODUCT_ID=B.ID and  "+
+	" A.M_ISSUE_TASK_ID='"+b_plan_id+"'"+
+	" group by M_ISSUE_TASK_ID,M_PRODUCTALIAS_ID,b.Name  "+
+	" having max(STOCKQTY)<sum(QTY*BOXQTY) ";
 	List list = QueryEngine.getInstance().doQueryList(query);
 	String sty_stock= "";
 	for(int i=0;i<list.size();i++){
@@ -266,9 +267,9 @@
 	String query_Rem = "select M_PRODUCTALIAS_ID, "+
 			"sum(QTY*BOXQTY) QtyDest, "+
 			"max(STOCKQTY)-sum(QTY*BOXQTY) QtyRem "+
-			"from M_ISSUE_APPLYITEM a  "+
-			"where M_ISSUE_APPLY_ID='"+b_plan_id+"' and "+ 
-			"exists(select 'x' from M_ISSUE_APPLY b where a.M_ISSUE_APPLY_ID=b.id and b.ISACTIVE='Y' and b.STATUS=1 ) "+
+			"from M_ISSUE_TASKITEM a  "+
+			"where M_ISSUE_TASK_ID='"+b_plan_id+"' and "+ 
+			"exists(select 'x' from M_ISSUE_TASK b where a.M_ISSUE_TASK_ID=b.id and b.ISACTIVE='Y' and b.STATUS=1 ) "+
 			"group by M_PRODUCTALIAS_ID ";	
 	List list_DR = QueryEngine.getInstance().doQueryList(query_Rem);
 	
@@ -286,30 +287,11 @@
 	
 	//单据信息
 	String Docinfo = "";
-	String Query_Docinfo = "select DOCNO,BILLDATE from M_ISSUE_APPLY where id='"+b_plan_id+"'";
+	String Query_Docinfo = "select DOCNO,BILLDATE from M_ISSUE_TASK where id='"+b_plan_id+"'";
 	List list_Docinfo = QueryEngine.getInstance().doQueryList(Query_Docinfo);
 	if(list_Docinfo.size()>0){
 		Docinfo = "[单据编号]:"+((List)list_Docinfo.get(0)).get(0).toString()+" [单据日期]:"+((List)list_Docinfo.get(0)).get(1).toString();
 	}
-	
-	//库存总量，款号+色号 值相同
-	String query_sty_color = "select m_issue_apply_id , m_product_id ,name||value1_code||value1 sty_color,sum(stockqty) stockqty from ( "+ 
-			" select a.m_issue_apply_id , a.m_product_id ,c.name,d.value1_code,d.value1, a.m_productalias_id,a.stockqty  "+
-			" from m_Issue_Applyitem a ,m_product_alias b ,m_product c ,m_attributesetinstance d "+
-			" where a.m_productalias_id = b.id and  a.m_product_id = c.id and a.m_attributesetinstance_id=d.id and "+ 
-			" m_issue_apply_id  = '"+b_plan_id+"' "+
-			" group by a.m_issue_apply_id , a.m_product_id ,c.name,d.value1_code,d.value1, a.m_productalias_id,a.stockqty "+ 
-			" ) group by m_issue_apply_id , m_product_id ,name,value1_code,value1";
-	List list_sty_color = QueryEngine.getInstance().doQueryList(query_sty_color);
-	JSONObject json_sty_color =new JSONObject();	
-	for(int i=0;i<list_sty_color.size();i++){
-		List list_sty_color_child = (List)list_sty_color.get(i);
-		json_sty_color.put(list_sty_color_child.get(2),list_sty_color_child.get(3));		
-	}
-	JSONObject data_sty_color =new JSONObject();
-	data_sty_color.put("json_sty_color", json_sty_color.toString());
-	
-
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -519,10 +501,27 @@ background-color:red;
                             <td></td>
                             <td></td>
                         </tr>
-                        <tr>
+                        <tr><!--
+                            <td class="ph-desc"  valign="top" nowrap="nowrap" align="right">
+                                <div class="desc-txt" align="center" style="color:blue;">物流备注*：</div>
+                            </td>
+                            <td class="ph-value" valign="top" align="left" >
+                                <input type="text" name="canModify" class="notes" id="notes"/>
+                            </td>
+                            <td class="ph-desc" valign="top" nowrap="" align="right"><div class="desc-txt">配单日期<font color="red">*</font>：</div></td>
+                            <td class="ph-value"  valign="top" nowrap="" align="left">
+                                <input type="text" name="canModify" class="ipt-4-2" name="billdatebeg"  tabIndex="5" maxlength="10" size="20" title="8位日期，如20070823" id="distdate" value="<%=end%>" />
+                                <span  class="coolButton" name="canShow">
+                                    <a onclick="window.event.cancelBubble=true;" href="javascript:showCalendar('imageCalendar3',false,'distdate',null,null,true);"><img id="imageCalendar3" width="16" height="18" border="0" align="absmiddle" title="Find" src="images/datenum.gif"/></a>
+                                </span>
+                            </td>-->
                              <td class="ph-desc" valign="top" align="right">
                                 <div class="desc-txt" align="center" id="idocnoType" style="color:red;font-size:14px;display:none;">*期货优先</div>
-                            </td></tr>
+                            </td><!--
+                            <td class="ph-desc" valign="top" align="left">
+                                  <div class="desc-txt" align="left" style="color:blue;float:left;font-size:15px;font-weight:bold;vertical-align:bottom;">本单金额：</div><div id="amount1" style="color:black;float:left;font-size:15px;margin-top:3px;"></div>
+                            </td>
+                        --></tr>
                     </table>
                 </div>
                 <!--单据号查询表格-->

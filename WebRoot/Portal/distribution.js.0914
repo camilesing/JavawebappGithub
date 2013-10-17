@@ -17,11 +17,8 @@ DIST.prototype={
     	  this.product=new Array();
     	  this.totCan=0;
     	  this.data=new Array();//向数据库获得数据组成单元数组
-        this.dataForQtyCan={};//订单余量可用量JSON对象
-        this.dataForQtyRem={};//订单库存可用量JSON对象
-        this.dataForQtyDest={};//已配量JSON对象
+        this.dataForQtyCan={};//库存可用量JSON对象
         this.dataForStyleQtyAl={};//所有款已配量的json对象
-        this.dataForStyBar={};//barcode对应的款号json
         //this.allQtyAl=0;//总已配量
         this.tot_can_dist=0;//自动配货总可配量
         this.bodyWidth=0;
@@ -173,20 +170,16 @@ DIST.prototype={
 	        		ii.qty_ady=this.data[i].qtyAl;
 	        		ii.sty=this.data[i].sty;
 	        		ii.color=this.data[i].color
-	        		ii.m_product_alias_id=this.data[i].bardcode_id;
+	        		ii.m_product_alias_id=this.data[i].barCode;
 	        		ii.store=this.data[i].store;
-	        		ii.docNo=this.data[i].docNo;
-	        		ii.b_so_matchsize_id=this.data[i].b_so_matchsize_id;
 	        		box_item.push(ii);
         		}else{
         			var ii={};
 	        		ii.qty_ady=this.data[i].qtyAl;
 	        		ii.sty=this.data[i].sty;
 	        		ii.color=this.data[i].color
-	        		ii.m_product_alias_id=this.data[i].bardcode_id;
+	        		ii.m_product_alias_id=this.data[i].barCode;
 	        		ii.store=this.data[i].store;
-	        		ii.docNo=this.data[i].docNo;
-	        		ii.b_so_matchsize_id=this.data[i].b_so_matchsize_id;
 	        		m_item.push(ii);	
         		}
         	}
@@ -223,18 +216,8 @@ DIST.prototype={
         HenloController.handle(tableName,bPlanId,Object.toJSON(evt), function(r){
             var result= r.evalJSON();
             alert(result.message);
-//            var message = "111,121915,125521";
-//            var array = message.split(",");
-//            alert(array[0]);
-//            if(array.length>1){
-//            	for(var i=0;i<array.length-1;i++){
-//            		jQuery("left_"+array[i]).attr("style","");
-//            		jQuery("left_"+array[i]).attr("style","background-color:red");
-//            	}
-//            }
             $("isChanged").value="false";
             window.location=window.location.href;
-            //window.location.href = "/penta/index.jsp";
         });
     },
     reShow:function(){
@@ -512,9 +495,6 @@ DIST.prototype={
 //        dwr.util.useLoadingMessage(gMessageHolder.LOADING);
 //        var data=e.getUserData();
         //var ret=data.jsonResult.evalJSON();
-    	//加入订单信息
-    	jQuery("#msg").html(Docinfo);
-    	
         var ret = retDate.jsonResult.evalJSON();
       // alert(Object.toJSON(ret.ISAUTOSUBSAL));
         this.manuStr="";
@@ -578,7 +558,7 @@ DIST.prototype={
                
                 $("pdt-img").src = "/pdt/"+pdt[ii].M_PRODUCT_LIST+"_1_2.jpg";
             }
-            this.manuStr+="\n<li><div id=\"left_"+pdt[ii].xmlns+"\" class=\"txt-on\"  onclick='javascript:$(\"pdt-img\").src = \"/pdt/"+pdt[ii].M_PRODUCT_LIST+"_1_2.jpg\";" ;
+            this.manuStr+="\n<li><div class=\"txt-on\"  onclick='javascript:$(\"pdt-img\").src = \"/pdt/"+pdt[ii].M_PRODUCT_LIST+"_1_2.jpg\";" ;
              if(pdt[ii].value=="\"\""){
                this.manuStr+=	"$(\"ph-pic-img-txt\").innerHTML=\""+pdt[ii].xmlns+"<br/>\";" ;
              	}else{
@@ -605,7 +585,6 @@ DIST.prototype={
             for(var p=0;p<colorArr.length;p++){//色号
             		var color_size_qtyCan=[];
                 for(var pp=0;pp<colorArr[p].stores.length;pp++){//店仓
-                	var store_length = colorArr[p].stores.length;//当前色号下店仓length
                     for(var ppp=0;ppp<colorArr[p].stores[pp].docnos.length;ppp++){//详细
                     	  style_y_length++;
                         for(var w=0;w<colorArr[p].stores[pp].docnos[ppp].tag.size.length;w++){//尺寸
@@ -617,10 +596,10 @@ DIST.prototype={
                              var qtyCan = colorArr[p].stores[pp].docnos[ppp].tag.can[w]!='non'?parseInt(colorArr[p].stores[pp].docnos[ppp].tag.can[w],10):0;//可用库存
                      		 var qtyRem = colorArr[p].stores[pp].docnos[ppp].tag.rem[w]!='non'?parseInt(colorArr[p].stores[pp].docnos[ppp].tag.rem[w],10):0;//订单余量
                              var qtyDest= colorArr[p].stores[pp].docnos[ppp].tag.dest[w]!='non'?parseInt(colorArr[p].stores[pp].docnos[ppp].tag.dest[w],10):0;//订单量
-                          	 var bardcode_id= colorArr[p].stores[pp].docnos[ppp].tag.bardcode_id[w];//单元格ID 唯一
+                          
                           var cellData={};//每个单元的数据，即配货编辑的单元                      
                           if(colorArr[p].stores[pp].docnos[ppp].tag.barCode[w]!='non'){
-                            this.dataForStyBar[colorArr[p].stores[pp].docnos[ppp].tag.barCode[w]]=pdt[ii].xmlns;//款号
+                            
                             cellData.sty = pdt[ii].xmlns;//款号
                             cellData.color = colorArr[p].name;//色号
                             cellData.size =  colorArr[p].stores[pp].docnos[ppp].tag.size[w] ;//尺寸
@@ -630,11 +609,10 @@ DIST.prototype={
                             cellData.store = colorArr[p].stores[pp].name;//店仓
                             cellData.barCode =colorArr[p].stores[pp].docnos[ppp].tag.barCode[w];//所属条码
                             cellData.qtyAl = isNaN(parseInt(qtyAl))?0:parseInt(qtyAl);
-							cellData.b_so_matchsize_id = colorArr[p].stores[pp].docnos[ppp].b_so_matchsize_id; //配码
+
                             cellData.qtyCan = isNaN(parseInt(qtyCan))?0:parseInt(qtyCan);
                             cellData.qtyRem = isNaN(parseInt(qtyRem))?0:parseInt(qtyRem);//订单余量
                             cellData.qtyDest= isNaN(parseInt(qtyDest))?0:parseInt(qtyDest);//订单量
-                            cellData.bardcode_id= bardcode_id;
                             this.data.push(cellData);
                             /* end */                         
 						 }		
@@ -683,10 +661,8 @@ DIST.prototype={
                                 var boxCnt=0;
                                 this.docNoes.push(colorArr[p].stores[pp].docnos[ppp].no);
                                 //poe 单据号、类型、日期等信息
-                                item+="<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+colorArr[p].stores[pp].docnos[ppp].date+"</td>"+
-                                      "<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+colorArr[p].stores[pp].docnos[ppp].no+"</td>"+
-                                      "<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+pdt[ii].xmlns+"</td>"+
-                                      "<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+colorArr[p].stores[pp].docnos[ppp].product_name+"</td>"+
+                                item+="<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+pdt[ii].xmlns+"</td>"+
+                                      "<td rowspan=\"4\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-left-txt01\""+(ss=='FWD'?" style='color:blue;word-break:break-all;'":"")+">"+colorArr[p].stores[pp].docnos[ppp].date+"</td>"+
                                       "<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txt\""+(ss=='FWD'?" style='color:blue;'":"")+">配货</td>";
                                 for(var w=0;w<colorArr[p].stores[pp].docnos[ppp].tag.size.length;w++){
                                     var itemMetrixTr=colorArr[p].stores[pp].docnos[ppp].tag.can[w];
@@ -694,31 +670,29 @@ DIST.prototype={
                                     var qtyAl=parseInt(colorArr[p].stores[pp].docnos[ppp].tag.qtyAl[w],10);
                                     var qtyRem=parseInt(colorArr[p].stores[pp].docnos[ppp].tag.rem[w],10);
                                     var qtyDest= colorArr[p].stores[pp].docnos[ppp].tag.dest[w]!='non'?parseInt(colorArr[p].stores[pp].docnos[ppp].tag.dest[w],10):0;
-                                    var qtyCan = itemMetrixTr!='non'?parseInt(itemMetrixTr,10):0;
+                                    var qtyCan = colorArr[p].stores[pp].docnos[ppp].tag.can[w]!='non'?parseInt(colorArr[p].stores[pp].docnos[ppp].tag.can[w],10):0;
                                     var docno=colorArr[p].stores[pp].docnos[ppp].no;
-                                    var boxqty=colorArr[p].stores[pp].docnos[ppp].boxqty;
-                                    var b_so_matchsize_id=colorArr[p].stores[pp].docnos[ppp].b_so_matchsize_id;
                                     qtyAl=isNaN(qtyAl)?0:qtyAl;
                                     qtyRem=isNaN(qtyRem)?0:qtyRem;
                                     if(w<colorArr[p].stores[pp].docnos[ppp].tag.size.length-1){
                                     	v0+=qtyAl;
-                                    	//modify penta input添加store_length属性
-                                    	item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-bg\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":"")+">"+(itemMetrixTr!='non'?"<input id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"' x-index='"+this.get_cell_x_index(w)+"' y-index='"+(style_y_length-1)+"' qtyCan='"+qtyCan+"' b_so_matchsize_id='"+b_so_matchsize_id+"' store_length='"+store_length+"' qtyId='"+pdt[ii].xmlns+"' qtyRem='"+qtyRem+"' qtyDest='"+qtyDest+"' title='"+barCode+"' barCode='"+barCode+"' color=\""+colorArr[p].name+"\"  size=\""+colorArr[p].stores[pp].docnos[ppp].tag.size[w]+"\" docNo=\""+docno+"\" store=\""+colorArr[p].stores[pp].name+"\" sty=\""+pdt[ii].xmlns+"\" name=\""+docno+"\" type=\"text\" docType='"+ss+"' class=\"td-txt-input\" value=\""+(qtyAl==0?'':qtyAl)+"\"/>":"")+"</td>";
+                                    	item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-bg\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":"")+">"+(itemMetrixTr!='non'?"<input id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"' x-index='"+this.get_cell_x_index(w)+"' y-index='"+(style_y_length-1)+"' qtyCan='"+qtyCan+"' qtyId='"+pdt[ii].xmlns+"' qtyRem='"+qtyRem+"' qtyDest='"+qtyDest+"' title='"+barCode+"' barCode='"+barCode+"' color=\""+colorArr[p].name+"\"  size=\""+colorArr[p].stores[pp].docnos[ppp].tag.size[w]+"\" docNo=\""+docno+"\" store=\""+colorArr[p].stores[pp].name+"\" sty=\""+pdt[ii].xmlns+"\" name=\""+docno+"\" type=\"text\" docType='"+ss+"' class=\"td-txt-input\" value=\""+(qtyAl==0?'':qtyAl)+"\"/>":"")+"</td>";
                                     }else{
                                     	//alert(qtyAl);
-                                    	item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-bg\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":"")+">"+(itemMetrixTr!='non'?"<input id='"+pdt[ii].xmlns+"-"+colorArr[p].name+"-"+colorArr[p].stores[pp].name+"-"+docno+"-"+b_so_matchsize_id+"-boxcnt'  qtyId='"+pdt[ii].xmlns+"' qtyCan='"+qtyCan+"' x-index='"+this.get_cell_x_index(w)+"' b_so_matchsize_id='"+b_so_matchsize_id+"' y-index='"+(style_y_length-1)+"' title='"+barCode+"' color=\""+colorArr[p].name+"\"  size=\""+colorArr[p].stores[pp].docnos[ppp].tag.size[w]+"\" barCode='"+barCode+"' docNo=\""+docno+"\" store=\""+colorArr[p].stores[pp].name+"\" sty=\""+pdt[ii].xmlns+"\" name=\""+docno+"\" type=\"text\" class=\"td-txt-input\" value=\""+(qtyAl==0?0:qtyAl)+"\"/>":"")+"</td>";
+                                    	item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-bg\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":"")+">"+(itemMetrixTr!='non'?"<input id='"+pdt[ii].xmlns+"-"+colorArr[p].name+"-"+colorArr[p].stores[pp].name+"-boxcnt'  qtyId='"+pdt[ii].xmlns+"' x-index='"+this.get_cell_x_index(w)+"' y-index='"+(style_y_length-1)+"' title='"+barCode+"' color=\""+colorArr[p].name+"\"  size=\""+colorArr[p].stores[pp].docnos[ppp].tag.size[w]+"\" barCode='"+barCode+"' docNo=\""+docno+"\" store=\""+colorArr[p].stores[pp].name+"\" sty=\""+pdt[ii].xmlns+"\" name=\""+docno+"\" type=\"text\" class=\"td-txt-input\" value=\""+(qtyAl==0?1:qtyAl)+"\"/>":"")+"</td>";
                                     }
                                     //edit by Robin 2010.5.7 在配货的input中增加属性：barCode,sty,docNo,store。。。
                                 }
-                                var b_so_matchsize_id=colorArr[p].stores[pp].docnos[ppp].b_so_matchsize_id;
-                                var boxqty_total = colorArr[p].stores[pp].docnos[ppp].boxqty_total; //配码*箱数 总数量
-                                item+="<td id='"+(pdt[ii].xmlns+colorArr[p].name+docno+colorArr[p].stores[pp].name+b_so_matchsize_id)+"' boxQty='"+boxqty+"' boxqty_total='"+boxqty_total+"' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v0+"</td>";
+                                //poe 小计
+                                item+="<td id='"+(pdt[ii].xmlns+colorArr[p].name+docno+colorArr[p].stores[pp].name)+"' boxQty='"+docno+"' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v0+"</td>";
                                	var boxIndex = colorArr[p].stores[pp].docnos[ppp].tag.size.length-1;
 	                            var boxIndexCnt=parseInt(colorArr[p].stores[pp].docnos[ppp].tag.qtyAl[boxIndex],10);
 	                            var boxCnt = isNaN(boxIndexCnt)?0:boxIndexCnt;
-                            	v0 = v0*boxCnt;
+	                            if(boxCnt>0){
+	                            	v0 = v0*boxCnt;
+	                            }
                                	//总计
-                                item+="<td id='"+(pdt[ii].xmlns+colorArr[p].name+docno+colorArr[p].stores[pp].name+b_so_matchsize_id)+"cnt' valign=\"top\" style=\"color:#FF0033\" class=\"td-right-txtW\">"+v0+"</td>";
+                                item+="<td id='"+(pdt[ii].xmlns+colorArr[p].name+docno+colorArr[p].stores[pp].name)+"cnt' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v0+"</td>";
                                 
                                 tot_all_cnt += v0;
                             }
@@ -727,16 +701,15 @@ DIST.prototype={
                                 item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txt\""+(ss=='FWD'?" style='color:blue;'":"")+">已配量</td>";
                                 for(var w=0;w<colorArr[p].stores[pp].docnos[ppp].tag.size.length;w++){
                                     var itemMetrixTr=colorArr[p].stores[pp].docnos[ppp].tag.dest[w];
-                                    var barCode=colorArr[p].stores[pp].docnos[ppp].tag.barCode[w];
                                     if(w<colorArr[p].stores[pp].docnos[ppp].tag.size.length-1){
                                     	v3+=isNaN(parseInt(itemMetrixTr,10))?0:parseInt(itemMetrixTr,10);
-                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"已配' qtyDest=\""+barCode+"已配\" valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtD\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
+                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"已配' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtD\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
                                     }else {
-                                    	item+="<td valign=\"top\" rowspan=\"2\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\"></td>";
+                                    	item+="<td valign=\"top\" rowspan=\"3\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\"></td>";
                                     }
                                 }
-                                item+="<td valign=\"top\" rowspan=\"2\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\"></td>";
-                                item+="<td valign=\"top\" rowspan=\"2\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\"></td>";
+                                item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v3+"</td>";
+                                item+="<td valign=\"top\" rowspan=\"3\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\"></td>";
                             }
                             if(con==2){
                                 var v2=0;
@@ -744,33 +717,28 @@ DIST.prototype={
                                 item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txt\""+(ss=='FWD'?" style='color:blue;'":"")+">参考库存</td>";
                                 for(var w=0;w<colorArr[p].stores[pp].docnos[ppp].tag.size.length;w++){
                                     var itemMetrixTr=colorArr[p].stores[pp].docnos[ppp].tag.rem[w];
-                                    //var qtyAl=parseInt(colorArr[p].stores[pp].docnos[ppp].tag.qtyAl[w],10);
                                     var docno=colorArr[p].stores[pp].docnos[ppp].no;
                                     var barCode=colorArr[p].stores[pp].docnos[ppp].tag.barCode[w];
                                     if(w<colorArr[p].stores[pp].docnos[ppp].tag.size.length-1){
                                     	v2+=isNaN(parseInt(itemMetrixTr,10))?0:parseInt(itemMetrixTr,10);
-                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"参考库存' valign=\"top\" barcode='"+barCode+"库存' bgcolor=\"#8db6d9\" class=\"td-right-txtW\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" id='"+(docno+barCode)+"-rem' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
+                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"余量' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" id='"+(docno+barCode)+"-rem' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
                                     }
                                 }
-                                //item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v2+"</td>";
+                                item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v2+"</td>";
                             }
                             if(con==3){
                             	var v1=0;
                                 var boxCnt=0;
-                                item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txt\""+(ss=='FWD'?" style='color:blue;'":"")+">订单配码</td>";
+                                item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txt\""+(ss=='FWD'?" style='color:blue;'":"")+">订单余量</td>";
                                 for(var w=0;w<colorArr[p].stores[pp].docnos[ppp].tag.size.length;w++){
                                     var itemMetrixTr=colorArr[p].stores[pp].docnos[ppp].tag.can[w];
                                     var barCode=colorArr[p].stores[pp].docnos[ppp].tag.barCode[w];
                                     if(w<colorArr[p].stores[pp].docnos[ppp].tag.size.length-1){
                                     	v1+=isNaN(parseInt(itemMetrixTr,10))?0:parseInt(itemMetrixTr,10);
-                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"订单配码' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtK\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" name='"+barCode+"' title='"+itemMetrixTr+"' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
-                                    }else{
-                                    	boxCnt=itemMetrixTr!='non'?itemMetrixTr:"";
-                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"订单配码' valign=\"top\" bgcolor=\"#FFCCFF\" class=\"td-right-txtK\" style=\"background-color:#FFCCFF\">"+boxCnt+"</td>";
+                                    	item+="<td id='"+pdt[ii].xmlns+"-"+this.get_cell_x_index(w)+"-"+(style_y_length-1)+"库存' valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtK\""+(itemMetrixTr=='non'?" style=\"background-color:#eeeeee\"":" name='"+barCode+"' title='"+itemMetrixTr+"' docType='"+ss+"'")+">"+(itemMetrixTr!='non'?itemMetrixTr:"")+"</td>";
                                     }
                                 }
                                 item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v1+"</td>";
-                                item+="<td valign=\"top\" bgcolor=\"#8db6d9\" class=\"td-right-txtW\">"+v1*boxCnt+"</td>";
                             }
                             item+="</tr>";
                         }
@@ -784,8 +752,6 @@ DIST.prototype={
             var tempcol= this.forTableShowStyle(tagLen)+"<tr'>"+
                           "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">色号</td>"+
                           "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">经销商</td>" +
-                          "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">日期</td>" +
-                          "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">订单号</td>" +
                           "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">款号</td>" +
                           "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">品名</td>"+
                           "<td bgcolor=\"#FFFFFF\" class=\"td-left-title\">尺寸</td>";
@@ -795,7 +761,7 @@ DIST.prototype={
             Edit by Robin 2010.5.10 新增列合计及总款合计
             */
             var tot_qty_al_for_col="<tr>"+
-                    "<td bgcolor=\"#FFFFFA\" class=\"td-left-title\" colspan=\"7\">款已配量合计</td>";
+                    "<td bgcolor=\"#FFFFFA\" class=\"td-left-title\" colspan=\"5\">款已配量合计</td>";
             var tot_for_style=0;
             for(var e=0;e<sizeArr.length;e++){
             	//alert(sizeArr.length); //poe  取出尺寸台头
@@ -841,7 +807,7 @@ DIST.prototype={
             this.product[ii].name=pdt[ii].xmlns;
             this.product[ii].value=pdt[ii].value;
             this.product[ii].colors=colorArr;
-            //this.dataForStyleQtyAl[pdt[ii].xmlns]=this.get_style_qty_aly(pdt[ii].xmlns);
+            this.dataForStyleQtyAl[pdt[ii].xmlns]=this.get_style_qty_aly(pdt[ii].xmlns);
             tempdivsizeArray.push(tempdivsize);
         }
         
@@ -849,11 +815,8 @@ DIST.prototype={
         
         $("category_manu").innerHTML=this.manuStr;
         $("ph-from-right-table").innerHTML=this.itemStr;
-        
         this.init_data_for_qtycan();
-        this.init_data_for_bankcolor();
-        
-       //$("tot-can").innerHTML=totCan;
+        //$("tot-can").innerHTML=totCan;
         //$("tot-rem").innerHTML=totRem;
         $("fund_balance").value=ret.m_allot_id;
         $("showStyle").value="metrix";
@@ -873,25 +836,20 @@ DIST.prototype={
          for(var m=0;m<tempdivsizeArray.length;m++){
          	 jQuery("#divsize"+pdt[m].xmlns).html(tempdivsizeArray[m]);
          	}
+    	 
     	   window.onscroll=function(){
-			    /*
-			     * var ph_piother_layer = document.getElementById('ph-piother');  
+			    var ph_piother_layer = document.getElementById('ph-piother');  
 			    var scrollTop = document.documentElement.scrollTop + document.body.scrollTop;  
 			    if(scrollTop>=155){
 			      ph_piother_layer.style.top = scrollTop-155  + 'px'; 
 			     }else{
 			     ph_piother_layer.style.top = 0  + 'px'; 
-			     }*/
-			    if( jQuery("#currSty").val()!=""){		
-			     var tablehight = jQuery("#currSty").height();
-			    	 
-			     var divsizelayer=document.getElementById('divtable'+ jQuery("#currSty").val());
-			     var scrollTop = document.documentElement.scrollTop + document.body.scrollTop;
-			     var scrollHeight = document.documentElement.scrollHeight + document.body.scrollHeight;
-			     //1280 
-			     
-			    if(scrollTop>=78){
-			      divsizelayer.style.top = scrollTop-69  + 'px'; 
+			     }
+			     if( jQuery("#currSty").val()!=""){
+			    var divsizelayer=document.getElementById('divtable'+ jQuery("#currSty").val());
+			     var scrollTop = document.documentElement.scrollTop + document.body.scrollTop;  
+			    if(scrollTop>=195){
+			      divsizelayer.style.top = scrollTop-173  + 'px'; 
 			     }else{
 			      divsizelayer.style.top = 23  + 'px'; 
 			     }
@@ -922,88 +880,36 @@ DIST.prototype={
     get_cell_y_index:function(p,pp,ppp){
     	return (p+1)*(pp+1)*(ppp+1)-1;
     },
-    init_data_for_bankcolor:function(){
-    	 //对拥有负库存的款号标色
-	     var array = sty_stock.split(",");
-	     if(array.length>1){
-        	for(var i=0;i<array.length-1;i++){
-        		jQuery("#left_"+array[i]).attr("style","");
-        		jQuery("#left_"+array[i]).addClass("red");
-        	}
-        }
-        /*
-    	for(var key in this.dataForQtyRem){
-    		if(this.dataForQtyRem[key]<0){
-    			jQuery("td[barCode='"+key.replace("FWD","")+"库存']").addClass("red");
-    		}
-  			jQuery("td[barCode='"+key.replace("FWD","")+"库存']").html(this.dataForQtyRem[key]+"");
-    	}
-    	for(var key in this.dataForQtyDest){
-  			jQuery("td[qtyDest='"+key.replace("FWD","")+"已配']").html(this.dataForQtyDest[key]+"");
-    	}
-    	* */
-    	for(var key in this.dataForQtyRem){
-    		var QtyRem = this.dataForQtyRem[key];
-    		var barCode_KC = key.replace("FWD","")+"库存";
-    		var TableID = this.dataForStyBar[key.replace("FWD","")];
-    		if(QtyRem<0){
-    			jQuery("#"+TableID + " td[barCode='"+barCode_KC+"']").addClass("red");
-    		}
-  			jQuery("#"+TableID + " td[barCode='"+barCode_KC+"']").html(QtyRem+"");
-    	}
-    	for(var key in this.dataForQtyDest){
-    		var QtyDest = this.dataForQtyDest[key]
-    		var barCode_YP = key.replace("FWD","")+"已配"; 
-    		var TableID = this.dataForStyBar[key.replace("FWD","")];
-  			jQuery("#"+ TableID + " td[qtyDest='"+barCode_YP+"']").html(QtyDest+"");
-    	}
-    },
     /**
      * 初始化this.dataForQtyCan
      * 此json对象中以条码为索引，保存库存可用量
      */     
     init_data_for_qtycan:function(){
-    	/*
     	var dataForTemp=this.data.slice(0);
     	while(dataForTemp.length>0){
-    		
-			var totAlForBarCode=0;
+    		var totAlForBarCode=0;
     		var barcode=dataForTemp[0].barCode;
     		var docType=dataForTemp[0].docType;
     		var qtyCan=parseInt(dataForTemp[0].qtyCan,10);
-    		var qtyRem=parseInt(dataForTemp[0].qtyRem,10);
-    		var qtyDest=parseInt(dataForTemp[0].qtyDest,10);
     		/*
     		数组逐渐减少，循环遍历，index递减
     		*/
-    		/*
     		var i=dataForTemp.length-1;
     		while(i>=0){
     			if(dataForTemp[i].barCode==barcode&&docType==dataForTemp[i].docType){
-    				var sty=dataForTemp[i].sty;
-		    		var color=dataForTemp[i].color;
-		    		var store=dataForTemp[i].store;
-		    		var docNo=dataForTemp[i].docNo;
-		    		var boxHtml = jQuery("#"+sty+"-"+color+"-"+store+"-"+docNo+"-boxcnt").val();
-		    		var boxCnt = parseInt(boxHtml,10);
-		    		if(boxCnt>0){
-	    				//对已配量进行合计
-						totAlForBarCode+=parseInt(dataForTemp[i].qtyDest,10);
-		    		}
+    				totAlForBarCode+=parseInt(dataForTemp[i].qtyAl,10);
+    				var sty = dataForTemp[i].sty;
+    				var color = dataForTemp[i].color;
+    				var store = dataForTemp[i].store;
+    				var boxCnt = parseInt(jQuery("#"+sty+"-"+color+"-"+store+"-boxcnt").val(),10);
+    				totAlForBarCode = totAlForBarCode*boxCnt;
     				dataForTemp.splice(i,1);
     			}
     			i--;
     		}
     		/*end*/
-    		/*
-    		this.dataForQtyRem[barcode+docType]=qtyRem-totAlForBarCode;
     		this.dataForQtyCan[barcode+docType]=qtyCan-totAlForBarCode;
-    		this.dataForQtyDest[barcode+docType]=totAlForBarCode;
-    	}*/
-    	//采用数据库取值方式
-		this.dataForQtyRem = data_Rem.json_Rem.evalJSON();
-		this.dataForQtyDest= data_Rem.json_Dest.evalJSON();
-    	
+    	}
     },
     /**
      * 当编辑一个单元格已配数据时，列已配数合计跟着改变。并更新总款合计数
@@ -1054,13 +960,7 @@ DIST.prototype={
 		v2m_get_ret_any:function(cellData,data){
         var result=new Array();
         for(var i=0;i<data.length;i++){
-            if((cellData.b_so_matchsize_id?data[i].b_so_matchsize_id==cellData.b_so_matchsize_id:true)
-            &&(cellData.sty?data[i].sty==cellData.sty:true)
-            &&(cellData.color?data[i].color==cellData.color:true)
-            &&(cellData.size?data[i].size==cellData.size:true)
-            &&(cellData.docNo?cellData.docNo==data[i].docNo:true)
-            &&(cellData.store?cellData.store==data[i].store:true)
-            &&(cellData.barCode?cellData.barCode==data[i].barCode:true)){
+            if((cellData.docType?data[i].docType==cellData.docType:true)&&(cellData.sty?data[i].sty==cellData.sty:true)&&(cellData.color?data[i].color==cellData.color:true)&&(cellData.size?data[i].size==cellData.size:true)&&(cellData.docNo?cellData.docNo==data[i].docNo:true)&&(cellData.store?cellData.store==data[i].store:true)&&(cellData.barCode?cellData.barCode==data[i].barCode:true)){
                 result.push(data[i]);
             }
         }
@@ -1072,16 +972,12 @@ DIST.prototype={
      * @param cellData 含有docNo、store、barCode和qtyAl的JSON对象
      */
     update_v2mdata_celldata:function(cellData){
-        if(cellData.sty&&cellData.color&&cellData.b_so_matchsize_id&&cellData.docNo&&cellData.store&&cellData.barCode){
-    		for(var i=0;i<this.data.length;i++){
-    			if(cellData.b_so_matchsize_id==this.data[i].b_so_matchsize_id
-    			&&cellData.docNo==this.data[i].docNo
-    			&&cellData.store==this.data[i].store
-    			&&cellData.barCode==this.data[i].barCode
-    			&&cellData.sty==this.data[i].sty&&cellData.color==this.data[i].color){
-    				this.data[i].qtyAl=cellData.qtyAl||0;
-    			}
-    		}
+        if(cellData.docNo&&cellData.store&&cellData.barCode){
+        		for(var i=0;i<this.data.length;i++){
+        			if(cellData.docNo==this.data[i].docNo&&cellData.store==this.data[i].store&&cellData.barCode==this.data[i].barCode){
+        				this.data[i].qtyAl=cellData.qtyAl||0;
+        			}
+        		}
         }
     },
     /**
@@ -1132,26 +1028,6 @@ DIST.prototype={
       	return 0;
       }
     },
-     /**
-     * edit by Robin 2010.5.7
-     * 提供条码和订单类型，算出该码总的可配量
-     * @param barCode 条码
-     * @param docType 订单类型
-     */
-    get_barcode_rem_dist:function(barCode,docType){
-      if(barCode){
-//      	if(!this.priorityFutures){
-//      		if(this.dataForQtyRem[barCode+'INS']<this.dataForQtyRem[barCode+'FWD'])
-//      			this.dataForQtyRem[barCode+'FWD']=this.dataForQtyRem[barCode+'INS'];
-//      		else if(this.dataForQtyRem[barCode+'INS']>this.dataForQtyRem[barCode+'FWD'])
-//      			this.dataForQtyRem[barCode+'INS']=this.dataForQtyRem[barCode+'FWD'];
-//      	}
-      	//alert(this.dataForQtyRem[barCode+docType]);
-      	return parseInt(this.dataForQtyRem[barCode+docType],10);
-      }else{
-      	return 0;
-      }
-    },
     /**
      * edit by Robin 2010.5.12
      * 提供条码和订单类型，算出该码总的订单余量
@@ -1177,10 +1053,16 @@ DIST.prototype={
      * @param docType 订单类型
      */    
     update_barcode_can_dist:function(barCode,docType,realQtyAlChange){
-    	//var a=parseInt(this.dataForQtyCan[barCode+docType],10)-realQtyAlChange;
-    	var b=parseInt(this.dataForQtyRem[barCode+docType],10)-realQtyAlChange;
-    	//this.dataForQtyCan[barCode+docType]=a;
-		this.dataForQtyRem[barCode+docType]=b;
+    	var a=parseInt(this.dataForQtyCan[barCode+docType],10)-realQtyAlChange;
+    	this.dataForQtyCan[barCode+docType]=a;
+    	if(!this.priorityFutures){
+    		var types=['INS','FWD'];
+    		for(var i=0;i<types.length;i++){
+    			if(docType!=types[i]){
+    				this.dataForQtyCan[barCode+types[i]]=a;
+    			}
+    		}
+    	}
     },
     /**
      * edit by Robin 2010.5.7
@@ -1201,18 +1083,30 @@ DIST.prototype={
      * @param cellData 单元数据 必须有color,docNo,store属性
      * @param realQtyAlChange 实际单元配货编辑改变量
      */
-    update_row_count:function(cellData,realQtyAlChange,boxCnt){
+    update_row_count:function(cellData,realQtyAlChange){
     		if(cellData.docNo&&cellData.store&&cellData.color){
+    	//	alert(cellData.docNo+cellData.store+cellData.color);
     		//	alert(realQtyAlChange);
     			//更新小计
-      			var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id);
+      			var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store);
       			var eCnt = parseInt(e.html(),10);
       			e.html(eCnt+realQtyAlChange+"");
+      			//判断单箱数量是否符合
+//      			var boxQty = parseInt(e.attr("boxQty"));
+//      			if(eCnt+realQtyAlChange>boxQty){
+//      				alert("单箱数量"+boxQty+"不符，请重新输入！");
+//      				var oldQtyAl = cellData.oldQtyAl;
+//      				var x_index = cellData.x_index;
+//      				var y_index = cellData.y_index;
+//      				jQuery("#"+cellData.sty+"-"+x_index+"-"+y_index).val(oldQtyAl);
+//      				e.html(eCnt+"");
+//      				return;
+//      			}
       			//原合计
-      			var total =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id+"cnt");
+      			var total =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+"cnt");
       			//获取箱数
-    			//var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-boxcnt").val(),10);
-      			//var boxCnt = isNaN(count)?0:count;
+    			var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-boxcnt").val(),10);
+      			var boxCnt = isNaN(count)?0:count;
       			//更新合计
       			total.html((parseInt(e.html(),10)*boxCnt)+"");
       			//原总合计
@@ -1223,17 +1117,17 @@ DIST.prototype={
       			jQuery("#style-"+cellData.sty+"-total").html(total_All_Cnt+"");
         }
     },
-    update_row_box_count:function(cellData,realQtyAlChange,boxCnt){
+    update_row_box_count:function(cellData,realQtyAlChange){
     		if(cellData.docNo&&cellData.store&&cellData.color){
     	//	alert(cellData.docNo+cellData.store+cellData.color);
     		//	alert(realQtyAlChange);
-      			var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id);
+      			var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store);
       			//获取原先总计值
-      			var total =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id+"cnt");
+      			var total =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+"cnt");
       			var oldTotal = parseInt(total.html(),10);
       			//获取箱数
-      			//var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-boxcnt").val(),10);
-      			//var boxCnt = isNaN(count)?0:count;
+      			var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-boxcnt").val(),10);
+      			var boxCnt = isNaN(count)?0:count;
       			//更新总计值
       			total.html((parseInt(e.html(),10)*boxCnt)+"");
       			//获取更新后总计值
@@ -1519,11 +1413,7 @@ DIST.prototype={
               docnoArr[jj]={};
               docnoArr[jj].date=itemDocno[jj].billdate;
               docnoArr[jj].no = itemDocno[jj].xmlns;
-              docnoArr[jj].b_so_matchsize_id = itemDocno[jj].b_so_matchsize_id;
               docnoArr[jj].type = itemDocno[jj].sotype;
-              docnoArr[jj].product_name = itemDocno[jj].product_name;
-              docnoArr[jj].boxqty = itemDocno[jj].boxqty;
-              docnoArr[jj].boxqty_total = itemDocno[jj].boxqty_total;
               var itemTag=itemDocno[jj].q.array.tag_c;
               docnoArr[jj].tag=this.forItemTagChangeToArr(itemTag);
             }
@@ -1531,11 +1421,7 @@ DIST.prototype={
               docnoArr[0]={};
               docnoArr[0].date=itemDocno.billdate;
               docnoArr[0].no = itemDocno.xmlns;
-              docnoArr[0].b_so_matchsize_id = itemDocno.b_so_matchsize_id;
               docnoArr[0].type = itemDocno.sotype;
-              docnoArr[0].product_name = itemDocno.product_name;
-              docnoArr[0].boxqty = itemDocno.boxqty;
-              docnoArr[0].boxqty_total = itemDocno.boxqty_total;
               var itemTag=itemDocno.q.array.tag_c; 
               docnoArr[0].tag=this.forItemTagChangeToArr(itemTag);         	
           }
@@ -1554,7 +1440,6 @@ DIST.prototype={
       var dest=new Array();
       var barCode=new Array();
       var qtyAl=new Array();
-      var bardcode_id=new Array();
       if(this.checkIsArray(itemTag)){
           for(var s=0;s<itemTag.length;s++) {
               size[s]=itemTag[s].content?itemTag[s].content:itemTag[s];
@@ -1563,7 +1448,6 @@ DIST.prototype={
               dest[s]=itemTag[s].content?itemTag[s].DESTQTY:'non';
               barCode[s]=itemTag[s].content?itemTag[s].m_product_alias_id:'non';
               qtyAl[s]=itemTag[s].content?itemTag[s].QTY_ALLOT:'non';
-              bardcode_id[s]=itemTag[s].content?itemTag[s].BARCODE_ID:'non';
           }
       }else{
           size[0]=itemTag.content?itemTag.content:itemTag;
@@ -1572,7 +1456,6 @@ DIST.prototype={
           dest[0]=itemTag.content?itemTag.DESTQTY:'non';
           barCode[0]=itemTag.content?itemTag.m_product_alias_id:'non';
           qtyAl[0]=itemTag.content?itemTag.QTY_ALLOT:'non';
-          bardcode_id[0]=itemTag[s].content?itemTag[s].BARCODE_ID:'non';
       }
       tag.size=size;
       tag.can=can;
@@ -1580,7 +1463,6 @@ DIST.prototype={
       tag.dest=dest;
       tag.barCode=barCode;
       tag.qtyAl=qtyAl;
-      tag.bardcode_id=bardcode_id;
       return tag;
     },
     /*
@@ -1877,7 +1759,7 @@ DIST.prototype={
                 }
               }else{
                  dist.tonext=0;
-            	jQuery(dist.i).focus();
+            jQuery(dist.i).focus();
               	}
                }       
            }
@@ -1904,56 +1786,48 @@ DIST.prototype={
 //                	this.value=0;
 //                	}
                     $("isChanged").value='true';
-		            if(event.which==8||event.which==46||event.which==32){
-                    	if(this.value==""||this.value.strip()==""){
-                      		this.value=0;
-                    		}
-                		}
-                	 var cellData1={};
+                    var cellData1={};
 				            cellData1.barCode=jQuery(this).attr("barCode");
 				            cellData1.docNo = jQuery(this).attr("docNo");
 				            cellData1.store=jQuery(this).attr("store");
 				            cellData1.sty=jQuery(this).attr("sty");
 				            cellData1.color=jQuery(this).attr("color");
-				            cellData1.size=jQuery(this).attr("size");
-				            cellData1.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
+				            if(event.which==8||event.which==46||event.which==32){
+                    	if(this.value==""||this.value.strip()==""){
+                      		this.value=0;
+                    		}
+                		}
 		            var dataCell1=dist.v2m_get_ret(cellData1)[0];
 		            var oldQtyAl=parseInt(dataCell1.qtyAl,10);//未编辑前的单元的已配量
 		           // var nowQty=parseInt(jQuery(this).val(),10);//响应事件后的数量
 		            var nowQty=parseInt(jQuery(this).val(),10);
 	              	if(isNaN(this.value)){
-       	            	dist.i=this;
-	      				dist.tonext=1;
+       	            //  dist.tonext=1;
                     	this.value=0;
         	            alert("请输入数字");
                      	jQuery(this).focus();
-                     	return;
                     }
                 	//获取款号
                    	var boxSty =  jQuery(this).attr("sty");
                    	
-                   	//var qtyRem=parseInt(dataCell1.qtyRem,10);
+                   	var qtyRem=parseInt(dataCell1.qtyRem,10);
                    
                    	if(jQuery(this).attr("size")!='箱数'){
                    		var boxColor = jQuery(this).attr("color");
 	               		var boxStore = jQuery(this).attr("store");
-	               		var docno = jQuery(this).attr("docno");
-	               		var b_so_matchsize_id = jQuery(this).attr("b_so_matchsize_id");
-                   		var boxCount = parseInt(jQuery("#"+boxSty+"-"+boxColor+"-"+boxStore+"-"+docno+"-"+b_so_matchsize_id+"-boxcnt").val(),10);
-               		 	var qtyAlChange=nowQty-oldQtyAl;//改变的数量
-	                    var barCodeRemDist=dist.get_barcode_rem_dist(jQuery(this).attr("barCode"),jQuery(this).attr("docType"));
-	                    if(qtyAlChange*boxCount>barCodeRemDist&&qtyAlChange>0) { //||qtyAlChange>barCodeCanDist
+                   		var boxCount = parseInt(jQuery("#"+boxSty+"-"+boxColor+"-"+boxStore+"-boxcnt").val(),10);
+               		 	var qtyAlChange=(nowQty-oldQtyAl)*boxCount;//改变的数量
+               		 	var barCodeCanDist=dist.get_barcode_can_dist(jQuery(this).attr("barCode"),jQuery(this).attr("docType"));//可分配量
+	                    //nowQty*boxCount>qtyRem||
+	                    if(qtyAlChange>barCodeCanDist) {
 	                    	dist.tonext=1;
+	                    	jQuery(this).focus();
 	                    	dist.i=this;
 	                        alert("当前可配量已小于0！请重新分配！");
+	                    //  jQuery(this).focus();
 	                        this.value = oldQtyAl;
-	                        //jQuery(this).focus();
-	                        //dwr.util.selectRange(this,0,100);
+	                        dwr.util.selectRange(this,0,100);
 	                        return;
-	                    }else{
-	                    	if(barCodeRemDist>=0){
-	                    		jQuery("td[barCode='"+jQuery(this).attr("barCode")+"库存']").removeClass("red");
-	                    	}
 	                    }
 	                    var cellData={};
 	                    cellData.color = jQuery(this).attr("color");
@@ -1961,163 +1835,104 @@ DIST.prototype={
 	                    cellData.docNo = jQuery(this).attr("docNo");
 	                    cellData.store=jQuery(this).attr("store");
 	                    cellData.qtyId=jQuery(this).attr("qtyId");
-	                    cellData.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
 	                    cellData.qtyAl=nowQty;
 	                    cellData.oldQtyAl=oldQtyAl;
 	                    cellData.sty=jQuery(this).attr("sty");
-	                    cellData.docType="FWD";
+	                    cellData.docType=jQuery(this).attr("docType");
 	                    cellData.size=jQuery(this).attr("size");
 	                    cellData.x_index=jQuery(this).attr("x-index");
 	                    cellData.y_index=jQuery(this).attr("y-index");
 	                    cellData.box = '0';
 	                    
-	                    var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id);
+	                    var e =jQuery("#"+cellData.qtyId+cellData.color+cellData.docNo+cellData.store);
 		      			var eCnt = parseInt(e.html(),10);
 		      			//判断单箱数量是否符合
 		      			var boxQty = parseInt(e.attr("boxQty"));
 		      			if(eCnt+nowQty-oldQtyAl>boxQty){
-		      				dist.i=this;
-		      				dist.tonext=1;
-		      				alert("单箱数量_"+boxQty+"_不符，请重新输入！");
+		      				alert("单箱数量"+boxQty+"不符，请重新输入！");
 		      				jQuery("#"+cellData.sty+"-"+cellData.x_index+"-"+cellData.y_index).val(oldQtyAl);
 		      				e.html(eCnt+"");
 		      				return;
 		      			}
-		      			
-		      			//判断配码总数量是否超标  2013.9.16
-		      			var boxqty_total = parseInt(e.attr("boxqty_total"));
-		      			if((eCnt+nowQty-oldQtyAl)*boxCount>boxqty_total){
-		      				//dist.i=this;
-		      				//dist.tonext=1;
-		      				alert("配码总数量超标("+(eCnt+nowQty-oldQtyAl)*boxCount+"/"+boxqty_total+",请重新输入！(配码)");
-		      				jQuery("#"+cellData.sty+"-"+cellData.x_index+"-"+cellData.y_index).val(oldQtyAl);
-		      				e.html(eCnt+"");
-		      				return;
-		      			}
-		      			//改变库存
-		      			var oldQtyCan = parseInt(jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(),10);
-		      			var nowQtyCan = oldQtyCan - qtyAlChange*boxCount; 
-		      			jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(nowQtyCan+"");
-		      			//改变已配量
-		      			var oldQtyDest = parseInt(jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(),10);
-		      			var nowQtyDest = oldQtyDest + qtyAlChange*boxCount; 
-		      			jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(nowQtyDest+"");
 	                   	dist.update_when_cell_real_change(cellData,qtyAlChange);
                    	}else{
                    		//判断箱数是否为零
-                   		var newTotalBoxCnt = 0;
-               			if(nowQty>=0){
-               				var boxHtml = jQuery("#"+boxSty+"箱数");
+               			var boxCount = parseInt(jQuery(this).val(),10);
+               			var newTotalBoxCnt = 0;
+               			if(isNaN(boxCount)?0:boxCount>0){
+               				var boxStyle = jQuery(this).attr("sty");
+               				var boxHtml = jQuery("#"+boxStyle+"箱数");
                				var oldTotalBoxCnt = 0;
                				//获取原箱数款合计
                				for(var i=0;i<dist.dataforbox.length;i++){
-					            if(boxSty?dist.dataforbox[i].sty==boxSty:true){
+					            if(boxStyle?dist.dataforbox[i].sty==boxStyle:true){
 					               oldTotalBoxCnt =dist.dataforbox[i].qty;
 					            }
 					        }
-           				newTotalBoxCnt = oldTotalBoxCnt+nowQty-oldQtyAl;
+               				newTotalBoxCnt = oldTotalBoxCnt+nowQty-oldQtyAl;
+               				
+	               		}else{
+	               			jQuery(this).val(1);
+	               			alert("请输入箱数！");
+	               			jQuery(this).focus();
+	               			return;
 	               		}
-	               		//判断配码箱数是否超标
-	               		var docNoBoxCnt = parseInt(jQuery(this).attr("qtyCan"),10); //获取订单箱数
-	               		if(nowQty>docNoBoxCnt){
-	               			//dist.i=this;
-		      				//dist.tonext=1;
-		      				alert("配码箱数超标("+docNoBoxCnt+"),请重新输入！");
-		      				jQuery(this).val(oldQtyAl);
-		      				return;
-	               		}
-	               		//判断配码总数量是否超标 2013.9.16
-               			var cellData={};	                    
-	                    cellData.sty=jQuery(this).attr("sty");
-	                    cellData.color=jQuery(this).attr("color");
-	                    cellData.docNo=jQuery(this).attr("docno");
-	                    cellData.store=jQuery(this).attr("store");
-               			cellData.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
-	                    var e =jQuery("#"+cellData.sty+cellData.color+cellData.docNo+cellData.store+cellData.b_so_matchsize_id);
-		      			var eCnt = parseInt(e.html(),10);
-		      			var boxqty_total = parseInt(e.attr("boxqty_total"));
-		      			if(eCnt*nowQty>boxqty_total){
-		      				//dist.i=this;
-		      				//dist.tonext=1;
-		      				alert("配码总数量超标("+eCnt*nowQty+"/"+boxqty_total+",请重新输入！(箱)");
-		      				jQuery(this).val(oldQtyAl);
-		      				e.html(eCnt+"");
-		      				return;
-		      			}
                    		//获取索引
 	               		var x_index = jQuery(this).attr("x-index");
 	               		var y_index = jQuery(this).attr("y-index");
+	               		//var booleanBox = true;
                    		//当输入箱数时，判断是否超量
 	               		for(var index=0;index<parseInt(x_index);index++){
 	               			//获取该行下的每个尺寸输入的值
 	               			var sizeValue = parseInt(jQuery("#"+boxSty+"-"+index+"-"+y_index).val(),10);
 	               			if(isNaN(sizeValue)){
 	               				sizeValue = 0;
-	               			}else{
-	               				var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
-		               			var size = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
-		               			//获取可用库存
-		               			var barCodeChangeRemDist=dist.get_barcode_rem_dist(baCode,"FWD");
-		               			var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
-		               			
-		               			if(sizeValueChange>barCodeChangeRemDist&&sizeValueChange>0) { //||sizeValueChange>barCodeChangeCanDist
-		               				dist.tonext=1;
-			                    	dist.i=this;
-			                        alert("当前可配量已小于0！请重新分配！");
-			                        this.value = oldQtyAl;
-			                        jQuery(this).focus();
-			                        dwr.util.selectRange(this,0,100);
-			                        return;
-			                    }else{
-									if(barCodeChangeRemDist>=0){
-			                    		jQuery("#"+boxSty+" td[barCode='"+jQuery(this).attr("barCode")+"库存']").removeClass("red");
-			                    	}
-								}
-		               		}
-	               		}
-	               		for(var index=0;index<parseInt(x_index);index++){
-	               				var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
-		               			var size = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
-	               				var sizeValue = parseInt(jQuery("#"+boxSty+"-"+index+"-"+y_index).val(),10);
-	               				sizeValue = isNaN(sizeValue)?0:sizeValue;
-	               				var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
-	               			 	var cellData={};
-			                    cellData.color = jQuery(this).attr("color");
-			                    cellData.barCode=baCode;
-			                    cellData.docNo = jQuery(this).attr("docNo");
-			                    cellData.store=jQuery(this).attr("store");
-			                    cellData.qtyId=jQuery(this).attr("qtyId");
-			                    cellData.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
-			                    cellData.qtyAl=sizeValue;
-			                    cellData.sty=boxSty;
-			                    cellData.docType="FWD";
-			                    cellData.box = '1';
-			                    cellData.size=size;
-			                    
-			                     //改变库存
-				      			var oldQtyCan = parseInt(jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(),10);
-				      			var nowQtyCan = oldQtyCan - sizeValueChange; 
-				      			jQuery("#"+boxSty+" td[barCode='"+cellData.barCode+"库存']").html(nowQtyCan+"");
-				      			//改变已配量
-				      			var oldQtyDest = parseInt(jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(),10);
-				      			var nowQtyDest = oldQtyDest + sizeValueChange; 
-				      			jQuery("#"+boxSty+" td[qtyDest='"+cellData.barCode+"已配']").html(nowQtyDest+"");
-			                   	dist.update_when_cell_real_change(cellData,sizeValueChange);
+	               			}
+	               			
+	               			var baCode = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("barCode");
+	               			var doType = jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("docType");
+	               			var barCodeChangeDist=dist.get_barcode_can_dist(baCode,doType);
+	               			var sizeValueChange = sizeValue*(nowQty-oldQtyAl);//改变的量
+	               			//sizeValue*nowQty>qtyRem||
+	               			if(sizeValueChange>barCodeChangeDist) {
+	               				dist.tonext=1;
+		                    	jQuery(this).focus();
+		                    	dist.i=this;
+		                        alert("当前可配量已小于0！请重新分配！");
+		                    	// jQuery(this).focus();
+		                        this.value = oldQtyAl;
+		                        dwr.util.selectRange(this,0,100);
+		                        return;
+		                    }
+	               			
+	               			var cellData={};
+		                    cellData.color = jQuery(this).attr("color");
+		                    cellData.barCode=baCode;
+		                    cellData.docNo = jQuery(this).attr("docNo");
+		                    cellData.store=jQuery(this).attr("store");
+		                    cellData.qtyId=jQuery(this).attr("qtyId");
+		                    cellData.qtyAl=sizeValue;
+		                    cellData.sty=boxSty;
+		                    cellData.docType=doType;
+		                    cellData.box = '1';
+		                    cellData.size=jQuery("#"+boxSty+"-"+index+"-"+y_index).attr("size");
+		                    
+		                    //var realQtyAlChange=newQtyAl-oldQtyAl;//实际单元配货量改变数
+		                   	dist.update_when_cell_real_change(cellData,sizeValueChange);
+	               			//获取当前尺寸库存量
+	               			//var wareSizeCnt = parseInt(jQuery("#"+boxSty+"-"+index+"-"+y_index+"库存").html(),10);
 	               		}
 	               		//更新箱数
 	               		var cellDataBox={};
-	               		cellDataBox.sty=jQuery(this).attr("sty");
-	               		cellDataBox.color=jQuery(this).attr("color");
 						cellDataBox.barCode=jQuery(this).attr("barCode");
 				        cellDataBox.docNo = jQuery(this).attr("docNo");
 				        cellDataBox.store=jQuery(this).attr("store");
-				        cellDataBox.b_so_matchsize_id=jQuery(this).attr("b_so_matchsize_id");
-				        cellDataBox.qtyAl=parseInt(jQuery(this).val(),10); //现在的配货量
+				        cellDataBox.qtyAl=jQuery(this).val(); //现在的配货量
 		    			dist.update_v2mdata_celldata(cellDataBox);//更新单元
 		    			
 		    			//设置新的箱数款合计
 	       				for(var i=0;i<dist.dataforbox.length;i++){
-				            if(boxSty?dist.dataforbox[i].sty==boxSty:true){
+				            if(boxStyle?dist.dataforbox[i].sty==boxStyle:true){
 				               dist.dataforbox[i].qty = newTotalBoxCnt;
 				            }
 				        }
@@ -2148,14 +1963,11 @@ DIST.prototype={
      */      
     update_when_cell_real_change:function(cellData,realQtyAlChange){
     		//this.allQtyAl+=realQtyAlChange;//总已配
-    	var cellData1={};
-    	cellData1.sty=cellData.sty;
-        cellData1.color = cellData.color;	
-		cellData1.barCode=cellData.barCode;
+    		var cellData1={};
+				cellData1.barCode=cellData.barCode;
         cellData1.docNo = cellData.docNo;
         cellData1.store=cellData.store;
         cellData1.qtyAl=cellData.qtyAl; //现在的配货量
-        cellData1.b_so_matchsize_id=cellData.b_so_matchsize_id;
 		this.update_v2mdata_celldata(cellData1);//更新单元
         var cellData2={};
         cellData2.color = cellData.color;
@@ -2163,33 +1975,33 @@ DIST.prototype={
         cellData2.store=cellData.store;  
         cellData2.qtyId=cellData.qtyId; 
         cellData2.sty=cellData.sty;
-        cellData2.b_so_matchsize_id=cellData.b_so_matchsize_id;
+        //cellData2.oldQtyAl=cellData.oldQtyAl;
+        //cellData2.x_index=cellData.x_index;
+        //cellData2.y_index=cellData.y_index;
       	//  alert(realQtyAlChange); 
       	var sizeStr = cellData.size;
-      	//获取箱数
-		var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-"+cellData.docNo+"-"+cellData.b_so_matchsize_id+"-boxcnt").val(),10);
-		var boxCnt = isNaN(count)?0:count;
+      	
       	if(sizeStr!='箱数'){
       		if(cellData.box=='0'){
+      			//获取箱数
+				var count = parseInt(jQuery("#"+cellData.sty+"-"+cellData.color+"-"+cellData.store+"-boxcnt").val(),10);
+				var boxCnt = isNaN(count)?0:count;
+				realQtyAlChange = parseInt(realQtyAlChange/boxCnt,10);
       			// 可编辑单元数量改变更新小计 		
-				this.update_row_count(cellData2,parseInt(realQtyAlChange,10),boxCnt);
+				this.update_row_count(cellData2,realQtyAlChange);
 				//更新列合计
-				this.update_style_tot_al_for_col(cellData.size,cellData.sty,parseInt(realQtyAlChange,10));
-				if(boxCnt>0){
-					//更新款总已配量
-					//this.update_style_qty_al(cellData.sty,realQtyAlChange);
-					//更新库存可配、余量可配
-			       	this.update_barcode_can_dist(cellData.barCode,cellData.docType,realQtyAlChange);
-				}
-      		}
-      		else{
-				//更新库存可配、余量可配
-		       	this.update_barcode_can_dist(cellData.barCode,cellData.docType,realQtyAlChange);
-      			this.update_row_box_count(cellData2,realQtyAlChange,boxCnt);
+				this.update_style_tot_al_for_col(cellData.size,cellData.sty,realQtyAlChange);
+      		}else{
+      			this.update_row_box_count(cellData2,realQtyAlChange);
       		}
       	}else{
-      		this.update_row_box_count(cellData2,realQtyAlChange,boxCnt);
+      		this.update_row_box_count(cellData2,realQtyAlChange);
       	}
+		
+		//更新款总已配量
+		this.update_style_qty_al(cellData.sty,realQtyAlChange);
+		
+       	this.update_barcode_can_dist(cellData.barCode,cellData.docType,realQtyAlChange);
     },
     showContent1:function(tb,type){
         var lies=$("category_manu").getElementsByTagName("li");
