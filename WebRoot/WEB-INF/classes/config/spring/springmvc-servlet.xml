@@ -111,6 +111,7 @@
 			<mvc:mapping path="/message**/**" />
 			<mvc:mapping path="/filemanager**/**" />
 			<mvc:mapping path="/pdaaction**/**"/>
+			<mvc:mapping path="/wzsjj**/**" />
 			<bean class="com.authority.web.interseptor.LoginInterceptor"></bean>
 		</mvc:interceptor>
 	</mvc:interceptors>

@@ -236,4 +236,74 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 		return result > 0 ? "01" : msg;
 	}
 
+	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+	public String save_check(List list, String USERID) {
+		String query="",update ="",insert = "",delete="",B_PO_BOXNO_ID_="",procedure="",boxqty="";
+		int result = 0;
+		String msg ="";
+		String IS_CHANG ="N";
+		Boolean check = true;
+		Boolean del = true;
+		try{
+						
+			String M_IN_ID ="";
+			
+			for (Object object : list) {
+				Map<String,Object> list_child = JSON.parseObject(object.toString());
+				String BOXNO = list_child.get("BOXNO")==null?"":list_child.get("BOXNO").toString();
+				if(del){
+					// 先删除该箱号的原有验收记录
+					delete = "delete from m_in_diff a where A.B_PO_BOXNO_ID in ( select ID from b_po_boxno where BOXNO='"+BOXNO+"' ) ";
+					jdbcTemplate.update(delete);
+					del = false ;
+					//获取 M_IN_ID 
+					query = "select max(A.ID) M_IN_ID "+
+							"from m_in a, m_out b ,M_OUT_BOXNOITEM c , b_po_boxno d  "+
+							"where A.REAL_ID=B.REAL_ID  and B.ID=C.M_OUT_ID  and C.B_PO_BOXNO_ID = D.ID "+ 
+							"and D.BOXNO='"+BOXNO+"'" ;
+					M_IN_ID = jdbcTemplate.queryForObject(query, String.class);
+					
+				}
+				
+				String B_PO_BOXNO_ID  = list_child.get("B_PO_BOXNO_ID")==null?"":list_child.get("B_PO_BOXNO_ID").toString();
+				if(B_PO_BOXNO_ID!=null&&!B_PO_BOXNO_ID.equals(""))
+					B_PO_BOXNO_ID_=B_PO_BOXNO_ID;
+				
+				String M_PRODUCT_ALIAS_NO = list_child.get("M_PRODUCT_ALIAS_NO")==null?"":list_child.get("M_PRODUCT_ALIAS_NO").toString();
+				String QTY_QR =list_child.get("QTY_QR")==null?"0":list_child.get("QTY_QR").toString();
+				String QTY = list_child.get("QTY")==null?"0":list_child.get("QTY").toString();
+				Map<String,Object> paramMap = new HashMap<String, Object>();
+				// 明细确认数量有不一致情况,执行插入操作
+				if(!QTY_QR.equals(QTY)){
+					insert = "insert into M_IN_DIFF(ID, AD_CLIENT_ID, AD_ORG_ID, M_IN_ID,B_PO_BOXNO_ID,M_PRODUCT_ID,M_PRODUCTALIAS_ID,M_ATTRIBUTESETINSTANCE_ID,QTY,QTY_REAL,MODIFIERID,MODIFIEDDATE,ISACTIVE) " +
+							"select GET_SEQUENCES('M_IN_DIFF') ID,AD_CLIENT_ID, AD_ORG_ID, :M_IN_ID, B_PO_BOXNO_ID, B.M_PRODUCT_ID, B.ID M_PRODUCTALIAS_ID, B.M_ATTRIBUTESETINSTANCE_ID, :QTY,:QTY_REAL,:MODIFIERID,sysdate,'Y' "+ 
+							"from B_PO_BOXITEM A "+ 
+							"LEFT JOIN (SELECT ID,M_PRODUCT_ID,M_ATTRIBUTESETINSTANCE_ID FROM M_PRODUCT_ALIAS WHERE NO=:M_PRODUCT_ALIAS_NO ) B ON 1=1 "+ 
+							"where exists(select 'x' from  B_PO_BOXNO B WHERE A.B_PO_BOXNO_ID = B.ID AND B.BOXNO=:BOXNO ) AND ROWNUM=1";
+					Map<String,Object> param = new HashMap<String, Object>();
+					param.put("M_IN_ID", M_IN_ID);
+					param.put("QTY", QTY);
+					param.put("QTY_REAL", QTY_QR);
+					param.put("M_PRODUCT_ALIAS_NO", M_PRODUCT_ALIAS_NO);
+					param.put("BOXNO", BOXNO);
+					param.put("MODIFIERID", USERID);
+					
+					njdbcTemplate.update(insert, param);					
+				}
+				
+			}
+			
+			result = 1;
+			
+		} catch(Exception e){
+			System.out.println(e);
+			String str = "执行失败,请重试或联系管理员";
+			msg = e.toString();
+			throw new RuntimeException(e);
+		}
+		// TODO Auto-generated method stub
+		return result > 0 ? "01" : msg;
+	}
+
 }

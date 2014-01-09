@@ -1,8 +1,11 @@
 package com.authority.web.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Resource;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.authority.common.springmvc.DateConvertEditor;
+import com.authority.pojo.BaseRoles;
 import com.authority.pojo.BaseUsers;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExceptionReturn;
@@ -36,6 +41,7 @@ import com.authority.pojo.ExtReturn;
 import com.authority.pojo.PdaReturn;
 import com.authority.pojo.Tree;
 import com.authority.service.BaseModulesService;
+import com.authority.service.BaseRolesService;
 import com.authority.service.BaseUsersService;
 import com.authority.web.interseptor.WebConstants;
 import com.google.code.kaptcha.Constants;
@@ -47,15 +53,18 @@ import com.google.code.kaptcha.Constants;
  * @date 2011-10-20 上午11:45:00
  */
 @Controller
-public class LoginController {
+public class LoginController {  
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 	@Autowired
 	private BaseUsersService baseUsersService;
 	@Autowired
 	private BaseModulesService baseModulesService;
+	@Autowired
+	private BaseRolesService baseRolesService;
+	
 	/** 限制时间 */
-	@Value("${limit.millis:3600000}")
+	@Value("${limit.millis:3600000}") 
 	private Long millis;
 
 	@SuppressWarnings("unused")
@@ -241,6 +250,78 @@ public class LoginController {
 	@RequestMapping(value = "/findpwd", method = RequestMethod.GET)
 	public String findpwd() {
 		return "user/findpwd";
+	}
+	
+	/**
+	 * 转到找回用户密码页面
+	 */
+	@RequestMapping(value = "/register", method = RequestMethod.GET)
+	public String register() {
+		return "user/register";
+	}
+	
+	/**
+	 * 找回用户密码
+	 */
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	@ResponseBody
+	public Object saveregister(BaseUsers user,@RequestParam String captcha,HttpSession session) {
+		try {
+			if (StringUtils.isBlank(captcha)) {
+				return new ExtReturn(false, "验证码不能为空！");
+			}
+			Object sessionCaptcha =  session.getAttribute(Constants.KAPTCHA_SESSION_KEY);
+			if(null==sessionCaptcha){
+				return new ExtReturn(false, "验证码已经失效!请重新输入新的验证码！");
+			}
+			if (!captcha.equalsIgnoreCase((String)sessionCaptcha)) {
+				return new ExtReturn(false, "验证码输入不正确,请重新输入！");
+			}
+			//移除验证码，不能用同一个验证码重复提交来试探密码等，不要像铁道部的网站那样
+			session.removeAttribute(Constants.KAPTCHA_SESSION_KEY);
+			if (user == null) {
+				return new ExtReturn(false, "用户不能为空！");
+			}
+			if (StringUtils.isBlank(user.getAccount())) {
+				return new ExtReturn(false, "帐号不能为空！");
+			}
+			if (StringUtils.isBlank(user.getEmail())) {
+				return new ExtReturn(false, "注册邮箱不能为空！");
+			}
+			Criteria criteria = new Criteria();
+			//验证用户是否存在
+			criteria.put("account", user.getAccount());
+			int count = this.baseUsersService.countByExample(criteria);
+			if(count>0){
+				return new ExtReturn(false, "帐号已经被注册！");
+			}
+			//普通用户的角色信息
+			Collection<String> roleIds = new ArrayList<String>();			
+			Criteria criteria_role = new Criteria();
+			criteria_role.put("roleName", "普通账户");
+			List<BaseRoles> list_roles = this.baseRolesService.selectByExample(criteria_role);
+			for (BaseRoles baseRoles : list_roles) {
+				roleIds.add(baseRoles.getRoleId());
+			}
+			//插入用户
+			criteria.clear();			
+			criteria.put("user", user);
+			user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+			criteria.put("roleIds", roleIds);
+			String result = this.baseUsersService.saveUser(criteria);
+			
+			if ("01".equals(result)) {
+				return new ExtReturn(true, "用户注册成功");
+			} else if ("00".equals(result)) {
+				return new ExtReturn(false, "注册失败,请稍后重试！");
+			} else {
+				return new ExtReturn(false, result);
+			}
+			
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}
 	}
 
 	/**

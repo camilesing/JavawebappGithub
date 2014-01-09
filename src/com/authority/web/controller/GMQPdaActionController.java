@@ -98,6 +98,29 @@ public class GMQPdaActionController {
 		
 	}
 	
+	@RequestMapping(value="/login_c_customerup")
+	@ResponseBody
+	public Object login_c_customerup(HttpSession session, HttpServletRequest request) {
+		try {
+			String C_STORE_ID = request.getParameter("C_STORE_ID").toString();
+			String FROM = request.getParameter("FROM")==null?"":request.getParameter("FROM").toString();
+			String query = "select ID,NAME,C_CUSTOMER_ID,C_CUSTOMERUP_ID from c_store a where a.id='"+C_STORE_ID+"'";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			int total = list.size();
+			if(list.size()==0&&FROM.equals("PDA")){
+				Map<String,Object> map = new HashMap<String, Object>();
+				map.put("ID", "");
+				list.add(map);
+			}
+			return new ExtGridReturn(total, list);
+						
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}			
+		
+	}
+	
 	@RequestMapping(value="/login")
 	@ResponseBody
 	public Object login(HttpSession session, HttpServletRequest request) {

@@ -98,7 +98,7 @@
 	<!-- Dwr Comet 配置 -->
 	<bean id="chatService" class="test.controls.ChatService"/>
 	<bean id="chatMessageClient" class="test.controls.ChatMessageClient"/>
-	<bean id="HenloController" class="com.henlo.process.HenloController" />
+	<!-- <bean id="HenloController" class="com.henlo.process.HenloController" /> -->
 
 	<!-- RESTFUL Webservice 客户端 -->
 	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
@@ -130,11 +130,11 @@
 	<task:annotation-driven />
 		<bean id="TaskYRK_Openmas" class="com.henlo.process.TaskYRK_Openmas"></bean>
 	<task:scheduled-tasks>
-	5/3 * * * * ? 这里表示的是从第五秒开始 ，每三秒执行一次
 		<task:scheduled ref="TaskYRK_Openmas" method="openmas" cron="50/59 * * * * ?" />
 	</task:scheduled-tasks>	 
 	-->
 	<!-- 
+	    5/3 * * * * ? 这里表示的是从第五秒开始 ，每三秒执行一次
 		秒     0-59     , - * /  
 		分     0-59     , - * /  
 		小时     0-23     , - * /  

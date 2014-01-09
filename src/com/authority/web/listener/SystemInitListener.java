@@ -10,7 +10,6 @@ import com.authority.common.springmvc.SpringContextHolder;
 import com.authority.pojo.Criteria;
 import com.authority.service.BaseFieldsService;
 
-import config.Classpathlocation;
 
 /**
  * 系统初始化监听器

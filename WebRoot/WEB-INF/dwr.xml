@@ -12,9 +12,9 @@
         <param name="beanName" value="chatService" />
     </create>
     
-    <create creator="spring" javascript="HenloController" >
+    <!-- <create creator="spring" javascript="HenloController" >
       	<param name="beanName" value="HenloController"/>
-    </create>
+    </create> -->
     
 </allow>
 </dwr>

@@ -105,26 +105,26 @@ public class SmsServiceImpl implements SmsService {
 		messageid= messageid==null?"":messageid;
 		StatusCode = StatusCode==null?"":StatusCode;
 		
-		String STATE ="A";
-		if(StatusCode.equals("DELIVRD")){ //
+		String STATE ="E";
+		if(StatusCode.toUpperCase().equals("DELIVRD")){ //
 			STATE = "B";
 		}
 		//插入所有状态返回信息到  HENLO_SMS_STORE 表
-		String insert = "insert into HENLO_SMS_STORE select sys_guid(),'"+messageid+"','"+
-				MessageDeliveryStatus+"','"+ReceivedAddress+"','"+StatusCode+"','"+SendAddress+"' from dual";
+		String insert = "insert into HENLO_SMS_STORE(ID, MESSAGEID, MESSAGEDELIVERYSTATUS, RECEIVEDADDRESS, STATUSCODE, SENDADDRESS,addtime) " +
+				"select sys_guid(),'"+messageid+"','"+MessageDeliveryStatus+"','"+ReceivedAddress+"','"+StatusCode+"','"+SendAddress+"',sysdate from dual";
 		jdbcTemplate.update(insert);
 		
 		if(!messageid.equals("")){
-			String update = "update SMS_OUTMSG a set a.STATE='"+STATE+"' where MESSAGEID ='"+messageid+"'";
+			String update = "update SMS_OUTMSG a set a.STATE='"+STATE+"' where MESSAGEID ='"+messageid+"' and a.phone='"+ReceivedAddress+"'";
 			String query = "";
 			if(jdbcTemplate.update(update)>0){
 				//更新来源表,队列中的短信
-				System.out.println("开始更新表……U_MESSAGE_ADDR U_MESSAGE");		
 				if(STATE.equals("B")){
+					System.out.println("======开始更新表……U_MESSAGE_ADDR U_MESSAGE========");
 					update ="update U_MESSAGE_ADDR a set a.STATE=2 " +
-							"where exists(select 'x' from SMS_OUTMSG b where a.id=b.tablerowid and b.tablename='U_MESSAGE_ADDR' and MESSAGEID ='"+messageid+"')";
+							"where exists(select 'x' from SMS_OUTMSG b where b.STATE='B' and a.id=b.tablerowid and b.tablename='U_MESSAGE_ADDR' and b.MESSAGEID ='"+messageid+"' and b.phone='"+ReceivedAddress+"' )";
 					jdbcTemplate.update(update);
-					query = "select max(tablerowid) tablerowid from SMS_OUTMSG where MESSAGEID ='"+messageid+"' ";
+					query = "select max(tablerowid) tablerowid from SMS_OUTMSG where MESSAGEID ='"+messageid+"' and phone='"+ReceivedAddress+"'";
 					String tablerowid = jdbcTemplate.queryForObject(query, String.class);
 					if(tablerowid==null||tablerowid.equals(""))
 						;
@@ -140,7 +140,6 @@ public class SmsServiceImpl implements SmsService {
 						}
 					}
 				}
-				
 			}
 		}		
 	}

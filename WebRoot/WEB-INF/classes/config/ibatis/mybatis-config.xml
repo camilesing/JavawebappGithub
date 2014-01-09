@@ -22,5 +22,10 @@
 		<mapper resource="sqlmap/WebMessageMapper.xml" />
 		<mapper resource="sqlmap/CommonModulesMapper.xml" />
 		<mapper resource="sqlmap/WebQudviewMapper.xml" />
+		<!-- 温州交警网接口开发 -->
+		<mapper resource="sqlmap/WzsjjcarregisterMapper.xml" />
+		<mapper resource="sqlmap/WzsjjcarpeccancyMapper.xml" />
+		<mapper resource="sqlmap/WzsjjSmssendMapper.xml" />
+		<mapper resource="sqlmap/WzsjjSmsreturnMapper.xml" />
 	</mappers>
 </configuration>

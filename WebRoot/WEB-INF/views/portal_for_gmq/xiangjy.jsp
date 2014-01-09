@@ -97,42 +97,8 @@
 						xiangjy.printAction.enable();
 					xiangjy.disableFun();
 					if(store.getCount()>0){
-						//读取箱被检验状态
-						Share.AjaxRequest({
-							url : xiangjy.boxcheck,
-							showMsg : false,
-							params : {
-								BOXNO : xiangjy.BOXNO
-							},
-							callback : function(json) {
-								if(json.success){
-									var boxcheckstatus = json.msg;	
-									var strs= new Array();
-									strs=boxcheckstatus.split(",");
-									if(strs[0]=="2"){
-										Ext.Msg.alert('提示', '<font color=red >箱号对应销售单已经提交! </font>');
-										xiangjy.store.removeAll();
-					                	return ;										
-									}else if(strs[1]=="2"){
-										Ext.Msg.confirm('提示', '该箱已经被检验,是否重新检验! \n（确认？）', function(btn, text) {
-											if (btn == 'yes') {
-												xiangjy.alwaysFun();
-												Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
-											}else{
-												xiangjy.store.removeAll();
-												return;
-											}
-										});
-									}else{
-										xiangjy.alwaysFun();
-										Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
-									}
-								}															
-							}
-						});
-						
 						//读取装箱数量、款号、颜色等控制参数
-						Share.AjaxRequest({
+						Share.AjaxRequest({ 
 							url : xiangjy.standard,
 							showMsg : false,
 							params : {
@@ -173,6 +139,41 @@
 								}								
 							}
 						});
+						
+						//读取箱被检验状态
+						Share.AjaxRequest({
+							url : xiangjy.boxcheck,
+							showMsg : false,
+							params : {
+								BOXNO : xiangjy.BOXNO
+							},
+							callback : function(json) {
+								if(json.success){
+									var boxcheckstatus = json.msg;	
+									var strs= new Array();
+									strs=boxcheckstatus.split(",");
+									if(strs[0]=="2"){
+										Ext.Msg.alert('提示', '<font color=red >箱号对应销售单已经提交! </font>');
+										xiangjy.store.removeAll();
+					                	return ;										
+									}else if(strs[1]=="2"){
+										Ext.Msg.confirm('提示', '该箱已经被检验,是否重新检验! \n（确认？）', function(btn, text) {
+											if (btn == 'yes') {
+												xiangjy.alwaysFun();
+												Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+											}else{
+												xiangjy.store.removeAll();
+												return;
+											}
+										});
+									}else{
+										xiangjy.alwaysFun();
+										Ext.getCmp('M_PRODUCT_ALIAS_NO').focus(1000);
+									}
+								}															
+							}
+						});
+						
 						
 					}
 					
@@ -499,7 +500,7 @@
 			},
 			callback : function(json) {
 				xiangjy.alwaysFun();
-				xiangjy.store.reload();
+				xiangjy.store.removeAll();
 				Ext.getCmp('BOXNO').focus(1000);
 				Ext.getCmp('BOXNO').selectText();
 			}

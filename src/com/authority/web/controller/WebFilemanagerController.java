@@ -6,8 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -25,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -40,6 +48,8 @@ import com.authority.common.jackjson.JackJson;
 import com.authority.common.springmvc.DateConvertEditor;
 import com.authority.common.utils.FileDigest;
 import com.authority.common.utils.FileOperateUtil;
+import com.authority.common.utils.PoiHelper;
+import com.authority.pojo.BaseUsers;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExceptionReturn;
 import com.authority.pojo.ExtGridReturn;
@@ -63,6 +73,7 @@ public class WebFilemanagerController {
 	@Resource(name="njdbcTemplate")
 	private NamedParameterJdbcTemplate njdbcTemplate;
 	
+	
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Date.class, new DateConvertEditor());
@@ -85,6 +96,12 @@ public class WebFilemanagerController {
 	@RequestMapping(value="/getdirectories",method = RequestMethod.POST)	
 	public void getDirectories( PrintWriter writer,HttpSession session, HttpServletRequest request) throws IOException {
 		String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+		BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);
+		if(baseusers.getAccount().equals("admin"))
+			;
+		else
+			rootPath = rootPath+File.separator+baseusers.getAccount();
+				
 		File file = new File(rootPath);
 		if(!file.exists()){
 			file.mkdirs();
@@ -115,6 +132,11 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object getfiles( HttpSession session, HttpServletRequest request) throws IOException {
 		String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+		BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);
+		if(baseusers.getAccount().equals("admin"))
+			;
+		else
+			rootPath = rootPath+File.separator+baseusers.getAccount();
 		File file = new File(rootPath);
 		if(!file.exists()){
 			file.mkdirs();
@@ -135,8 +157,12 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object deleteFiles( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			System.out.println("CURRENT_USER"+request.getSession().getAttribute(WebConstants.CURRENT_USER));
-			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();			
 			String[] paths =request.getParameterValues("paths");
 			File file = new File(rootPath);
 			if(!file.exists()){
@@ -171,11 +197,9 @@ public class WebFilemanagerController {
 	}
 
 	@RequestMapping(value="/uploadFiles")
-	@ResponseBody
 	public void uploadFiles(@RequestParam MultipartFile file, HttpServletRequest request, HttpServletResponse response,
 			PrintWriter writer) {
 		try {
-		//	System.out.println("CURRENT_USER"+request.getSession().getAttribute(WebConstants.CURRENT_USER));	
 			//文件的MD5
 			logger.info("start");
 			String node=request.getParameter("node");			
@@ -183,6 +207,12 @@ public class WebFilemanagerController {
 			logger.info(fileMD5);
 			// 保存的地址
 			String savePath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				savePath = savePath+File.separator+baseusers.getAccount();
+			
 			// 上传的文件名 //需要保存
 			String uploadFileName = file.getOriginalFilename();
 			// 获取文件后缀名 //需要保存
@@ -192,7 +222,7 @@ public class WebFilemanagerController {
 			// 以年月/天的格式来存放
 			String dataPath = DateFormatUtils.format(new Date(), "yyyy-MM" + File.separator + "dd");
 			
-			if(null==node||node.equals("")||node.startsWith("xnode-"))
+			if(null==node||node.equals("")||node.startsWith("xnode-")||node.equals("null"))
 				dataPath=File.separator+"";
 			else
 				dataPath=node;
@@ -237,6 +267,11 @@ public class WebFilemanagerController {
 		try {
 			// 保存的地址
 			String savePath = request.getSession().getServletContext().getRealPath("/resources/upload");			
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				savePath = savePath+File.separator+baseusers.getAccount();
 			
 			String finalPath=new String(request.getParameter("path").getBytes("ISO-8859-1"),"UTF-8");
 			
@@ -275,6 +310,12 @@ public class WebFilemanagerController {
 		ServletOutputStream output = null;
 		try {
 			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();
+			
 			String[] paths =request.getParameterValues("paths");
 			File file = new File(rootPath);
 			if(!file.exists()){
@@ -318,7 +359,12 @@ public class WebFilemanagerController {
 	public Object createFolder( HttpSession session, HttpServletRequest request) throws IOException{
 		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();
 			String node=request.getParameter("node");
 			if(null==node||node.startsWith("xnode-"))
 				node="";
@@ -339,7 +385,11 @@ public class WebFilemanagerController {
 	public Object getSpaceInfo( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
 			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
-			
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();
 			File spacefile=new File(rootPath);
 			
 			Float UsableSpace=(float) Math.round(100*spacefile.getUsableSpace()/1073741824f);
@@ -357,7 +407,12 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object paste( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();
 			String source = request.getParameter("source");
 			String node=request.getParameter("node");
 			if(null==node||node.startsWith("xnode-"))
@@ -413,7 +468,13 @@ public class WebFilemanagerController {
 	@ResponseBody
 	public Object rename( HttpSession session, HttpServletRequest request) throws IOException{		
 		try {
-			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");			
+			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload");
+			BaseUsers baseusers = (BaseUsers)request.getSession().getAttribute(WebConstants.CURRENT_USER);			
+			if(baseusers.getAccount().equals("admin"))
+				;
+			else
+				rootPath = rootPath+File.separator+baseusers.getAccount();
+			
 			String filename = request.getParameter("filename");
 			String newname  = request.getParameter("newname");
 			
@@ -439,13 +500,11 @@ public class WebFilemanagerController {
 		}
 	}
 	
-	
+		
 	
 	public String compressionFiles() throws IOException {
 		return null;
 	}
-	
-	
 	
 	public String decompressionFiles() {
 		return null;

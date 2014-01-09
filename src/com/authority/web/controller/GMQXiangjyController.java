@@ -315,6 +315,38 @@ public class GMQXiangjyController  {
 		}
 	}
 	
+	/**
+	 * 代理商验收结果提交
+	 */
+	@RequestMapping("/save_check")
+	@ResponseBody
+	public Object save_check(HttpSession session, HttpServletRequest request) {
+		try {
+			//更新 B_PO_BOXITEM 表
+			String data = request.getParameter("data");
+			String USERID = request.getParameter("USERID");
+			if(USERID==null){
+				USERID="";
+			}
+			List list  = JSON.parseArray(data);
+			String result = "00";
+			if(list.size()>0)
+				result = gmqxiangjyservice.save_check(list,USERID);
+			
+			if ("01".equals(result)) {
+				return new ExtReturn(true, "更新成功！");
+			} else if ("00".equals(result)) {
+				return new ExtReturn(false, "更新失败！");
+			} else {
+				return new ExtReturn(false, result);
+			}
+			
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}
+	}
+	
 	@RequestMapping(value="/henlo_ireport_xiangjy")
 	@ResponseBody
 	public void henlo_ireport_xiangjy(ExtPager pager, HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException{

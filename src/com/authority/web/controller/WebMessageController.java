@@ -1,33 +1,18 @@
 package com.authority.web.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.reflection.wrapper.MapWrapper;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.Region;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.authority.common.springmvc.DateConvertEditor;
-import com.authority.common.springmvc.SpringContextHolder;
-import com.authority.common.utils.StringprocessHelper;
-import com.authority.common.utils.TypeCaseHelper;
-import com.authority.pojo.Article;
 import com.authority.pojo.BaseUsers;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExceptionReturn;
@@ -56,9 +37,7 @@ import com.authority.pojo.ExtGridReturn;
 import com.authority.pojo.ExtPager;
 import com.authority.pojo.ExtReturn;
 import com.authority.pojo.WebMessage;
-import com.authority.service.BaseFieldsService;
 import com.authority.service.WebMessageService;
-import com.authority.service.impl.ArticleClient;
 import com.authority.web.interseptor.WebConstants;
 
 @Controller

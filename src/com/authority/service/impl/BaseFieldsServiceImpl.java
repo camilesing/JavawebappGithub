@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,7 @@ public class BaseFieldsServiceImpl implements BaseFieldsService {
 
 	@Override
 	public HashMap<String, String> selectAllByExample(Criteria example) {
+			
 		List<BaseFields> list = this.baseFieldsMapper.selectByExample(example);
 		HashMap<String, LinkedHashMap<String, String>> all = new HashMap<String, LinkedHashMap<String, String>>();
 		LinkedHashMap<String, String> part = null;
@@ -59,16 +61,16 @@ public class BaseFieldsServiceImpl implements BaseFieldsService {
 			}
 		}
 		part = new LinkedHashMap<String, String>();
-		logger.info("-----------开始读取系统默认配置-----------");
+		//logger.info("-----------开始读取系统默认配置-----------");
 		for (Entry<String, LinkedHashMap<String, String>> entry : all.entrySet()) {
 			String key = entry.getKey();
 			HashMap<String, String> value = entry.getValue();
 			// 为了eval('(${applicationScope.fields.sex})')这个单引号使用,替换所有的'，为\'
 			String val = JackJson.fromObjectToJson(value).replaceAll("\\'", "\\\\'");
-			logger.info(val);
+			//logger.info(val);
 			part.put(key, val);
 		}
-		logger.info("-----------结束读取系统默认配置-----------");
+		//logger.info("-----------结束读取系统默认配置-----------");
 		return part;
 	}
 

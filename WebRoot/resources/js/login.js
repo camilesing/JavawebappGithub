@@ -115,10 +115,10 @@ $(document).ready(function () {
 
     // 状态栏HTMl
     login.bbarHtml = "<a href='javascript:login.resetPassword();'>忘记密码？</a>";
-    //	if ('true' == 'true') {
-    //		login.bbarHtml = login.bbarHtml
-    //				+ "&nbsp;&nbsp;<a href='javascript:login.register();'>注册</a>";
-    //	}
+    if ('true' == 'true') {
+    	login.bbarHtml = login.bbarHtml
+    				+ "&nbsp;&nbsp;<a href='javascript:login.registerUser();'>注册</a>";
+    }
     // 用户登录窗口
     login.loginWindow = new Ext.Window({
         renderTo: 'login-win-div',
@@ -241,9 +241,23 @@ $(document).ready(function () {
         }).show();
     }
     // 注册
-    login.register = function () {
+    login.registerUser = function () {
         // 跳转到注册
-        location.href = login.register;
+        login.registerWindow = new Ext.Window({
+            title: '用户使用注册',
+            width: 300,
+            height: 300,
+            modal: true,
+            maximizable: false,
+            resizable: false,
+            layout: 'fit',
+            plain: true,
+            autoLoad: {
+                url: login.register,
+                scripts: true,
+                nocache: true
+            }
+        }).show();
     }
     //监听事件
 	var events = "beforecopy beforepaste beforedrag contextmenu selectstart drag paste copy cut dragenter";

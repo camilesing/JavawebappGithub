@@ -17,6 +17,8 @@ public class Table {
 	 */
 	public static String toClumn(String field) {
 		StringBuilder sb = new StringBuilder();
+		if(field==null)
+			return "";
 		for (int i = 0; i < field.length(); i++) {
 			char c = field.charAt(i);
 			if (Character.isUpperCase(c) && i > 0) {

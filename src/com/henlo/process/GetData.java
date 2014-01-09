@@ -1,13 +1,13 @@
 package com.henlo.process;
 import nds.query.QueryEngine;
-import nds.util.Tools;
+//import nds.util.Tools;
 import java.util.*;
 import java.security.MessageDigest;
 
 public class GetData {
 
 	
-	int uid=userweb.getUserId();
+	/*int uid=userweb.getUserId();
 	Map m=new HashMap();
 
 	Object paramV= QueryEngine.getInstance().doQueryOne("select value from ad_param where name='webpos.datagenerationUrl'");
@@ -33,5 +33,5 @@ public class GetData {
 	String uri=uriPre+"/bpos/datageneration.jsp?uid="+uid+"&datetype=all&scope=all&vf="+r;
 	m.put("code",4);
 	m.put("message",uri);
-	m
+	m*/
 }

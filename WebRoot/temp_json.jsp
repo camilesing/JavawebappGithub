@@ -14,7 +14,7 @@
 	ResultSet.CONCUR_UPDATABLE);   
 	String sql="select * from BASE_FIELDS where rownum<3";
 	JSONArray json = new JSONArray();
-	   
+	
 	ResultSet rs=stmt.executeQuery(sql);   
 	int length=0;
 	while(rs.next()) {

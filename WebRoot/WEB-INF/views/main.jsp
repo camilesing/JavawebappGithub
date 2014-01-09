@@ -18,9 +18,9 @@ yepnope({
 <script type="text/javascript" src="${pageContext.request.contextPath }/dwr/engine.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/dwr/util.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath }/dwr/interface/ChatService.js"></script>
+<%--
 <script type="text/javascript" src="${pageContext.request.contextPath }/dwr/interface/HenloController.js"></script>
-
-
+--%>
 </head>
 <body class="x-border-layout-ct" style="position:static;overflow:hidden;" onload="dwr.engine.setActiveReverseAjax(true);">
 <div></div>
