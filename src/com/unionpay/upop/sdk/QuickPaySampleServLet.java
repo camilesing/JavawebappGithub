@@ -41,7 +41,7 @@ public class QuickPaySampleServLet extends HttpServlet {
 	            "",//收单机构代码（仅收单机构接入需要填写）
 	            "",//商户类别（收单机构接入需要填写）
 	            "http://localhost:9000/Javawebapp",//商品URL
-	            "交通违章费用缴纳",//商品名称
+	            "商品名称....",//商品名称
 	            Param.get("orderAmount").toString(),//"3000",//商品单价 单位：分
 	            "1",//商品数量
 	            "0",//折扣 单位：分
@@ -55,7 +55,7 @@ public class QuickPaySampleServLet extends HttpServlet {
 	            "",//默认支付方式
 	            "",//默认银行编号
 	            "300000",//交易超时时间
-	            QuickPayConf.merFrontEndUrl,// 前台回调商户URL
+	            Param.get("merFrontEndUrl").toString(),//QuickPayConf.merFrontEndUrl,// 前台回调商户URL
 				QuickPayConf.merBackEndUrl,// 后台回调商户URL
 	            ""//商户保留域
 		};

@@ -1,26 +1,140 @@
 package test.controls;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
+import com.alipay.config.AlipayConfig;
+import com.alipay.util.httpClient.HttpProtocolHandler;
+import com.alipay.util.httpClient.HttpRequest;
+import com.alipay.util.httpClient.HttpResponse;
+import com.alipay.util.httpClient.HttpResultType;
 import com.authority.common.utils.XmlOperateUtil;
 
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 
 public class Test {
-
+	
+	private static final String BASE_URL = "http://111.1.15.134/stardy/";
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String string = "温州";
+		// %E6%B8%A9%E5%B7%9E
+		try {
+			String encode = URLEncoder.encode(string,"utf-8");
+			System.out.println("encode:"+encode);
+			
+			String  decode = URLDecoder.decode(encode,"utf-8");
+			System.out.println("decode:"+decode);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		try {
+			HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+			HttpRequest request = new HttpRequest(HttpResultType.BYTES);
+			//设置编码集
+	        request.setCharset(AlipayConfig.input_charset);
+	        
+	        String to = "18857846128";
+	        String yzm = String.valueOf(Integer.parseInt(to.substring(to.length()-4))*3+3206);
+	        String tjpc = "1";
+	        
+	        Map<String, String> paramTemp = new HashMap<String, String>();
+	        paramTemp.put("usr", "wz255774");
+	        paramTemp.put("pwd", "xg");
+	        paramTemp.put("to", to);
+	        paramTemp.put("content", "短信内容测试");
+	        paramTemp.put("yzm", yzm);
+	        paramTemp.put("zihao", "");
+	        paramTemp.put("tjpc", tjpc);
+	        paramTemp.put("ds", "");
+	        
+	        request.setParameters(generatNameValuePair(paramTemp));
+	        request.setUrl(BASE_URL+"sendmsg_xuege.jsp");
+	        HttpResponse response;
+			response = httpProtocolHandler.execute(request,"","");
+			String strResult ="";
+	        if (response == null) {
+	        	System.out.println("response is null");
+	        }else{
+	        	strResult = response.getStringResult();
+	        	System.out.println("strResult:"+strResult);
+	        }
+		} catch (Exception e) {
+			
+			// TODO: handle exception
+		}
+		
+		
+		
+		/*if(1==1)
+			return;
+		
+		try {
+			HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+			HttpRequest request = new HttpRequest(HttpResultType.BYTES);
+			//设置编码集
+	        request.setCharset(AlipayConfig.input_charset);
+	        
+	        String to = "18857846128";
+	        String yzm = String.valueOf(Integer.parseInt(to.substring(to.length()-4))*3+3206);
+	        String tjpc = "1";
+	        
+	        Map<String, String> paramTemp = new HashMap<String, String>();
+	        paramTemp.put("usr", "wz255774");
+	        paramTemp.put("pwd", "xg");
+	        paramTemp.put("to", to);
+	        paramTemp.put("content", "短信内容测试");
+	        paramTemp.put("yzm", yzm);
+	        paramTemp.put("zihao", "");
+	        paramTemp.put("tjpc", tjpc);
+	        paramTemp.put("ds", "");
+	        
+	        request.setParameters(generatNameValuePair(paramTemp));
+	        request.setUrl(BASE_URL+"sendmsg_xuege.jsp");
+	        HttpResponse response;
+			response = httpProtocolHandler.execute(request,"","");
+			String strResult ="";
+	        if (response == null) {
+	        	System.out.println("response is null");
+	        }else{
+	        	strResult = response.getStringResult();
+	        	System.out.println("strResult:"+strResult);
+	        }
+		} catch (Exception e) {
+			
+			// TODO: handle exception
+		}
+		
+				
+		String username ="fd";
+		String password ="fd";
+		password = DigestUtils.md5Hex(password);
+		
+		System.out.println("password:"+password);
+		
+		password = DigestUtils.md5Hex(password+"{"+username+"}");
+				
+		System.out.println("password:"+password);
+		
 		//Do xml 
 		String text = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ 
@@ -56,11 +170,11 @@ public class Test {
            }
            
            
-           /*Iterator iter_element = element.elementIterator("msg_id");
+           Iterator iter_element = element.elementIterator("msg_id");
            while (iter_element.hasNext()) {
                Element nameElement = (Element) iter_element.next();
                System.out.println("msg_id:"+nameElement.getText());
-           }*/
+           }
            
            
         }
@@ -142,8 +256,23 @@ public class Test {
         } catch (EvaluationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		} */
 		
 	}
+	
+	/**
+     * MAP类型数组转换成NameValuePair类型
+     * @param properties  MAP类型数组
+     * @return NameValuePair类型数组
+     */
+    private static NameValuePair[] generatNameValuePair(Map<String, String> properties) {
+        NameValuePair[] nameValuePair = new NameValuePair[properties.size()];
+        int i = 0;
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            nameValuePair[i++] = new NameValuePair(entry.getKey(), entry.getValue());
+        }
+
+        return nameValuePair;
+    }
 
 }

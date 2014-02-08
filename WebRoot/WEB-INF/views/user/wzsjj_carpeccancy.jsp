@@ -213,8 +213,8 @@ $(document).ready(function() {
 			var chulzt = record.data.chulzt;
 			if(chulzt=='0')
 				alert("请先确认 交通违法 事项，再执行缴费动作");
-			else if(chulzt=='1'){
-				window.open(wzsjjcarpeccancy.pay+"?tongzsbh="+tongzsbh+"&time="+(new Date()).toString());
+			else if(chulzt=='1'||chulzt=='21'){
+				window.open(wzsjjcarpeccancy.pay_online+"?tongzsbh="+tongzsbh+"&time="+(new Date()).toString());
 				wzsjjcarpeccancy.addWindow.setIconClass('db-icn-money_yen'); // 设置窗口的样式
 				wzsjjcarpeccancy.addWindow.setTitle('缴费'); // 设置窗口的名称
 				wzsjjcarpeccancy.addWindow.show().center();
@@ -223,6 +223,9 @@ $(document).ready(function() {
 			}
 			else if(chulzt=='2')
 				alert("已完成缴费");
+			else{
+				alert("状态有误");
+			}
 		}
 	});
 	

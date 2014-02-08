@@ -15,7 +15,7 @@ package com.unionpay.upop.sdk;
 public class QuickPayQuery{
 
 	public static void main(String[] aa){
-		new QuickPayQuery().queryTrans("01", "330314010300001", "20140103141129");
+		new QuickPayQuery().queryTrans("01", "330320140109103646", "20140207140629");
 	}
 	
 	/**

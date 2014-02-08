@@ -27,5 +27,10 @@
 		<mapper resource="sqlmap/WzsjjcarpeccancyMapper.xml" />
 		<mapper resource="sqlmap/WzsjjSmssendMapper.xml" />
 		<mapper resource="sqlmap/WzsjjSmsreturnMapper.xml" />
+		<!-- 温州广电接口开发 -->
+		<mapper resource="sqlmap/WzgdKehjbxxMapper.xml" />
+		<mapper resource="sqlmap/WzgdShoulywnrMapper.xml" />
+		<mapper resource="sqlmap/WzgdSmsreturnMapper.xml" />
+		<mapper resource="sqlmap/WzgdSmssendMapper.xml" />
 	</mappers>
 </configuration>

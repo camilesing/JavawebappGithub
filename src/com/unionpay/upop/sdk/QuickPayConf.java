@@ -69,9 +69,9 @@ public class QuickPayConf {
 	// 商户名称
 	public final static String merName = "用户商城名称";
 
-	public final static String merFrontEndUrl = "http://www.yourdomain.com/your_path/yourFrontEndUrl";
+	public final static String merFrontEndUrl = "http://www.baidu.com";
 
-	public final static String merBackEndUrl = "http://www.yourdomain.com/your_path/yourBackEndUrl";
+	public final static String merBackEndUrl = "http://www.baidu.com";
 
 	// 加密方式
 	public final static String signType = "MD5";

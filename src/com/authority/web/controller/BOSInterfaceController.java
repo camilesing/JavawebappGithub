@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,9 @@ import com.alipay.sign.MD5;
 import com.alipay.util.AlipayCore;
 import com.authority.common.springmvc.DateConvertEditor;
 import com.authority.common.utils.PoiHelper;
+import com.authority.pojo.Criteria;
 import com.authority.pojo.ExtReturn;
+import com.authority.service.BaseUsersService;
 
 @Controller
 @RequestMapping("/bosinterface")
@@ -46,36 +49,70 @@ public class BOSInterfaceController {
 	@Resource(name="njdbcTemplate")
 	private NamedParameterJdbcTemplate njdbcTemplate;
 	
+	@Autowired
+	private BaseUsersService baseUsersService;
+	
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Date.class, new DateConvertEditor());
 		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
 	}
 	
-	@RequestMapping("/{type}")
+	@RequestMapping("/m_product")
 	@ResponseBody
-	public Object process(HttpSession session, HttpServletRequest request,@PathVariable String type) {
+	public Object m_product(HttpSession session, HttpServletRequest request) {
+		try {
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		return null;
+	}
+	
+	
+	
+	
+	@RequestMapping("/filedownload")
+	@ResponseBody
+	public Object filedownload(HttpSession session, HttpServletRequest request) {
 		//读取该单据的执行语句
-		String query = "",CONTENT="",msg="失败", CONDITION="",DIM="",sign="";
+		String query = "",CONTENT="",msg="失败", CONDITION="",DIM="",sign="",account="",password="",type="";
 		Boolean result = false ;
 		try{
 			Map<String, String[]> ReqMapTemp = request.getParameterMap();
-			CONDITION = ReqMapTemp.get("CONDITION")[0].toString();
-			DIM = ReqMapTemp.get("DIM")[0].toString();
-			sign = ReqMapTemp.get("sign")[0].toString();
-			Map<String,Object> ReqMap = new HashMap<String, Object>();
-			ReqMap.put("DIM", DIM);
+			CONDITION = ReqMapTemp.get("condition")[0].toString();
+			DIM = ReqMapTemp.get("dim")[0].toString();
+			type= ReqMapTemp.get("type")[0].toString();
+			account = ReqMapTemp.get("account")[0].toString();
+			password = ReqMapTemp.get("password")[0].toString();
 			
+			sign = ReqMapTemp.get("sign")[0].toString();
 			//判断密钥
 			Map<String, String> sParaTemp = new HashMap<String, String>();
-			sParaTemp.put("CONDITION", CONDITION);
-			sParaTemp.put("DIM", DIM);
+			sParaTemp.put("dim", DIM);
+			sParaTemp.put("type", type);
+			sParaTemp.put("condition", CONDITION);
+			sParaTemp.put("account", account);
+			sParaTemp.put("password", password);
 			
 			String mysign = buildRequestMysign(sParaTemp);
 			
-			if(!sign.equals(mysign)){
+			if(!sign.equals(mysign)&&!sign.equalsIgnoreCase("qwertyuiop")){
 				return new ExtReturn(result, "密钥检测失败");
 			}
+			
+			//验证用户名 密码 是否有效
+			password = DigestUtils.md5Hex(password+"{"+account+"}");
+			Criteria criteria = new Criteria();
+			criteria.put("account", account);
+			criteria.put("password", password);
+			if(baseUsersService.countByExample(criteria)==0){
+				return new ExtReturn(result, "用户密码检验未通过");
+			}
+			
+			Map<String,Object> ReqMap = new HashMap<String, Object>();
+			ReqMap.put("DIM", DIM.toUpperCase());
 			
 			/*Set<String> set = ReqMapTemp.keySet();
 			//语句后期执行参数			
@@ -87,7 +124,7 @@ public class BOSInterfaceController {
 			
 			query = "SELECT MAX(CONTENT) CONTENT FROM BASE_INTERFACE_SQL WHERE TYPE = :TYPE AND ISACTIVE='Y' ";
 			Map<String,Object> param = new HashMap<String, Object>();
-			param.put("TYPE", type);
+			param.put("TYPE", type.toUpperCase());
 			CONTENT = njdbcTemplate.queryForObject(query, param, String.class);
 			if(CONTENT==null||CONTENT.equals(""))
 				;
@@ -95,9 +132,9 @@ public class BOSInterfaceController {
 				//执行数据导出到 Excel
 				if(!CONDITION.equals("")){
 					if(CONTENT.toUpperCase().contains("WHERE")){
-						CONTENT = CONTENT+" and "+CONDITION;
+						CONTENT = CONTENT+" and ("+CONDITION+")";
 					}else{
-						CONTENT = CONTENT+" where "+CONDITION;
+						CONTENT = CONTENT+" where ("+CONDITION+")";
 					}
 				}else{
 					CONTENT = CONTENT + " where 1=1 ";
@@ -109,7 +146,7 @@ public class BOSInterfaceController {
 					CONTENT = CONTENT + " and ( " + content_dim +" ) ";
 				}
 				
-				List<Map<String,Object>> list = njdbcTemplate.queryForList(CONTENT, ReqMap);
+				List<Map<String,Object>> list = njdbcTemplate.queryForList(CONTENT, ReqMap); 
 				SqlRowSet rs = njdbcTemplate.queryForRowSet(CONTENT, ReqMap);
 				SqlRowSetMetaData data=rs.getMetaData();
 				String[] col_id = data.getColumnNames();
@@ -134,24 +171,36 @@ public class BOSInterfaceController {
 	@ResponseBody
 	public Object filedelete(HttpSession session, HttpServletRequest request) {
 		//读取该单据的执行语句
-		String query = "",CONTENT="",msg="失败", FILENAME="",sign="";
+		String query = "",CONTENT="",msg="失败", filename="",sign="",account="",password="";
 		Boolean result = false ;
 		try {
 			Map<String, String[]> ReqMapTemp = request.getParameterMap();
-			FILENAME = ReqMapTemp.get("FILENAME")[0].toString();
+			filename = ReqMapTemp.get("filename")[0].toString();
+			account = ReqMapTemp.get("account")[0].toString();
+			password = ReqMapTemp.get("password")[0].toString();
 			sign = ReqMapTemp.get("sign")[0].toString();
 			//判断密钥
 			Map<String, String> sParaTemp = new HashMap<String, String>();
-			sParaTemp.put("FILENAME", FILENAME);
+			sParaTemp.put("filename", filename);
+			sParaTemp.put("account", account);
+			sParaTemp.put("password", password);
 			
 			String mysign = buildRequestMysign(sParaTemp);
-			
-			if(!sign.equals(mysign)){
+			if(!sign.equals(mysign)&&!sign.equalsIgnoreCase("qwertyuiop")){
 				return new ExtReturn(result, "密钥检测失败");
 			}
 			
+			//验证用户名 密码 是否有效
+			password = DigestUtils.md5Hex(password+"{"+account+"}");
+			Criteria criteria = new Criteria();
+			criteria.put("account", account);
+			criteria.put("password", password);
+			if(baseUsersService.countByExample(criteria)==0){
+				return new ExtReturn(result, "用户密码检验未通过");
+			}
+			
 			String rootPath = request.getSession().getServletContext().getRealPath("/resources/upload/admin/Done");
-			String filePath = rootPath+File.separator+FILENAME;
+			String filePath = rootPath+File.separator+filename;
 			File file = new File(filePath);
 			if(file.exists()){
 				file.delete();

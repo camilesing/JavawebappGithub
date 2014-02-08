@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.authority.dao.WzgdKehjbxxMapper" >
+  <resultMap id="BaseResultMap" type="com.authority.pojo.WzgdKehjbxx" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="YONGHXM" property="yonghxm" jdbcType="VARCHAR" />
+    <result column="YONGHBM" property="yonghbm" jdbcType="VARCHAR" />
+    <result column="ZHENGJH" property="zhengjh" jdbcType="VARCHAR" />
+    <result column="GUDDH" property="guddh" jdbcType="VARCHAR" />
+    <result column="YIDDH" property="yiddh" jdbcType="VARCHAR" />
+    <result column="SHOULRQ" property="shoulrq" jdbcType="DATE" />
+    <result column="XIANGXDD" property="xiangxdd" jdbcType="VARCHAR" />
+    <result column="ADDTIME" property="addtime" jdbcType="DATE" />
+    <result column="ADDWHO" property="addwho" jdbcType="VARCHAR" />
+    <result column="ADDIP" property="addip" jdbcType="VARCHAR" />
+    <result column="EDITTIME" property="edittime" jdbcType="DATE" />
+    <result column="EDITWHO" property="editwho" jdbcType="VARCHAR" />
+    <result column="EDITIP" property="editip" jdbcType="VARCHAR" />
+    <result column="ISDISPLAY" property="isdisplay" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.yonghxm != null" >
+         and YONGHXM = #{condition.yonghxm,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.yonghbm != null" >
+         and YONGHBM = #{condition.yonghbm,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.zhengjh != null" >
+         and ZHENGJH = #{condition.zhengjh,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.guddh != null" >
+         and GUDDH = #{condition.guddh,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.yiddh != null" >
+         and YIDDH = #{condition.yiddh,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.shoulrq != null" >
+         and SHOULRQ = #{condition.shoulrq,jdbcType=DATE}
+      </if>
+      <if test="condition.xiangxdd != null" >
+         and XIANGXDD = #{condition.xiangxdd,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addtime != null" >
+         and ADDTIME = #{condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="condition.addwho != null" >
+         and ADDWHO = #{condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addip != null" >
+         and ADDIP = #{condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.edittime != null" >
+         and EDITTIME = #{condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="condition.editwho != null" >
+         and EDITWHO = #{condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.editip != null" >
+         and EDITIP = #{condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.isdisplay != null" >
+         and ISDISPLAY = #{condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="example.condition.yonghxm != null" >
+         and YONGHXM = #{example.condition.yonghxm,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.yonghbm != null" >
+         and YONGHBM = #{example.condition.yonghbm,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.zhengjh != null" >
+         and ZHENGJH = #{example.condition.zhengjh,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.guddh != null" >
+         and GUDDH = #{example.condition.guddh,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.yiddh != null" >
+         and YIDDH = #{example.condition.yiddh,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.shoulrq != null" >
+         and SHOULRQ = #{example.condition.shoulrq,jdbcType=DATE}
+      </if>
+      <if test="example.condition.xiangxdd != null" >
+         and XIANGXDD = #{example.condition.xiangxdd,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addtime != null" >
+         and ADDTIME = #{example.condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.addwho != null" >
+         and ADDWHO = #{example.condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addip != null" >
+         and ADDIP = #{example.condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.edittime != null" >
+         and EDITTIME = #{example.condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.editwho != null" >
+         and EDITWHO = #{example.condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.editip != null" >
+         and EDITIP = #{example.condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.isdisplay != null" >
+         and ISDISPLAY = #{example.condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, YONGHXM, YONGHBM, ZHENGJH, GUDDH, YIDDH, SHOULRQ, XIANGXDD, ADDTIME, ADDWHO, 
+    ADDIP, EDITTIME, EDITWHO, EDITIP, ISDISPLAY
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.authority.pojo.Criteria" >
+    <include refid="common.Oracle_Pagination_Head" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from WZGD_KEHJBXX
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="common.Oracle_Pagination_Tail" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from WZGD_KEHJBXX
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from WZGD_KEHJBXX
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.authority.pojo.Criteria" >
+    delete from WZGD_KEHJBXX
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.authority.pojo.WzgdKehjbxx" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+      select sys_guid() from dual
+    </selectKey>
+    insert into WZGD_KEHJBXX (ID, YONGHXM, YONGHBM, 
+      ZHENGJH, GUDDH, YIDDH, 
+      SHOULRQ, XIANGXDD, ADDTIME, 
+      ADDWHO, ADDIP, EDITTIME, 
+      EDITWHO, EDITIP, ISDISPLAY
+      )
+    values (#{id,jdbcType=VARCHAR}, #{yonghxm,jdbcType=VARCHAR}, #{yonghbm,jdbcType=VARCHAR}, 
+      #{zhengjh,jdbcType=VARCHAR}, #{guddh,jdbcType=VARCHAR}, #{yiddh,jdbcType=VARCHAR}, 
+      #{shoulrq,jdbcType=DATE}, #{xiangxdd,jdbcType=VARCHAR}, #{addtime,jdbcType=DATE}, 
+      #{addwho,jdbcType=VARCHAR}, #{addip,jdbcType=VARCHAR}, #{edittime,jdbcType=DATE}, 
+      #{editwho,jdbcType=VARCHAR}, #{editip,jdbcType=VARCHAR}, #{isdisplay,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.authority.pojo.WzgdKehjbxx" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+      select sys_guid() from dual
+    </selectKey>
+    insert into WZGD_KEHJBXX
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      ID,
+      <if test="yonghxm != null" >
+        YONGHXM,
+      </if>
+      <if test="yonghbm != null" >
+        YONGHBM,
+      </if>
+      <if test="zhengjh != null" >
+        ZHENGJH,
+      </if>
+      <if test="guddh != null" >
+        GUDDH,
+      </if>
+      <if test="yiddh != null" >
+        YIDDH,
+      </if>
+      <if test="shoulrq != null" >
+        SHOULRQ,
+      </if>
+      <if test="xiangxdd != null" >
+        XIANGXDD,
+      </if>
+      <if test="addtime != null" >
+        ADDTIME,
+      </if>
+      <if test="addwho != null" >
+        ADDWHO,
+      </if>
+      <if test="addip != null" >
+        ADDIP,
+      </if>
+      <if test="edittime != null" >
+        EDITTIME,
+      </if>
+      <if test="editwho != null" >
+        EDITWHO,
+      </if>
+      <if test="editip != null" >
+        EDITIP,
+      </if>
+      <if test="isdisplay != null" >
+        ISDISPLAY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{id,jdbcType=VARCHAR},
+      <if test="yonghxm != null" >
+        #{yonghxm,jdbcType=VARCHAR},
+      </if>
+      <if test="yonghbm != null" >
+        #{yonghbm,jdbcType=VARCHAR},
+      </if>
+      <if test="zhengjh != null" >
+        #{zhengjh,jdbcType=VARCHAR},
+      </if>
+      <if test="guddh != null" >
+        #{guddh,jdbcType=VARCHAR},
+      </if>
+      <if test="yiddh != null" >
+        #{yiddh,jdbcType=VARCHAR},
+      </if>
+      <if test="shoulrq != null" >
+        #{shoulrq,jdbcType=DATE},
+      </if>
+      <if test="xiangxdd != null" >
+        #{xiangxdd,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null" >
+        #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null" >
+        #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null" >
+        #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null" >
+        #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null" >
+        #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null" >
+        #{isdisplay,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.authority.pojo.Criteria" resultType="java.lang.Integer" >
+    select count(*) from WZGD_KEHJBXX
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update WZGD_KEHJBXX
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yonghxm != null" >
+        YONGHXM = #{record.yonghxm,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yonghbm != null" >
+        YONGHBM = #{record.yonghbm,jdbcType=VARCHAR},
+      </if>
+      <if test="record.zhengjh != null" >
+        ZHENGJH = #{record.zhengjh,jdbcType=VARCHAR},
+      </if>
+      <if test="record.guddh != null" >
+        GUDDH = #{record.guddh,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yiddh != null" >
+        YIDDH = #{record.yiddh,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shoulrq != null" >
+        SHOULRQ = #{record.shoulrq,jdbcType=DATE},
+      </if>
+      <if test="record.xiangxdd != null" >
+        XIANGXDD = #{record.xiangxdd,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addtime != null" >
+        ADDTIME = #{record.addtime,jdbcType=DATE},
+      </if>
+      <if test="record.addwho != null" >
+        ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addip != null" >
+        ADDIP = #{record.addip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.edittime != null" >
+        EDITTIME = #{record.edittime,jdbcType=DATE},
+      </if>
+      <if test="record.editwho != null" >
+        EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.editip != null" >
+        EDITIP = #{record.editip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isdisplay != null" >
+        ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update WZGD_KEHJBXX
+    set ID = #{record.id,jdbcType=VARCHAR},
+      YONGHXM = #{record.yonghxm,jdbcType=VARCHAR},
+      YONGHBM = #{record.yonghbm,jdbcType=VARCHAR},
+      ZHENGJH = #{record.zhengjh,jdbcType=VARCHAR},
+      GUDDH = #{record.guddh,jdbcType=VARCHAR},
+      YIDDH = #{record.yiddh,jdbcType=VARCHAR},
+      SHOULRQ = #{record.shoulrq,jdbcType=DATE},
+      XIANGXDD = #{record.xiangxdd,jdbcType=VARCHAR},
+      ADDTIME = #{record.addtime,jdbcType=DATE},
+      ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      ADDIP = #{record.addip,jdbcType=VARCHAR},
+      EDITTIME = #{record.edittime,jdbcType=DATE},
+      EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      EDITIP = #{record.editip,jdbcType=VARCHAR},
+      ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.authority.pojo.WzgdKehjbxx" >
+    update WZGD_KEHJBXX
+    <set >
+      <if test="yonghxm != null" >
+        YONGHXM = #{yonghxm,jdbcType=VARCHAR},
+      </if>
+      <if test="yonghbm != null" >
+        YONGHBM = #{yonghbm,jdbcType=VARCHAR},
+      </if>
+      <if test="zhengjh != null" >
+        ZHENGJH = #{zhengjh,jdbcType=VARCHAR},
+      </if>
+      <if test="guddh != null" >
+        GUDDH = #{guddh,jdbcType=VARCHAR},
+      </if>
+      <if test="yiddh != null" >
+        YIDDH = #{yiddh,jdbcType=VARCHAR},
+      </if>
+      <if test="shoulrq != null" >
+        SHOULRQ = #{shoulrq,jdbcType=DATE},
+      </if>
+      <if test="xiangxdd != null" >
+        XIANGXDD = #{xiangxdd,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        ADDTIME = #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null" >
+        ADDWHO = #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null" >
+        ADDIP = #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null" >
+        EDITTIME = #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null" >
+        EDITWHO = #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null" >
+        EDITIP = #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null" >
+        ISDISPLAY = #{isdisplay,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.authority.pojo.WzgdKehjbxx" >
+    update WZGD_KEHJBXX
+    set YONGHXM = #{yonghxm,jdbcType=VARCHAR},
+      YONGHBM = #{yonghbm,jdbcType=VARCHAR},
+      ZHENGJH = #{zhengjh,jdbcType=VARCHAR},
+      GUDDH = #{guddh,jdbcType=VARCHAR},
+      YIDDH = #{yiddh,jdbcType=VARCHAR},
+      SHOULRQ = #{shoulrq,jdbcType=DATE},
+      XIANGXDD = #{xiangxdd,jdbcType=VARCHAR},
+      ADDTIME = #{addtime,jdbcType=DATE},
+      ADDWHO = #{addwho,jdbcType=VARCHAR},
+      ADDIP = #{addip,jdbcType=VARCHAR},
+      EDITTIME = #{edittime,jdbcType=DATE},
+      EDITWHO = #{editwho,jdbcType=VARCHAR},
+      EDITIP = #{editip,jdbcType=VARCHAR},
+      ISDISPLAY = #{isdisplay,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

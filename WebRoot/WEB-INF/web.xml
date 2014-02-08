@@ -48,6 +48,14 @@
 	<servlet>
     <servlet-name>DruidStatView</servlet-name>
     	<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+    	<init-param>
+        	<param-name>loginUsername</param-name>
+        	<param-value>admin</param-value>
+    	</init-param>
+    	<init-param>
+        	<param-name>loginPassword</param-name>
+        	<param-value>1</param-value>
+    	</init-param>
 	</servlet>
 	<servlet-mapping>
 	    <servlet-name>DruidStatView</servlet-name>
@@ -167,7 +175,6 @@
 		<location>/WEB-INF/views/commons/timeout.jsp</location>
 	</error-page>
 	
-		
 	<servlet>
 		<servlet-name>file_browser</servlet-name>
 		<servlet-class>com.authority.common.ckeditor.FileBrowerController</servlet-class>
@@ -176,7 +183,6 @@
 		<servlet-name>file_browser</servlet-name>
 		<url-pattern>/ckeditor_browser</url-pattern>
 	</servlet-mapping>
-	
 
 	<servlet>
 		<servlet-name>SimpleUploader</servlet-name>
@@ -228,9 +234,6 @@
 	<welcome-file-list>
 		<welcome-file>/WEB-INF/views/login.jsp</welcome-file>
 	</welcome-file-list>
-	
-	
-	
 	
 	<session-config>
 		<session-timeout>30</session-timeout>

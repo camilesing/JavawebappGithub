@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.authority.dao.WzsjjcarregisterMapper">
+  <resultMap id="BaseResultMap" type="com.authority.pojo.Wzsjjcarregister">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="CHEP" jdbcType="VARCHAR" property="chep" />
+    <result column="CHEPZL" jdbcType="VARCHAR" property="chepzl" />
+    <result column="SUOYR" jdbcType="VARCHAR" property="suoyr" />
+    <result column="CHELPP" jdbcType="VARCHAR" property="chelpp" />
+    <result column="CHELSBM" jdbcType="VARCHAR" property="chelsbm" />
+    <result column="FADJBH" jdbcType="VARCHAR" property="fadjbh" />
+    <result column="CHUCDJSJ" jdbcType="VARCHAR" property="chucdjsj" />
+    <result column="JIANYYXQ" jdbcType="VARCHAR" property="jianyyxq" />
+    <result column="QIANGZBFSJ" jdbcType="VARCHAR" property="qiangzbfsj" />
+    <result column="JIDCZT" jdbcType="VARCHAR" property="jidczt" />
+    <result column="ISDISPLAY" jdbcType="VARCHAR" property="isdisplay" />
+    <result column="ADDTIME" jdbcType="DATE" property="addtime" />
+    <result column="ADDWHO" jdbcType="VARCHAR" property="addwho" />
+    <result column="ADDIP" jdbcType="VARCHAR" property="addip" />
+    <result column="EDITTIME" jdbcType="DATE" property="edittime" />
+    <result column="EDITWHO" jdbcType="VARCHAR" property="editwho" />
+    <result column="EDITIP" jdbcType="VARCHAR" property="editip" />
+    <result column="USERID" jdbcType="VARCHAR" property="userid" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test="condition.chep != null">
+         and CHEP = #{condition.chep,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.chepLike != null">
+         <![CDATA[ and CHEP LIKE '%'||#{condition.chepLike}||'%' ]]>
+      </if>
+      <if test="condition.chepzl != null">
+         and CHEPZL = #{condition.chepzl,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.suoyr != null">
+         and SUOYR = #{condition.suoyr,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.chelpp != null">
+         and CHELPP = #{condition.chelpp,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.chelsbm != null">
+         and CHELSBM = #{condition.chelsbm,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.fadjbh != null">
+         and FADJBH = #{condition.fadjbh,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.chucdjsj != null">
+         and CHUCDJSJ = #{condition.chucdjsj,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.jianyyxq != null">
+         and JIANYYXQ = #{condition.jianyyxq,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.qiangzbfsj != null">
+         and QIANGZBFSJ = #{condition.qiangzbfsj,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.jidczt != null">
+         and JIDCZT = #{condition.jidczt,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.isdisplay != null">
+         and ISDISPLAY = #{condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addtime != null">
+         and ADDTIME = #{condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="condition.addwho != null">
+         and ADDWHO = #{condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addip != null">
+         and ADDIP = #{condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.edittime != null">
+         and EDITTIME = #{condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="condition.editwho != null">
+         and EDITWHO = #{condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.editip != null">
+         and EDITIP = #{condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.userid != null">
+         and USERID = #{condition.userid,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test="example.condition.chep != null">
+         and CHEP = #{example.condition.chep,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.chepzl != null">
+         and CHEPZL = #{example.condition.chepzl,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.suoyr != null">
+         and SUOYR = #{example.condition.suoyr,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.chelpp != null">
+         and CHELPP = #{example.condition.chelpp,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.chelsbm != null">
+         and CHELSBM = #{example.condition.chelsbm,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.fadjbh != null">
+         and FADJBH = #{example.condition.fadjbh,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.chucdjsj != null">
+         and CHUCDJSJ = #{example.condition.chucdjsj,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.jianyyxq != null">
+         and JIANYYXQ = #{example.condition.jianyyxq,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.qiangzbfsj != null">
+         and QIANGZBFSJ = #{example.condition.qiangzbfsj,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.jidczt != null">
+         and JIDCZT = #{example.condition.jidczt,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.isdisplay != null">
+         and ISDISPLAY = #{example.condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addtime != null">
+         and ADDTIME = #{example.condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.addwho != null">
+         and ADDWHO = #{example.condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addip != null">
+         and ADDIP = #{example.condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.edittime != null">
+         and EDITTIME = #{example.condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.editwho != null">
+         and EDITWHO = #{example.condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.editip != null">
+         and EDITIP = #{example.condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.userid != null">
+         and USERID = #{example.condition.userid,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, CHEP, CHEPZL, SUOYR, CHELPP, CHELSBM, FADJBH, CHUCDJSJ, JIANYYXQ, QIANGZBFSJ, 
+    JIDCZT, ISDISPLAY, ADDTIME, ADDWHO, ADDIP, EDITTIME, EDITWHO, EDITIP, USERID
+  </sql>
+  <select id="selectByExample" parameterType="com.authority.pojo.Criteria" resultMap="BaseResultMap">
+    <include refid="common.Oracle_Pagination_Head" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from WZSJJ_CARREGISTER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="common.Oracle_Pagination_Tail" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from WZSJJ_CARREGISTER
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from WZSJJ_CARREGISTER
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.authority.pojo.Criteria">
+    delete from WZSJJ_CARREGISTER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.authority.pojo.Wzsjjcarregister">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      select sys_guid() from dual
+    </selectKey>
+    insert into WZSJJ_CARREGISTER (ID, CHEP, CHEPZL, 
+      SUOYR, CHELPP, CHELSBM, 
+      FADJBH, CHUCDJSJ, JIANYYXQ, 
+      QIANGZBFSJ, JIDCZT, ISDISPLAY, 
+      ADDTIME, ADDWHO, ADDIP, 
+      EDITTIME, EDITWHO, EDITIP, 
+      USERID)
+    values (#{id,jdbcType=VARCHAR}, #{chep,jdbcType=VARCHAR}, #{chepzl,jdbcType=VARCHAR}, 
+      #{suoyr,jdbcType=VARCHAR}, #{chelpp,jdbcType=VARCHAR}, #{chelsbm,jdbcType=VARCHAR}, 
+      #{fadjbh,jdbcType=VARCHAR}, #{chucdjsj,jdbcType=VARCHAR}, #{jianyyxq,jdbcType=VARCHAR}, 
+      #{qiangzbfsj,jdbcType=VARCHAR}, #{jidczt,jdbcType=VARCHAR}, #{isdisplay,jdbcType=VARCHAR}, 
+      #{addtime,jdbcType=DATE}, #{addwho,jdbcType=VARCHAR}, #{addip,jdbcType=VARCHAR}, 
+      #{edittime,jdbcType=DATE}, #{editwho,jdbcType=VARCHAR}, #{editip,jdbcType=VARCHAR}, 
+      #{userid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.authority.pojo.Wzsjjcarregister">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      select sys_guid() from dual
+    </selectKey>
+    insert into WZSJJ_CARREGISTER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      ID,
+      <if test="chep != null">
+        CHEP,
+      </if>
+      <if test="chepzl != null">
+        CHEPZL,
+      </if>
+      <if test="suoyr != null">
+        SUOYR,
+      </if>
+      <if test="chelpp != null">
+        CHELPP,
+      </if>
+      <if test="chelsbm != null">
+        CHELSBM,
+      </if>
+      <if test="fadjbh != null">
+        FADJBH,
+      </if>
+      <if test="chucdjsj != null">
+        CHUCDJSJ,
+      </if>
+      <if test="jianyyxq != null">
+        JIANYYXQ,
+      </if>
+      <if test="qiangzbfsj != null">
+        QIANGZBFSJ,
+      </if>
+      <if test="jidczt != null">
+        JIDCZT,
+      </if>
+      <if test="isdisplay != null">
+        ISDISPLAY,
+      </if>
+      <if test="addtime != null">
+        ADDTIME,
+      </if>
+      <if test="addwho != null">
+        ADDWHO,
+      </if>
+      <if test="addip != null">
+        ADDIP,
+      </if>
+      <if test="edittime != null">
+        EDITTIME,
+      </if>
+      <if test="editwho != null">
+        EDITWHO,
+      </if>
+      <if test="editip != null">
+        EDITIP,
+      </if>
+      <if test="userid != null">
+        USERID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{id,jdbcType=VARCHAR},
+      <if test="chep != null">
+        #{chep,jdbcType=VARCHAR},
+      </if>
+      <if test="chepzl != null">
+        #{chepzl,jdbcType=VARCHAR},
+      </if>
+      <if test="suoyr != null">
+        #{suoyr,jdbcType=VARCHAR},
+      </if>
+      <if test="chelpp != null">
+        #{chelpp,jdbcType=VARCHAR},
+      </if>
+      <if test="chelsbm != null">
+        #{chelsbm,jdbcType=VARCHAR},
+      </if>
+      <if test="fadjbh != null">
+        #{fadjbh,jdbcType=VARCHAR},
+      </if>
+      <if test="chucdjsj != null">
+        #{chucdjsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jianyyxq != null">
+        #{jianyyxq,jdbcType=VARCHAR},
+      </if>
+      <if test="qiangzbfsj != null">
+        #{qiangzbfsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jidczt != null">
+        #{jidczt,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null">
+        #{isdisplay,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null">
+        #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null">
+        #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null">
+        #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null">
+        #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null">
+        #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.authority.pojo.Criteria" resultType="java.lang.Integer">
+    select count(*) from WZSJJ_CARREGISTER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update WZSJJ_CARREGISTER
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chep != null">
+        CHEP = #{record.chep,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chepzl != null">
+        CHEPZL = #{record.chepzl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.suoyr != null">
+        SUOYR = #{record.suoyr,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chelpp != null">
+        CHELPP = #{record.chelpp,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chelsbm != null">
+        CHELSBM = #{record.chelsbm,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fadjbh != null">
+        FADJBH = #{record.fadjbh,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chucdjsj != null">
+        CHUCDJSJ = #{record.chucdjsj,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jianyyxq != null">
+        JIANYYXQ = #{record.jianyyxq,jdbcType=VARCHAR},
+      </if>
+      <if test="record.qiangzbfsj != null">
+        QIANGZBFSJ = #{record.qiangzbfsj,jdbcType=VARCHAR},
+      </if>
+      <if test="record.jidczt != null">
+        JIDCZT = #{record.jidczt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isdisplay != null">
+        ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addtime != null">
+        ADDTIME = #{record.addtime,jdbcType=DATE},
+      </if>
+      <if test="record.addwho != null">
+        ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addip != null">
+        ADDIP = #{record.addip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.edittime != null">
+        EDITTIME = #{record.edittime,jdbcType=DATE},
+      </if>
+      <if test="record.editwho != null">
+        EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.editip != null">
+        EDITIP = #{record.editip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userid != null">
+        USERID = #{record.userid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update WZSJJ_CARREGISTER
+    set ID = #{record.id,jdbcType=VARCHAR},
+      CHEP = #{record.chep,jdbcType=VARCHAR},
+      CHEPZL = #{record.chepzl,jdbcType=VARCHAR},
+      SUOYR = #{record.suoyr,jdbcType=VARCHAR},
+      CHELPP = #{record.chelpp,jdbcType=VARCHAR},
+      CHELSBM = #{record.chelsbm,jdbcType=VARCHAR},
+      FADJBH = #{record.fadjbh,jdbcType=VARCHAR},
+      CHUCDJSJ = #{record.chucdjsj,jdbcType=VARCHAR},
+      JIANYYXQ = #{record.jianyyxq,jdbcType=VARCHAR},
+      QIANGZBFSJ = #{record.qiangzbfsj,jdbcType=VARCHAR},
+      JIDCZT = #{record.jidczt,jdbcType=VARCHAR},
+      ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR},
+      ADDTIME = #{record.addtime,jdbcType=DATE},
+      ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      ADDIP = #{record.addip,jdbcType=VARCHAR},
+      EDITTIME = #{record.edittime,jdbcType=DATE},
+      EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      EDITIP = #{record.editip,jdbcType=VARCHAR},
+      USERID = #{record.userid,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.authority.pojo.Wzsjjcarregister">
+    update WZSJJ_CARREGISTER
+    <set>
+      <if test="chep != null">
+        CHEP = #{chep,jdbcType=VARCHAR},
+      </if>
+      <if test="chepzl != null">
+        CHEPZL = #{chepzl,jdbcType=VARCHAR},
+      </if>
+      <if test="suoyr != null">
+        SUOYR = #{suoyr,jdbcType=VARCHAR},
+      </if>
+      <if test="chelpp != null">
+        CHELPP = #{chelpp,jdbcType=VARCHAR},
+      </if>
+      <if test="chelsbm != null">
+        CHELSBM = #{chelsbm,jdbcType=VARCHAR},
+      </if>
+      <if test="fadjbh != null">
+        FADJBH = #{fadjbh,jdbcType=VARCHAR},
+      </if>
+      <if test="chucdjsj != null">
+        CHUCDJSJ = #{chucdjsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jianyyxq != null">
+        JIANYYXQ = #{jianyyxq,jdbcType=VARCHAR},
+      </if>
+      <if test="qiangzbfsj != null">
+        QIANGZBFSJ = #{qiangzbfsj,jdbcType=VARCHAR},
+      </if>
+      <if test="jidczt != null">
+        JIDCZT = #{jidczt,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null">
+        ISDISPLAY = #{isdisplay,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        ADDTIME = #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null">
+        ADDWHO = #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null">
+        ADDIP = #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null">
+        EDITTIME = #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null">
+        EDITWHO = #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null">
+        EDITIP = #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        USERID = #{userid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.authority.pojo.Wzsjjcarregister">
+    update WZSJJ_CARREGISTER
+    set CHEP = #{chep,jdbcType=VARCHAR},
+      CHEPZL = #{chepzl,jdbcType=VARCHAR},
+      SUOYR = #{suoyr,jdbcType=VARCHAR},
+      CHELPP = #{chelpp,jdbcType=VARCHAR},
+      CHELSBM = #{chelsbm,jdbcType=VARCHAR},
+      FADJBH = #{fadjbh,jdbcType=VARCHAR},
+      CHUCDJSJ = #{chucdjsj,jdbcType=VARCHAR},
+      JIANYYXQ = #{jianyyxq,jdbcType=VARCHAR},
+      QIANGZBFSJ = #{qiangzbfsj,jdbcType=VARCHAR},
+      JIDCZT = #{jidczt,jdbcType=VARCHAR},
+      ISDISPLAY = #{isdisplay,jdbcType=VARCHAR},
+      ADDTIME = #{addtime,jdbcType=DATE},
+      ADDWHO = #{addwho,jdbcType=VARCHAR},
+      ADDIP = #{addip,jdbcType=VARCHAR},
+      EDITTIME = #{edittime,jdbcType=DATE},
+      EDITWHO = #{editwho,jdbcType=VARCHAR},
+      EDITIP = #{editip,jdbcType=VARCHAR},
+      USERID = #{userid,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

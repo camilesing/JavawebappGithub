@@ -51,7 +51,9 @@ import com.authority.service.WzsjjSmssendService;
 import com.authority.service.WzsjjcarpeccancyService;
 import com.authority.web.interseptor.WebConstants;
 import com.unionpay.upop.sdk.QuickPayConf;
+import com.unionpay.upop.sdk.QuickPayQuery;
 import com.unionpay.upop.sdk.QuickPaySampleServLet;
+import com.unionpay.upop.sdk.QuickPayUtils;
 
 /**
  * 后台资源、系统菜单相关
@@ -414,6 +416,7 @@ public class WzsjjcarpeccancyController {
 			Param.put("customerIp", customerIp);
 			Param.put("customerName", customerName);
 			Param.put("orderTime", orderTime);
+			Param.put("merFrontEndUrl", "http://www.henlo.net");
 			
 			QuickPaySampleServLet Payservice = new QuickPaySampleServLet();
 			Payservice.service(request, response ,Param);	
@@ -643,6 +646,8 @@ public class WzsjjcarpeccancyController {
 	@ResponseBody
 	public Object verify(HttpSession session, HttpServletRequest request){
 		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+			
 			String tongzsbh =request.getParameter("tongzsbh");
 			String chelbm   =request.getParameter("chelbm");
 			if(tongzsbh==null||tongzsbh.equals("")){
@@ -650,6 +655,55 @@ public class WzsjjcarpeccancyController {
 			}
 			if(chelbm==null||chelbm.equals("")){
 				return new ExtReturn(false, "车辆编码不能为空");
+			}
+			Criteria search = new Criteria();
+			search.put("tongzsbh", tongzsbh);
+			search.put("chelbm", chelbm);
+			List<Wzsjjcarpeccancy> list = this.wzsjjcarpeccancyService.selectByExample(search);
+			Wzsjjcarpeccancy record = list.get(0);
+			
+			//发送银联端查询交易记录
+			QuickPayQuery quickPayQuery = new QuickPayQuery();
+			String res = quickPayQuery.query("01", tongzsbh,sdf.format(record.getEdittime()));
+			if (res != null && !"".equals(res)) {
+				String[] arr = QuickPayUtils.getResArr(res);
+				if(checkSecurity(arr)){//验证签名
+					String queryResult = "";
+					for (int i = 0; i < arr.length; i++) {
+						String[] queryResultArr = arr[i].split("=");
+						// 处理商户业务逻辑
+						if (queryResultArr.length >= 2 && "queryResult".equals(queryResultArr[0])) {
+							queryResult = arr[i].substring(queryResultArr[0].length()+1);
+							break;
+						}
+					}
+					if(queryResult!=""){
+						if ("0".equals(queryResult)) {
+							record.setChulzt("2");
+							System.out.println("交易成功");
+						}
+						if ("1".equals(queryResult)) {
+							record.setChulzt("22");
+							System.out.println("交易失败");
+						}
+						if ("2".equals(queryResult)) {
+							record.setChulzt("21");
+							System.out.println("交易处理中");
+						}
+						if ("3".equals(queryResult)) {
+							record.setChulzt("21");
+							System.out.println("无此交易");
+						}
+					}else{
+						record.setChulzt("21");
+						System.out.println("报文格式错误");
+					}
+					
+					this.wzsjjcarpeccancyService.updateByPrimaryKeySelective(record);
+					
+				}
+			}else{
+				System.out.println("报文格式为空");
 			}
 			
 			Criteria criteria = new Criteria();
@@ -660,7 +714,7 @@ public class WzsjjcarpeccancyController {
 			if(count>0){
 				return new ExtReturn(true,"缴费成功");
 			}else{
-				return new ExtReturn(false,"未缴费");
+				return new ExtReturn(false,"未成功缴费");
 			}
 			
 		} catch (Exception e) {
@@ -694,6 +748,23 @@ public class WzsjjcarpeccancyController {
 		
 		return new ExtReturn(true,"");
 		
+	}
+	
+	
+	//验证签名 
+	public boolean checkSecurity(String[] arr){
+		//验证签名
+		int checkedRes = new QuickPayUtils().checkSecurity(arr);
+		if(checkedRes==1){
+			return true;
+		}else if(checkedRes == 0){
+			System.out.println("验证签名失败");
+			return false;
+		}else if(checkedRes == 2){
+			System.out.println("报文格式错误");
+			return false;
+		}
+		return false;
 	}
 	
 	

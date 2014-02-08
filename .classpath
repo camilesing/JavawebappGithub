@@ -48,7 +48,7 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/cxf-xjc-runtime-2.6.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/cxf-xjc-ts-2.6.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/druid-0.2.9.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/druid-0.2.9.jar" sourcepath="E:/BCKF/resource/druid-0.2.12-sources.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dwr.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/fastjson-1.1.32.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/groovy-all-1.7.5.jar"/>
@@ -145,5 +145,7 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/saaj.jar"/>
 	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_6_CONTAINER"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/netpayclient.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-net-1.4.1.jar" sourcepath="E:/BCKF/resource/commons-net-1.4.1-src.zip"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>

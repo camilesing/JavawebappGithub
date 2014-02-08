@@ -1,5 +1,7 @@
 package com.chinapay.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,34 +14,84 @@ import com.alipay.util.httpClient.HttpProtocolHandler;
 import com.alipay.util.httpClient.HttpRequest;
 import com.alipay.util.httpClient.HttpResponse;
 import com.alipay.util.httpClient.HttpResultType;
+import com.authority.common.utils.WebUtils;
 
 
 
 public class ChinaPayService {
 	
+	private static final String BASE_URL = "http://bianmin-test.chinapay.com:9080/witsingletran/WitSinTranServlet";
 	
 	public static void main(String[] args) {
-		chinapay.PrivateKey key=new chinapay.PrivateKey(); 
+		 chinapay.PrivateKey key=new chinapay.PrivateKey(); 
 
 	     chinapay.SecureLink t; 
 
 	     boolean flag; 
-
-	     String MerId = null, OrdId, TransAmt, CuryId, TransDate, TransType,ChkValue; 
-
 	     String plainData, ChkValue2 ; 
+	     String MId= "808080001000157";
 
-	     flag=key.buildKey(MerId,0,"app/usr/chinapay/keys/MerPrk.key"); 
+	     flag=key.buildKey(MId,0,"E:\\BCKF\\Project\\java\\Workspaces\\JavawebappGithub\\src\\config\\others\\MerPrk.key"); 
 
 	     if (flag==false) 
-
-	     { 
-
-	     System.out.println("build key error!"); 
-
+	     {
+	    	 System.out.println("build key error!"); 
 	     return; 
+	     } else{
+	    	 System.out.println("build key success");
+	    	 
+	    	 WebUtils web = new WebUtils();
+	    	 try {
+	 			HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+	 			HttpRequest request = new HttpRequest(HttpResultType.BYTES);
+	 			//设置编码集
+	 	        request.setCharset(AlipayConfig.input_charset);
+	 	        
+	 	        String to = "18857846128";
+	 	        String yzm = String.valueOf(Integer.parseInt(to.substring(to.length()-4))*3+3206);
+	 	        String tjpc = "1";
+	 	        
+	 	        //发送支付请求
+		    	 Map<String,String> Param = new HashMap<String, String>();
+		    	 
+		    	 Param.put("merId", "808080001000157");
+		    	 Param.put("transDate", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+		    	 Param.put("orderNo", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+		    	 Param.put("transType", "0003");
+		    	 Param.put("openBankId", "0102");
+		    	 Param.put("cardType", "0");
+		    	 Param.put("cardNo", "6212261203005120596");
+		    	 Param.put("usrName", web.chinaToUnicode("陈锋"));
+		    	 Param.put("certType", "01");
+		    	 Param.put("certId", "33038119801273670");
+		    	 Param.put("curyId", "156");
+		    	 Param.put("transAmt", "1");
+		    	 Param.put("purpose", "");
+		    	 Param.put("priv1", "");
+		    	 Param.put("version", "20100831");
+		    	 Param.put("gateId", "7008");
+		    	 Param.put("chkValue", "");
+		    	 
+		    	//t.Sign(MsgBody);
+	 	        
+	 	        request.setParameters(generatNameValuePair(Param));
+	 	        request.setUrl(BASE_URL);
+	 	        HttpResponse response;
+	 			response = httpProtocolHandler.execute(request,"","");
+	 			String strResult ="";
+	 	        if (response == null) {
+	 	        	System.out.println("response is null");
+	 	        }else{
+	 	        	strResult = response.getStringResult();
+	 	        	System.out.println("strResult:"+strResult);
+	 	        }
+	 		} catch (Exception e) {
+	 			
+	 			// TODO: handle exception
+	 		}
 
-	     } 
+
+	     }
 		
 		
 	}
