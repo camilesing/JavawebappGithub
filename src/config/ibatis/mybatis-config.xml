@@ -22,6 +22,8 @@
 		<mapper resource="sqlmap/WebMessageMapper.xml" />
 		<mapper resource="sqlmap/CommonModulesMapper.xml" />
 		<mapper resource="sqlmap/WebQudviewMapper.xml" />
+		<mapper resource="sqlmap/BaseUsersWeixinMapper.xml" />
+		
 		<!-- 温州交警网接口开发 -->
 		<mapper resource="sqlmap/WzsjjcarregisterMapper.xml" />
 		<mapper resource="sqlmap/WzsjjcarpeccancyMapper.xml" />
@@ -32,5 +34,13 @@
 		<mapper resource="sqlmap/WzgdShoulywnrMapper.xml" />
 		<mapper resource="sqlmap/WzgdSmsreturnMapper.xml" />
 		<mapper resource="sqlmap/WzgdSmssendMapper.xml" />
+		<!-- 乐清广电接口 -->
+		<mapper resource="sqlmap/YqgdRequestdataMapper.xml" />
+		<mapper resource="sqlmap/YqgdTradedataMapper.xml" />
+		<mapper resource="sqlmap/YqgdResponsedataMapper.xml" />
+		<mapper resource="sqlmap/YqgdSmsreturnMapper.xml" />
+		<mapper resource="sqlmap/YqgdSmssendMapper.xml" />
+		<mapper resource="sqlmap/YqgdBankcodeMapper.xml" />
+		<mapper resource="sqlmap/YqgdRequestsmsMapper.xml"/>
 	</mappers>
 </configuration>

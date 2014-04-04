@@ -66,9 +66,40 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 					String BOXNO = list_child.get("BOXNO")==null?"":list_child.get("BOXNO").toString();
 					String QTY_QR =list_child.get("QTY_QR")==null?"0":list_child.get("QTY_QR").toString();
 					if(check){
-						query = "select BOX_QTY from M_PRODUCT where id=( select M_PRODUCT_ID from B_PO_BOXNO where  boxno='"+BOXNO+"')";
+						/*query = "select BOX_QTY from M_PRODUCT where id=( select M_PRODUCT_ID from B_PO_BOXNO where  boxno='"+BOXNO+"')";
 						boxqty = jdbcTemplate.queryForObject(query,String.class);
+						qty_standard = Integer.parseInt(boxqty);*/
+						//装箱数量标准调整
+						query = "select B_BOXQTY from ( " +
+								"select B.B_BOXQTY "+
+								"from C_CUS_BOXPLANCUSITEM a ,C_CUS_BOXPLANPRDITEM b "+ 
+								"where A.C_CUS_BOXPLAN_ID=B.C_CUS_BOXPLAN_ID "+
+								"and (A.C_CUSTOMER_ID,B.M_PRODUCT_ID) in ( "+
+								"select B.C_CUSTOMER_ID ,A.M_PRODUCT_ID "+
+								"from B_PO_BOXNO  a,B_SO b where A.B_SO_ID=B.ID "+
+								"and  A.BOXNO='"+BOXNO+"'"+
+								") order by B.MODIFIEDDATE desc "+ 
+			 					") where rownum =1 ";
+						
+						boxqty = jdbcTemplate.queryForObject(query,String.class);
+						if(boxqty==null||boxqty.equals("")){
+							//读取经销商档案中的装箱数量
+							query = "select  max(ISTWELVE) ISTWELVE from C_CUSTOMER where ID in ( "+
+								    "select B.C_CUSTOMER_ID "+
+								    "from B_PO_BOXNO  a,B_SO b " +
+								    "where A.B_SO_ID=B.ID "+
+								    "and  A.BOXNO='"+BOXNO+"'"+
+								    ") ";
+							
+							boxqty = jdbcTemplate.queryForObject(query,String.class);
+							
+							if(boxqty==null||boxqty.equals("")){
+								boxqty = "0";
+							}
+						}
+						
 						qty_standard = Integer.parseInt(boxqty);
+						
 						check = false;
 					}
 					qty_submit = qty_submit + Integer.parseInt(QTY_QR);

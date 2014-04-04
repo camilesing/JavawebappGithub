@@ -58,12 +58,14 @@
   		<constructor-arg index="0" ref="druid" />
   	</bean>
   	
-  	<bean id="jt_access_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
-  		<property name="dataSource" ref="proxool_henlo_access" /> 
+  	<bean id="yqgdRequestdataController" class="com.authority.web.controller.YqgdRequestdataController" />
+  	
+  	<bean id="jdbcTemplate_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
+  		<property name="dataSource" ref="druid_henlo" />
   	</bean>
-
-	<bean id="jt_oracle_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
-  		<property name="dataSource" ref="proxool_henlo_oracle" /> 
+  	
+  	<bean id="njdbcTemplate_henlo" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+  		<constructor-arg index="0" ref="druid_henlo" />
   	</bean>
 	
 	<!-- define the SqlSessionFactory class="org.mybatis.spring.SqlSessionFactoryBean" -->
@@ -126,13 +128,13 @@
 	</bean>
 	
 	<!-- 定时器开关 -->
-	<!-- 	
+	 	
 	<task:annotation-driven />
-		<bean id="TaskYRK_Openmas" class="com.henlo.process.TaskYRK_Openmas"></bean>
+		<bean id="TaskYQGD_ChinaPay" class="com.henlo.process.TaskYQGD_ChinaPay"></bean>
 	<task:scheduled-tasks>
-		<task:scheduled ref="TaskYRK_Openmas" method="openmas" cron="50/59 * * * * ?" />
+		<task:scheduled ref="TaskYQGD_ChinaPay" method="dataprocess" cron="0 0 1-12 * * ?" />
 	</task:scheduled-tasks>	 
-	-->
+
 	<!-- 
 	    5/3 * * * * ? 这里表示的是从第五秒开始 ，每三秒执行一次
 		秒     0-59     , - * /  

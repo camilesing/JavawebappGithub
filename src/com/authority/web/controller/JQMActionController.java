@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
@@ -50,7 +51,7 @@ private static final Logger logger = LoggerFactory.getLogger(JQMActionController
 		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
 	}
 	
-	@RequestMapping("/login")
+	@RequestMapping(value="/login",method=RequestMethod.POST)
 	public void login(HttpSession session, HttpServletRequest request,HttpServletResponse response) {
 		String result = "",callbackfun="";
 		PrintWriter writer = null ;
@@ -284,7 +285,7 @@ private static final Logger logger = LoggerFactory.getLogger(JQMActionController
 	@ResponseBody
 	public Object requestobject(HttpSession session, HttpServletRequest request,HttpServletResponse response) {
 		try {
-			
+			System.out.println("................");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

@@ -1,5 +1,7 @@
 /com
 /config
-/org
 /example
+/logback.xml
 /nds
+/org
+/test

@@ -21,7 +21,7 @@ public class OpenMasSms
 		  String Password = web.readValue("config/others/config.properties","openmas.Password");
 		  			  
 		  Sms sms = new Sms(webservice);
-		  String[] destinationAddresses = new String[]{"18857846128","15967417271"};
+		  String[] destinationAddresses = new String[]{"18857846128"};
 		  
 		  String message="短信测试....";	
 		  String GateWayid = "";

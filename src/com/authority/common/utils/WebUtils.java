@@ -234,12 +234,22 @@ public class WebUtils {
 			Properties props = new Properties(); 
 			// 定义邮件服务器的地址
 			WebUtils web = new WebUtils();
-			props.put("mail.smtp.host", web.readValue("config.properties","email.host"));	
-			props.put("mail.smtp.port", "25"); 
-			props.put("mail.smtp.auth", "true");			
+			
+			props.put("mail.smtp.host", "smtp.exmail.qq.com");
+			props.put("mail.smtp.port","465" );
+			props.put("mail.smtp.starttls.enable","true" );
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.socketFactory.port", "465");
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			props.put("mail.smtp.socketFactory.fallback", "false");
+			      
+			props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			props.setProperty("mail.imap.socketFactory.fallback", "false");
+			props.setProperty("mail.imap.port", "993");
+			props.setProperty("mail.imap.socketFactory.port", "993");
 						
-			final String emailAccount=web.readValue("config.properties","email.account");
-			final String emailPassword=web.readValue("config.properties","email.password");
+			final String emailAccount=web.readValue("config/others/config.properties","email.account");
+			final String emailPassword=web.readValue("config/others/config.properties","email.password");
 			
 			
 			// 取得Session
@@ -299,7 +309,7 @@ public class WebUtils {
 
 	 
 
-	 static String unicode2String(String unicodeStr){
+	 public  String unicode2String(String unicodeStr){
 	    StringBuffer sb = new StringBuffer();
 	    String str[] = unicodeStr.toUpperCase().split("U");
 	    for(int i=0;i<str.length;i++){
@@ -346,18 +356,47 @@ public class WebUtils {
         return false;
     }
 
+	public String smssend(String phone,String msg,String msg_id){
+		try {
+			WebUtils web = new WebUtils();
+			String webservice = web.readValue("config/others/config.properties","chinamobile.webservice");
+			String dbuser = web.readValue("config/others/config.properties","chinamobile.dbuser");
+			String src_tele_num = web.readValue("config/others/config.properties","chinamobile.corporation");
+			int pwd = Integer.parseInt(web.readValue("config/others/config.properties","chinamobile.password"));
+			
+			String method = "sendmsg";
+			//根据Sequence 获取ID
+			String dest_tele_num =phone;
+			//手机末尾数 4位*3+579 
+			String password = String.valueOf(Integer.parseInt(dest_tele_num.substring(dest_tele_num.length()-4))*3+pwd);
+			String message= "" ;
+			src_tele_num = src_tele_num + msg_id;
+			message = ChinaMobileMessageService.add_msg_t();
+			message = message + ChinaMobileMessageService.add_msg_b(msg_id, password, src_tele_num, dest_tele_num, msg);
+			message = message + ChinaMobileMessageService.add_msg_w();
+			
+			String result = ChinaMobileMessageService.send_msg(webservice, method, dbuser, message);
+			
+			return result;
+			
+		} catch (Exception e) {
+			return null;
+			// TODO: handle exception
+		}
+		
+	}
 		
 	 public static void main(String[] args) {  
         
 		 WebUtils web = new WebUtils();
-		 String address="chenfeng@cugroup.com";
+		 String address="cf@henlo.net";
 		 String title="服务任务指派[技术中心产品开发平台]";
 		 String body ="测试";
 		 try {
-			//web.execSend(address, title, body);
-			 String unicode_str = web.chinaToUnicode("天空");
+			web.execSend(address, title, body);
+			 /*String unicode_str = web.chinaToUnicode("天空");
 			 System.out.println("unicode_str:"+unicode_str);
-			 System.out.println("china_str:"+web.unicode2String("u5929u7a7a"));
+			 System.out.println("china_str:"+web.unicode2String("u7b7eu540du9a8cu8bc1u6ca1u901au8fc7"));*/
 			 
 			 
 		} catch (Exception e) {

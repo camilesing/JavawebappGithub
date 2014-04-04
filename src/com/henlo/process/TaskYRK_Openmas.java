@@ -203,6 +203,7 @@ private static final Logger logger = LoggerFactory.getLogger(TaskYRK_Openmas.cla
 			System.out.println("================== Task End ================== "+new Date());
 			
 		}catch(Exception e){
+			logger.error("Exception:{} ", e);
 			System.out.println(e);
 		}		
 	}	

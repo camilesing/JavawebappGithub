@@ -1,0 +1,18 @@
+2014.4.2------------------------------------------------------
+spring-common.xml ：
+	<bean id="yqgdRequestdataController" class="com.authority.web.controller.YqgdRequestdataController" />
+	定时任务
+
+config.properties ：
+	yqgd.plantime = 02\:00-04\:00
+	yqgd.planstatus = N
+	
+修改  MerPrk.key 	PgPubk.key
+
+增加计划处理类 TaskYQGD_ChinaPay.java
+
+更新 YqgdRequestdataController.java 加入执行计划方法
+
+增加表 BASE_INTERFACE_EMAIL
+
+更新表 YQGD_BANKCODE

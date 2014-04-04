@@ -80,6 +80,7 @@ public class BOSInterfaceController {
 		String query = "",CONTENT="",msg="失败", CONDITION="",DIM="",sign="",account="",password="",type="";
 		Boolean result = false ;
 		try{
+			
 			Map<String, String[]> ReqMapTemp = request.getParameterMap();
 			CONDITION = ReqMapTemp.get("condition")[0].toString();
 			DIM = ReqMapTemp.get("dim")[0].toString();
@@ -112,7 +113,7 @@ public class BOSInterfaceController {
 			}
 			
 			Map<String,Object> ReqMap = new HashMap<String, Object>();
-			ReqMap.put("DIM", DIM.toUpperCase());
+			ReqMap.put("DIM", account.toUpperCase());
 			
 			/*Set<String> set = ReqMapTemp.keySet();
 			//语句后期执行参数			
@@ -143,6 +144,11 @@ public class BOSInterfaceController {
 					String content_dim =" M_PRODUCT_ID in ( "+
 										" select id from M_PRODUCT where M_DIM1_ID=(" +
 										" select id from M_DIM where ATTRIBCODE=:DIM ) ) ";
+					
+					if(type.equalsIgnoreCase("C_STORE_LOG")||type.equalsIgnoreCase("C_STORE_CHKDAY")){
+						content_dim = " DIM = :DIM ";
+					}
+										
 					CONTENT = CONTENT + " and ( " + content_dim +" ) ";
 				}
 				
@@ -152,11 +158,11 @@ public class BOSInterfaceController {
 				String[] col_id = data.getColumnNames();
 				String savePath = request.getSession().getServletContext().getRealPath("/resources/upload/admin/Done");
 				String datestr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-				savePath = savePath+File.separator+type+"_"+datestr+".xls";
-				PoiHelper.Excel_Generate(list, col_id, col_id, savePath);
+				savePath = savePath+File.separator+type+"_"+DIM+"_"+datestr+".xlsx";
+				PoiHelper.Excel_Generate(list, col_id, col_id, savePath,true);
 				
 				result = true ;
-				msg = "/resources/upload/admin/Done/"+type+"_"+datestr+".xls";
+				msg = "/resources/upload/admin/Done/"+type+"_"+DIM+"_"+datestr+".xlsx";
 			}
 			
 		}catch(Exception e){

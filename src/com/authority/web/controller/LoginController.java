@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.authority.common.springmvc.DateConvertEditor;
 import com.authority.pojo.BaseRoles;
 import com.authority.pojo.BaseUsers;
+import com.authority.pojo.BaseUsersWeixin;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExceptionReturn;
 import com.authority.pojo.ExtReturn;
@@ -43,6 +47,7 @@ import com.authority.pojo.Tree;
 import com.authority.service.BaseModulesService;
 import com.authority.service.BaseRolesService;
 import com.authority.service.BaseUsersService;
+import com.authority.service.BaseUsersWeixinService;
 import com.authority.web.interseptor.WebConstants;
 import com.google.code.kaptcha.Constants;
 
@@ -62,6 +67,8 @@ public class LoginController {
 	private BaseModulesService baseModulesService;
 	@Autowired
 	private BaseRolesService baseRolesService;
+	@Autowired
+	private BaseUsersWeixinService baseUsersWeixinService;
 	
 	/** 限制时间 */
 	@Value("${limit.millis:3600000}") 
@@ -73,6 +80,9 @@ public class LoginController {
 	
 	@Resource(name="jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
+	
+	@Resource(name="njdbcTemplate")
+	private NamedParameterJdbcTemplate njdbcTemplate;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -165,6 +175,217 @@ public class LoginController {
 			return new ExceptionReturn(e);
 		}
 	}
+	
+	/**
+	 * 用户登录
+	 */
+	@RequestMapping(value = "/login_portal", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_portal(HttpSession session, HttpServletRequest request) {
+		try {
+			String username = request.getParameter("account");
+			String password = request.getParameter("password");
+			System.out.println("username:"+username+" ,password:"+password);
+			
+			String query = "select id,truename from fdfair.users where name=:username and password=:password ";
+			String truename = "",userid="";
+			Boolean success = false;
+			Map<String,Object> param = new HashMap<String, Object>();
+			param.put("username", username);
+			param.put("password", password);
+			
+			List<Map<String,Object>> list = njdbcTemplate.queryForList(query,param);
+			if(list.size()>0){
+				Map<String,Object> map = list.get(0);
+				truename = map.get("truename").toString();
+				userid = map.get("id").toString();
+				success = true ;
+			}else{
+				success = false;
+			}
+			
+			
+			
+			session.setAttribute("userid", userid);
+			session.setAttribute("truename", truename);
+			
+			return new ExtReturn(success, truename);
+			
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}
+		
+	}
+	
+	
+	/**
+	 * bosapp 登陆
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/login_bosapp", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_bosapp(HttpSession session, HttpServletRequest request){
+		Boolean success=false ;
+		String msg = "";
+		try {
+			Criteria criteria = new Criteria();
+			String result ="";
+			String weixinid = request.getParameter("weixinid");
+			if(weixinid!=null){
+				//1.根据 weixinid 查询所判定的用户
+				criteria.put("weixinid", weixinid);
+				criteria.put("isdisplay", "1");
+				List<BaseUsersWeixin> list_baseUsersWeixin = baseUsersWeixinService.selectByExample(criteria);
+				if(list_baseUsersWeixin.size()>0){
+					//读取绑定用户
+					BaseUsers baseUser =  this.baseUsersService.selectByPrimaryKey(list_baseUsersWeixin.get(0).getUserId());
+					session.setAttribute(WebConstants.CURRENT_USER, baseUser);
+					
+					String user_role="";
+					String sql_role="select A.ROLE_NAME from BASE_ROLES a,BASE_USER_ROLE b where A.ROLE_ID=B.ROLE_ID and B.USER_ID=?";
+					Object[] args={baseUser.getUserId()};
+					if(null==(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class))
+						;
+					else
+						user_role=(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class);
+					
+					session.setAttribute(WebConstants.CURRENT_USER_ROLE, user_role);				
+					
+					success = true;
+					
+					logger.info("{}登陆成功", baseUser.getRealName());
+				}
+				
+			}
+			
+			return new ExtReturn(success, msg);			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ExtReturn(success, msg);
+		}
+		
+	}
+	
+	/**
+	 * 用户绑定
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/login_bosapp_bd", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_bosapp_bd(HttpSession session, HttpServletRequest request){
+		Boolean success=false ;
+		String msg = "绑定失败";
+		try {
+			Criteria criteria = new Criteria();
+			String result ="";
+			String weixinid = request.getParameter("weixinid");
+			String code = request.getParameter("code");
+			if(weixinid!=null){
+				//1.根据 weixinid 查询所判定的用户
+				criteria.put("weixinid", weixinid);
+				criteria.put("isdisplay", "1");
+				if(this.baseUsersWeixinService.countByExample(criteria)>0){
+					msg = "已经绑定过";
+					success = true ;
+				}else{
+					String[] code_split = code.split("#");
+					if(code_split.length==2){
+						String account = code_split[0];
+						String password = code_split[1];
+						//password md5 加密
+						password  = DigestUtils.md5Hex(password);
+						criteria.put("account", account);
+						criteria.put("passwordIn", password);
+						criteria.put("loginip", this.getIpAddr(request));
+						result = this.baseUsersService.selectByBaseUser(criteria);
+						if ("01".equals(result)) {
+							BaseUsers baseUser = (BaseUsers) criteria.get("baseUser");
+							//插入到  baseUsersWeixin
+							BaseUsersWeixin rdI_baseUsersWeixin = new BaseUsersWeixin();
+							rdI_baseUsersWeixin.setAddip(getIpAddr(request));
+							rdI_baseUsersWeixin.setIsdisplay("1");
+							rdI_baseUsersWeixin.setUserId(baseUser.getUserId());
+							rdI_baseUsersWeixin.setWeixinid(weixinid);
+							if(baseUsersWeixinService.insertSelective(rdI_baseUsersWeixin)>0){
+								msg = "绑定成功";
+								success = true ;
+							}else{
+								msg = "绑定失败";
+							}							
+						}else if ("00".equals(result)) {
+							msg = "用户名或者密码错误!";							
+						}else{
+							msg = result;							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			return new ExtReturn(success, msg);			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ExtReturn(success, msg);
+		}
+		
+	}
+	
+	/**
+	 * 取消用户绑定
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/login_bosapp_bdqx", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_bosapp_bdqx(HttpSession session, HttpServletRequest request){
+		Boolean success=false ;
+		String msg = "取消绑定失败";
+		try {
+			Criteria criteria = new Criteria();
+			String result ="";
+			String weixinid = request.getParameter("weixinid");
+			if(weixinid!=null){
+				//1.根据 weixinid 查询所判定的用户
+				criteria.put("weixinid", weixinid);
+				criteria.put("isdisplay", "1");
+				List<BaseUsersWeixin> list_baseUsersWeixin = baseUsersWeixinService.selectByExample(criteria);
+				if(list_baseUsersWeixin.size()>0){
+					//取消绑定
+					BaseUsersWeixin rdU_baseUsersWeixin = list_baseUsersWeixin.get(0);
+					rdU_baseUsersWeixin.setIsdisplay("0");
+					if(baseUsersWeixinService.updateByPrimaryKeySelective(rdU_baseUsersWeixin)>0){
+						success = true ;
+						msg = "取消绑定成功"; 
+					}else{
+						success = false ;
+						msg = "取消绑定失败"; 
+					}
+				}else{
+					success = false ;
+					msg = "未绑定用户"; 
+				}
+				
+			}
+			
+			return new ExtReturn(success, msg);			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ExtReturn(success, msg);
+		}
+		
+	}
+	
 	
 	/**
 	 * 用户登录_PDA

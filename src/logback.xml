@@ -111,8 +111,8 @@
 
 	<!-- TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF -->
     <root level="DEBUG" >
-        <appender-ref ref="stdout" />
-       <!--  <appender-ref ref="file—debug" /> -->
+       <!-- <appender-ref ref="stdout" />
+         <appender-ref ref="file—debug" /> -->
         <appender-ref ref="file—info" />
         <appender-ref ref="file—error" />
 		<!--<appender-ref ref="db" /> -->

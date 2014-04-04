@@ -1,5 +1,7 @@
 package test.controls;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -34,20 +36,52 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 		String string = "温州";
+		
+		String[] str = string.split("\\|");
+		System.out.println(str.length);
+		System.out.println(str[0]);
+		
+		String Path = "E:\\BCKF\\Project\\java\\Workspaces\\JavawebappGithub\\src\\config\\others\\MerPrk.key";
+		Path="/usr/local/tomcat/webapps/Javawebapp/WEB-INF/classes/config/others/MerPrk.key";
+		
+		
+		File file = new File(Path);
+		
+		if(file.exists()){
+			System.out.println("MerPrk.key exists");
+		}else{
+			System.out.println("MerPrk.key not exists");
+		}
+		
+		
+		// java -cp druid-1.0.0.jar com.alibaba.druid.filter.config.ConfigTools you_password
 		// %E6%B8%A9%E5%B7%9E
-		try {
+		//WNRMsp637PiROfSUR7s0jP2iN5mJb4FFvTjwnF45qVrMMP8gZVYFcqnsAEVO7J0EkOSRsl/tWRRh/skUX7qMDw==
+		/*try {
 			String encode = URLEncoder.encode(string,"utf-8");
 			System.out.println("encode:"+encode);
 			
 			String  decode = URLDecoder.decode(encode,"utf-8");
 			System.out.println("decode:"+decode);
 			
+		
+		
+			File downloadfile = new File("D:\\2011.txt");
+			FileOutputStream fos=null; 
+			fos =  new FileOutputStream(downloadfile);
+			
+			for(int i=0;i<=2;i++){
+				String line = i+"测试\r\n";
+				fos.write(line.getBytes("GBK"));
+			}
+			fos.close();
+			
+		
 		} catch (Exception e) {
 			// TODO: handle exception
-		}
+		}*/
 		
-		
-		try {
+		/*try {
 			HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
 			HttpRequest request = new HttpRequest(HttpResultType.BYTES);
 			//设置编码集
@@ -81,11 +115,11 @@ public class Test {
 		} catch (Exception e) {
 			
 			// TODO: handle exception
-		}
+		}*/
+		/*
 		
 		
-		
-		/*if(1==1)
+		if(1==1)
 			return;
 		
 		try {

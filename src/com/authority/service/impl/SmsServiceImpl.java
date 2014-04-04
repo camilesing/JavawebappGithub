@@ -7,6 +7,8 @@ import javax.jws.WebService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.WebDataBinder;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 
 import com.authority.common.springmvc.DateConvertEditor;
 import com.authority.service.SmsService;
+import com.authority.web.controller.WebFilemanagerController;
 import com.chinamobile.openmas.entity.MmsMessage;
 import com.chinamobile.openmas.entity.SmsMessage;
 import com.zjrc.meeting.common.MmsProvider;
@@ -23,7 +26,7 @@ import com.zjrc.meeting.domain.DeliveryReport;
 
 @WebService(endpointInterface = "com.zjrc.meeting.sms.SmsService", targetNamespace = "http://openmas.chinamobile.com/pulgin")
 public class SmsServiceImpl implements SmsService {
-	protected static final Log log = LogFactory.getLog(SmsServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
 
 	@Resource(name="jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
@@ -89,11 +92,11 @@ public class SmsServiceImpl implements SmsService {
 
 	//短信发送后的状态信息
 	public void notifySmsDeliveryReport(DeliveryReport deliveryReport) {
-		System.out.println("**********MessageId:" + deliveryReport.getMessageId().getValue());
+		/*System.out.println("**********MessageId:" + deliveryReport.getMessageId().getValue());
 		System.out.println("**********MessageDeliveryStatus:" + deliveryReport.getMessageDeliveryStatus().getValue());
 		System.out.println("**********ReceivedAddress:" + deliveryReport.getReceivedAddress().getValue());
 		System.out.println("**********StatusCode:" + deliveryReport.getStatusCode().getValue());
-		System.out.println("**********SendAddress:" + deliveryReport.getSendAddress().getValue());
+		System.out.println("**********SendAddress:" + deliveryReport.getSendAddress().getValue());*/
 		
 		//将接受到的信息回写数据库		
 		String messageid =deliveryReport.getMessageId().getValue();
@@ -101,6 +104,9 @@ public class SmsServiceImpl implements SmsService {
 		String ReceivedAddress = deliveryReport.getReceivedAddress().getValue();
 		String StatusCode = deliveryReport.getStatusCode().getValue();
 		String SendAddress = deliveryReport.getSendAddress().getValue();
+		
+		logger .debug("messageid: {},MessageDeliveryStatus:{},ReceivedAddress:{},StatusCode:{},SendAddress:{}", 
+				new Object[]{messageid,MessageDeliveryStatus,ReceivedAddress,StatusCode,SendAddress});
 		
 		messageid= messageid==null?"":messageid;
 		StatusCode = StatusCode==null?"":StatusCode;
@@ -113,35 +119,45 @@ public class SmsServiceImpl implements SmsService {
 		String insert = "insert into HENLO_SMS_STORE(ID, MESSAGEID, MESSAGEDELIVERYSTATUS, RECEIVEDADDRESS, STATUSCODE, SENDADDRESS,addtime) " +
 				"select sys_guid(),'"+messageid+"','"+MessageDeliveryStatus+"','"+ReceivedAddress+"','"+StatusCode+"','"+SendAddress+"',sysdate from dual";
 		jdbcTemplate.update(insert);
-		
-		if(!messageid.equals("")){
-			String update = "update SMS_OUTMSG a set a.STATE='"+STATE+"' where MESSAGEID ='"+messageid+"' and a.phone='"+ReceivedAddress+"'";
-			String query = "";
-			if(jdbcTemplate.update(update)>0){
-				//更新来源表,队列中的短信
-				if(STATE.equals("B")){
-					System.out.println("======开始更新表……U_MESSAGE_ADDR U_MESSAGE========");
-					update ="update U_MESSAGE_ADDR a set a.STATE=2 " +
-							"where exists(select 'x' from SMS_OUTMSG b where b.STATE='B' and a.id=b.tablerowid and b.tablename='U_MESSAGE_ADDR' and b.MESSAGEID ='"+messageid+"' and b.phone='"+ReceivedAddress+"' )";
-					jdbcTemplate.update(update);
-					query = "select max(tablerowid) tablerowid from SMS_OUTMSG where MESSAGEID ='"+messageid+"' and phone='"+ReceivedAddress+"'";
-					String tablerowid = jdbcTemplate.queryForObject(query, String.class);
-					if(tablerowid==null||tablerowid.equals(""))
-						;
-					else{
-						query ="select U_MESSAGE_ID from U_MESSAGE_ADDR where id='"+tablerowid+"'";
-						String U_MESSAGE_ID = jdbcTemplate.queryForObject(query, String.class);
-						if(U_MESSAGE_ID==null||U_MESSAGE_ID.equals(""))
+		try {
+			if(!messageid.equals("")){
+				String update = "update SMS_OUTMSG a set a.STATE='"+STATE+"' where MESSAGEID ='"+messageid+"' and a.phone='"+ReceivedAddress+"'";
+				String query = "";
+				if(jdbcTemplate.update(update)>0){
+					//更新来源表,队列中的短信
+					if(STATE.equals("B")){
+						System.out.println("======开始更新表……U_MESSAGE_ADDR U_MESSAGE========");
+						update ="update U_MESSAGE_ADDR a set a.STATE=2 " +
+								"where exists(select 'x' from SMS_OUTMSG b where b.STATE='B' and a.id=b.tablerowid and b.tablename='U_MESSAGE_ADDR' and b.MESSAGEID ='"+messageid+"' and b.phone='"+ReceivedAddress+"' )";
+						jdbcTemplate.update(update);
+						query = "select max(tablerowid) tablerowid from SMS_OUTMSG where MESSAGEID ='"+messageid+"' and phone='"+ReceivedAddress+"'";
+						String tablerowid = jdbcTemplate.queryForObject(query, String.class);
+						if(tablerowid==null||tablerowid.equals(""))
 							;
 						else{
-							update ="update U_MESSAGE a set a.STATE=2 " +
-									"where not exists(select 'x' from U_MESSAGE_ADDR b where a.id=b.U_MESSAGE_ID and b.STATE!='2' ) and id='"+U_MESSAGE_ID+"'";
-							jdbcTemplate.update(update);
+							query ="select U_MESSAGE_ID from U_MESSAGE_ADDR where id='"+tablerowid+"'";
+							String U_MESSAGE_ID = jdbcTemplate.queryForObject(query, String.class);
+							if(U_MESSAGE_ID==null||U_MESSAGE_ID.equals(""))
+								;
+							else{
+								update ="update U_MESSAGE a set a.STATE=2 " +
+										"where not exists(select 'x' from U_MESSAGE_ADDR b where a.id=b.U_MESSAGE_ID and b.STATE!='2' ) and id='"+U_MESSAGE_ID+"'";
+								jdbcTemplate.update(update);
+								
+								update ="update U_MESSAGE a set a.SUCCESS_CNT = (select count(*) from U_MESSAGE_ADDR b where a.id=b.U_MESSAGE_ID and b.STATE='2') where id='"+U_MESSAGE_ID+"'";
+								jdbcTemplate.update(update);
+							}
 						}
 					}
 				}
 			}
-		}		
+		} catch (Exception e) {
+			logger.error("Exception:{} ", e);
+			
+			// TODO: handle exception
+		}
+		
+				
 	}
 
 }

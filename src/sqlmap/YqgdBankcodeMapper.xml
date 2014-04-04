@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.authority.dao.YqgdBankcodeMapper" >
+  <resultMap id="BaseResultMap" type="com.authority.pojo.YqgdBankcode" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="ADDTIME" property="addtime" jdbcType="DATE" />
+    <result column="ADDWHO" property="addwho" jdbcType="VARCHAR" />
+    <result column="ADDIP" property="addip" jdbcType="VARCHAR" />
+    <result column="EDITTIME" property="edittime" jdbcType="DATE" />
+    <result column="EDITWHO" property="editwho" jdbcType="VARCHAR" />
+    <result column="EDITIP" property="editip" jdbcType="VARCHAR" />
+    <result column="ISDISPLAY" property="isdisplay" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="condition.code != null" >
+         and CODE = #{condition.code,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.name != null" >
+         and NAME = #{condition.name,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addtime != null" >
+         and ADDTIME = #{condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="condition.addwho != null" >
+         and ADDWHO = #{condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.addip != null" >
+         and ADDIP = #{condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.edittime != null" >
+         and EDITTIME = #{condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="condition.editwho != null" >
+         and EDITWHO = #{condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.editip != null" >
+         and EDITIP = #{condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="condition.isdisplay != null" >
+         and ISDISPLAY = #{condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <trim prefix="where" prefixOverrides="and|or" >
+      <if test="example.condition.code != null" >
+         and CODE = #{example.condition.code,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.name != null" >
+         and NAME = #{example.condition.name,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addtime != null" >
+         and ADDTIME = #{example.condition.addtime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.addwho != null" >
+         and ADDWHO = #{example.condition.addwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.addip != null" >
+         and ADDIP = #{example.condition.addip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.edittime != null" >
+         and EDITTIME = #{example.condition.edittime,jdbcType=DATE}
+      </if>
+      <if test="example.condition.editwho != null" >
+         and EDITWHO = #{example.condition.editwho,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.editip != null" >
+         and EDITIP = #{example.condition.editip,jdbcType=VARCHAR}
+      </if>
+      <if test="example.condition.isdisplay != null" >
+         and ISDISPLAY = #{example.condition.isdisplay,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, CODE, NAME, ADDTIME, ADDWHO, ADDIP, EDITTIME, EDITWHO, EDITIP, ISDISPLAY
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.authority.pojo.Criteria" >
+    <include refid="common.Oracle_Pagination_Head" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from YQGD_BANKCODE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="common.Oracle_Pagination_Tail" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from YQGD_BANKCODE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from YQGD_BANKCODE
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.authority.pojo.Criteria" >
+    delete from YQGD_BANKCODE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.authority.pojo.YqgdBankcode" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+      select sys_guid() from dual
+    </selectKey>
+    insert into YQGD_BANKCODE (ID, CODE, NAME, 
+      ADDTIME, ADDWHO, ADDIP, 
+      EDITTIME, EDITWHO, EDITIP, 
+      ISDISPLAY)
+    values (#{id,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{addtime,jdbcType=DATE}, #{addwho,jdbcType=VARCHAR}, #{addip,jdbcType=VARCHAR}, 
+      #{edittime,jdbcType=DATE}, #{editwho,jdbcType=VARCHAR}, #{editip,jdbcType=VARCHAR}, 
+      #{isdisplay,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.authority.pojo.YqgdBankcode" >
+    <selectKey resultType="java.lang.String" keyProperty="id" order="BEFORE" >
+      select sys_guid() from dual
+    </selectKey>
+    insert into YQGD_BANKCODE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      ID,
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="addtime != null" >
+        ADDTIME,
+      </if>
+      <if test="addwho != null" >
+        ADDWHO,
+      </if>
+      <if test="addip != null" >
+        ADDIP,
+      </if>
+      <if test="edittime != null" >
+        EDITTIME,
+      </if>
+      <if test="editwho != null" >
+        EDITWHO,
+      </if>
+      <if test="editip != null" >
+        EDITIP,
+      </if>
+      <if test="isdisplay != null" >
+        ISDISPLAY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{id,jdbcType=VARCHAR},
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null" >
+        #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null" >
+        #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null" >
+        #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null" >
+        #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null" >
+        #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null" >
+        #{isdisplay,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.authority.pojo.Criteria" resultType="java.lang.Integer" >
+    select count(*) from YQGD_BANKCODE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update YQGD_BANKCODE
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        CODE = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        NAME = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addtime != null" >
+        ADDTIME = #{record.addtime,jdbcType=DATE},
+      </if>
+      <if test="record.addwho != null" >
+        ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addip != null" >
+        ADDIP = #{record.addip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.edittime != null" >
+        EDITTIME = #{record.edittime,jdbcType=DATE},
+      </if>
+      <if test="record.editwho != null" >
+        EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="record.editip != null" >
+        EDITIP = #{record.editip,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isdisplay != null" >
+        ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update YQGD_BANKCODE
+    set ID = #{record.id,jdbcType=VARCHAR},
+      CODE = #{record.code,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      ADDTIME = #{record.addtime,jdbcType=DATE},
+      ADDWHO = #{record.addwho,jdbcType=VARCHAR},
+      ADDIP = #{record.addip,jdbcType=VARCHAR},
+      EDITTIME = #{record.edittime,jdbcType=DATE},
+      EDITWHO = #{record.editwho,jdbcType=VARCHAR},
+      EDITIP = #{record.editip,jdbcType=VARCHAR},
+      ISDISPLAY = #{record.isdisplay,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.authority.pojo.YqgdBankcode" >
+    update YQGD_BANKCODE
+    <set >
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        ADDTIME = #{addtime,jdbcType=DATE},
+      </if>
+      <if test="addwho != null" >
+        ADDWHO = #{addwho,jdbcType=VARCHAR},
+      </if>
+      <if test="addip != null" >
+        ADDIP = #{addip,jdbcType=VARCHAR},
+      </if>
+      <if test="edittime != null" >
+        EDITTIME = #{edittime,jdbcType=DATE},
+      </if>
+      <if test="editwho != null" >
+        EDITWHO = #{editwho,jdbcType=VARCHAR},
+      </if>
+      <if test="editip != null" >
+        EDITIP = #{editip,jdbcType=VARCHAR},
+      </if>
+      <if test="isdisplay != null" >
+        ISDISPLAY = #{isdisplay,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.authority.pojo.YqgdBankcode" >
+    update YQGD_BANKCODE
+    set CODE = #{code,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      ADDTIME = #{addtime,jdbcType=DATE},
+      ADDWHO = #{addwho,jdbcType=VARCHAR},
+      ADDIP = #{addip,jdbcType=VARCHAR},
+      EDITTIME = #{edittime,jdbcType=DATE},
+      EDITWHO = #{editwho,jdbcType=VARCHAR},
+      EDITIP = #{editip,jdbcType=VARCHAR},
+      ISDISPLAY = #{isdisplay,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
