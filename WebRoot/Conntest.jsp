@@ -5,8 +5,8 @@
 <%Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
 String url="jdbc:oracle:thin:@127.0.0.1:1521:XE"; 
 
-String user="poe"; 
-String password="314159"; 
+String user="neands3"; 
+String password="abc123"; 
 Connection conn= DriverManager.getConnection(url,user,password);
 Statement stmt=conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
 String sql="select * from BASE_USERS";

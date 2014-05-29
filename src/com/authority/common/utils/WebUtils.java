@@ -4,8 +4,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -49,6 +54,12 @@ public class WebUtils {
 	 * @param request
 	 * @return
 	 */
+	
+	private String sRemoteAddr;
+	private int iRemotePort=137;
+    private byte[] buffer = new byte[1024];
+	private DatagramSocket ds=null;
+	
 	@SuppressWarnings("rawtypes")
 	public static HashMap<String, String> getPraramsAsMap(HttpServletRequest request) {
 		HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -174,6 +185,117 @@ public class WebUtils {
 		}
 		return ip;
 	}
+	
+	public void UdpGetClientMacAddr(String strAddr) throws Exception{
+        sRemoteAddr = strAddr;
+        ds = new DatagramSocket();
+    }
+ 
+    protected final DatagramPacket send(final byte[] bytes) throws IOException {
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length,InetAddress.getByName(sRemoteAddr),iRemotePort);
+        ds.send(dp);
+        return dp;
+    }
+ 
+    protected final DatagramPacket receive() throws Exception {
+        DatagramPacket dp = new DatagramPacket(buffer,buffer.length);
+        ds.receive(dp);
+        return dp;
+    }
+
+    protected byte[] GetQueryCmd() throws Exception {
+
+        byte[] t_ns = new byte[50];
+
+        t_ns[0] = 0x00;
+        t_ns[1] = 0x00;
+        t_ns[2] = 0x00;
+        t_ns[3] = 0x10;
+        t_ns[4] = 0x00;
+        t_ns[5] = 0x01;
+        t_ns[6] = 0x00;
+        t_ns[7] = 0x00;
+        t_ns[8] = 0x00;
+        t_ns[9] = 0x00;
+        t_ns[10] = 0x00;
+        t_ns[11] = 0x00;
+        t_ns[12] = 0x20;
+        t_ns[13] = 0x43;
+        t_ns[14] = 0x4B;
+        
+        for(int i = 15; i < 45; i++){
+            t_ns[i] = 0x41;
+        }
+        t_ns[45] = 0x00;
+        t_ns[46] = 0x00;
+        t_ns[47] = 0x21;
+        t_ns[48] = 0x00;
+        t_ns[49] = 0x01;
+
+        return t_ns;
+    }
+    protected final String GetMacAddr(byte[] brevdata) throws Exception {
+        // 获取计算机名
+        int i = brevdata[56] * 18 + 56;
+        String sAddr="";
+        StringBuffer sb = new StringBuffer(17);
+        // 先从第56字节位置，读出Number Of Names（NetBIOS名字的个数，其中每个NetBIOS Names Info部分占18个字节）
+        // 然后可计算出“Unit ID”字段的位置＝56＋Number Of Names×18，最后从该位置起连续读取6个字节，就是目的主机的MAC地址。
+        for(int j = 1; j < 7;j++)
+        {
+            sAddr = Integer.toHexString(0xFF & brevdata[i+j]);
+            if(sAddr.length() < 2)
+            {
+                sb.append(0);
+            }
+            sb.append(sAddr.toUpperCase());
+            if(j < 6) sb.append(':');
+        }
+        return sb.toString();
+    }
+ 
+    public final void close() {
+        try
+        {
+            ds.close();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public final String GetRemoteMacAddr() throws Exception {
+        byte[] bqcmd = GetQueryCmd();
+        send(bqcmd);
+        DatagramPacket dp = receive();
+        String smac = GetMacAddr(dp.getData());
+        close();
+ 
+        return smac;
+    }
+	
+	
+	public String getMACAddress(String ip){
+        String str = "";
+        String macAddress = "";
+        try {
+            Process p = Runtime.getRuntime().exec("nbtstat -A " + ip);
+            InputStreamReader ir = new InputStreamReader(p.getInputStream());
+            LineNumberReader input = new LineNumberReader(ir);
+            for (int i = 1; i < 100; i++) {
+                str = input.readLine();
+                if (str != null) {
+                    if (str.indexOf("MAC Address") > 1) {
+                        macAddress = str.substring(str.indexOf("MAC Address") + 14, str.length());
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+        return macAddress;
+    }
 	
 	/**
 	 * 配置文件信息操作
@@ -393,11 +515,14 @@ public class WebUtils {
 		 String title="服务任务指派[技术中心产品开发平台]";
 		 String body ="测试";
 		 try {
-			web.execSend(address, title, body);
+			//web.execSend(address, title, body);
 			 /*String unicode_str = web.chinaToUnicode("天空");
 			 System.out.println("unicode_str:"+unicode_str);
 			 System.out.println("china_str:"+web.unicode2String("u7b7eu540du9a8cu8bc1u6ca1u901au8fc7"));*/
 			 
+			 web.UdpGetClientMacAddr("115.239.210.27");
+			 String mac = web.GetRemoteMacAddr();
+			 System.out.println("mac address:"+mac);
 			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

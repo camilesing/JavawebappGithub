@@ -1,6 +1,7 @@
 package com.authority.web.controller;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +34,11 @@ import com.alipay.sign.MD5;
 import com.alipay.util.AlipayCore;
 import com.authority.common.springmvc.DateConvertEditor;
 import com.authority.common.utils.PoiHelper;
+import com.authority.common.utils.WebUtils;
+import com.authority.pojo.BaseUsers;
 import com.authority.pojo.Criteria;
 import com.authority.pojo.ExtReturn;
+import com.authority.service.BOSInterfaceService;
 import com.authority.service.BaseUsersService;
 
 @Controller
@@ -48,6 +52,9 @@ public class BOSInterfaceController {
 	
 	@Resource(name="njdbcTemplate")
 	private NamedParameterJdbcTemplate njdbcTemplate;
+	
+	@Autowired
+	private BOSInterfaceService bosinterfaceservice;
 	
 	@Autowired
 	private BaseUsersService baseUsersService;
@@ -71,7 +78,484 @@ public class BOSInterfaceController {
 	}
 	
 	
+	public String MethodMapping(File file,Map<String,Object> fieldMap,String Account){
+		String exceptionMsg ="";
+		boolean flag = false;
+		try {
+			//根据文件名选择不同的处理程序
+			String FileName = file.getName().toUpperCase();
+			if(FileName.contains("M_SALE")){
+				String resultMsg = M_SALE(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_SALE ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_SALE 处理成功(请打开Failed文件夹查看是否有错误信息)<br>";
+				}
+			}else if(FileName.contains("M_RETAIL")){
+				String resultMsg = M_RETAIL(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_RETAIL ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_RETAIL 处理成功(请打开Failed文件夹查看是否有错误信息)<br>";
+				}
+			}else if(FileName.contains("M_RET_SALE")){
+				String resultMsg = M_RET_SALE(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_RET_SALE ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_RET_SALE 处理成功(请打开Failed文件夹查看是否有错误信息)<br>";
+				}
+			}else if(FileName.contains("M_TRANSFER")){
+				String resultMsg = M_TRANSFER(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_TRANSFER ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_TRANSFER 处理成功(请打开Failed文件夹查看是否有错误信息)";
+				}
+			}else if(FileName.contains("M_OTHER_INOUT")){
+				String resultMsg = M_OTHER_INOUT(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_OTHER_INOUT ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_OTHER_INOUT 处理成功(请打开Failed文件夹查看是否有错误信息)";
+				}
+			}else if(FileName.contains("M_INVENTORY")){
+				String resultMsg = M_INVENTORY(file,fieldMap,"admin");
+				if(!resultMsg.equals("1")){
+					flag = false;
+					exceptionMsg = exceptionMsg + " M_INVENTORY ("+resultMsg +")<br>";
+				}else{
+					flag = true ;
+					//exceptionMsg = exceptionMsg + " M_INVENTORY 处理成功(请打开Failed文件夹查看是否有错误信息)";
+				}
+			}else{
+				flag = false;
+				exceptionMsg = exceptionMsg + " 找不到相关处理程序<br>";
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			exceptionMsg = exceptionMsg + e.toString() +"<br>";
+		} finally{
+			return exceptionMsg;
+		}
+	}
 	
+	public Map<String,Object> FileStandard(List<String[]> DataArray,Map<String, Object> fieldMap, String Account)throws Exception{
+		boolean standard = true ; //文件是否合标准		
+		//源Excel 字段解析 映射，并检测是否合规范, fieldmatchMap 值所在的位置
+		Map<String,Object> fieldmatchMap =  new HashMap<String, Object>();
+		//判断Excel 格式是否符合标准
+		String[] DataArrayChild = DataArray.get(0);
+		Set<String> keySet = fieldMap.keySet();
+		for(String key : keySet){
+			boolean fieldexists = false ;
+			for (int i = 0; i < DataArrayChild.length; i++) {
+				if(key.toUpperCase().equals(DataArrayChild[i].toUpperCase())||fieldMap.get(key).toString().toUpperCase().equals(DataArrayChild[i].toUpperCase())){
+					fieldmatchMap.put(key, i);
+					fieldexists = true ;
+					break;
+				}
+			}
+			if(!fieldexists){
+				standard = false;
+				break;
+			}
+		}
+		
+		if(!standard){
+			return null;
+		}
+		
+		return fieldmatchMap;
+		
+	}
+	
+	/**
+	 * 销售单据处理
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_SALE(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_SALE(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_SALE_TMP where status = 1 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_SALE_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath , true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_SALE_TMP where status = 2 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_SALE_"+xlstime+".xlsx";	
+			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath ,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_SALE_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		
+		return "1";
+	}
+	/**
+	 * 零售单数据处理
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_RETAIL(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_RETAIL(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_RETAIL_TMP where status = 1 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_RETAIL_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_RETAIL_TMP where status = 2 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_RETAIL_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_RETAIL_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		
+		return "1";
+	}
+	
+	/**
+	 * 销售退货单数据处理
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_RET_SALE(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_RET_SALE(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_RET_SALE_TMP where status = 1 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_RET_SALE_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_RET_SALE_TMP where status = 2 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_RET_SALE_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_RET_SALE_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		
+		return "1";
+	}
+	
+	/**
+	 * 调拨单数据处理
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_TRANSFER(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_TRANSFER(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_TRANSFER_TMP where status = 1 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_TRANSFER_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_TRANSFER_TMP where status = 2 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_TRANSFER_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_TRANSFER_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		return "1";
+	}
+	
+	/**
+	 * 物理调整单
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_OTHER_INOUT(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_OTHER_INOUT(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_OTHER_INOUT_TMP where status = 1 and addwho='"+Account+"' and CONVERT(varchar(12) , addtime, 112 ) = CONVERT(varchar(12) , getdate(), 112 ) ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			/*String[] col_id = {"MASTERID","BILLDATE","STORE","REMARK","OPR","OPDATE","SKU","QTY"};
+			String[] col_name = {"单据编号","单据日期","店仓","调整原因","制单人","制单日期","条码","数量"};
+			*/
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_OTHER_INOUT_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_OTHER_INOUT_TMP where status = 2 and addwho='"+Account+"' and CONVERT(varchar(12) , addtime, 112 ) = CONVERT(varchar(12) , getdate(), 112 ) ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			
+			/*String[] col_id = {"MASTERID","BILLDATE","STORE","REMARK","OPR","OPDATE","SKU","QTY","NOTE"};
+			String[] col_name = {"单据编号","单据日期","店仓","调整原因","制单人","制单日期","条码","数量","备注"};
+			*/
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_OTHER_INOUT_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_OTHER_INOUT_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		
+		return "1";
+	}	
+	
+	/**
+	 * 盘点单
+	 * @param file
+	 * @param fieldMap 
+	 * @return
+	 * @throws Exception
+	 */
+	public String M_INVENTORY(File file,Map<String, Object> fieldMap, String Account) throws Exception{
+		String insert ="",query="",update="",delete="",exceptionMsg="";
+		//读取Excel 内容，插入数据到临时表
+		List<String[]> DataArray = PoiHelper.getData(file, 0,0);
+		//检测文件格式是否合乎标准
+		Map<String,Object> fieldmatchMap = FileStandard(DataArray,fieldMap,Account); 
+		if(fieldmatchMap==null)
+			return "文件格式不合标准";
+		DataArray.remove(0);
+		//提交服务层处理
+		String result = bosinterfaceservice.M_INVENTORY(DataArray, fieldmatchMap, Account);
+		if(!result.equals("1"))
+			return result;
+		
+		//删除已经处理文件
+		file.delete();
+		
+		SimpleDateFormat xlssdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String xlstime =  xlssdf.format(new Date());
+		
+		//将处理成功的记录写入Excel 到  Done 文件夹  分 抬头和明细  只取当天记录
+		if(1>0){
+			query = "select * from M_INVENTORY_TMP where status = 1 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			/*
+			String[] col_id = {"MASTERID","BILLDATE","STORE","OPR","OPDATE","SKU","PreQty"};
+			String[] col_name = {"单据编号","单据日期","店仓","制单人","制单日期","条码","实际盘点数量"};*/
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_INVENTORY_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+		//将处理失败的记录写入Excel 到 Failed 文件夹
+		if(1>0){
+			query = "select * from M_INVENTORY_TMP where status = 2 and addwho='"+Account+"' and to_char(addtime,'yyyy-MM-dd') = to_char(sysdate,'yyyy-MM-dd') ";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+			SqlRowSetMetaData data=rs.getMetaData();
+			String[] col_id = data.getColumnNames();
+			String[] col_name = col_id ;
+			/*
+			String[] col_id = {"MASTERID","BILLDATE","STORE","OPR","OPDATE","SKU","PreQty","NOTE"};
+			String[] col_name = {"单据编号","单据日期","店仓","制单人","制单日期","条码","实际盘点数量","备注"};*/
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_INVENTORY_"+xlstime+".xlsx";			
+			if(list.size()>0)
+				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
+		}
+				
+		//删除历史失败的记录 操作用户所插入记录
+		delete = "delete from M_INVENTORY_TMP where status = 2 and addwho='"+Account+"'";
+		jdbcTemplate.update(delete);
+		
+		return "1";
+	}
 	
 	@RequestMapping("/filedownload")
 	@ResponseBody
@@ -79,6 +563,7 @@ public class BOSInterfaceController {
 		//读取该单据的执行语句
 		String query = "",CONTENT="",msg="失败", CONDITION="",DIM="",sign="",account="",password="",type="";
 		Boolean result = false ;
+		int count = 0;
 		try{
 			
 			Map<String, String[]> ReqMapTemp = request.getParameterMap();
@@ -112,8 +597,30 @@ public class BOSInterfaceController {
 				return new ExtReturn(result, "用户密码检验未通过");
 			}
 			
-			Map<String,Object> ReqMap = new HashMap<String, Object>();
-			ReqMap.put("DIM", account.toUpperCase());
+			BaseUsers baseUsers = baseUsersService.selectByExample(criteria).get(0);
+			String IP = baseUsers.getRemark();
+			Short Sex = baseUsers.getSex(); // 0 男不限制 ，1女限制IP
+			String RemoteIP= WebUtils.getIpAddr(request);
+			if(Sex==1){
+				if(!IP.contains(RemoteIP))
+					return new ExtReturn(result, "IP地址受限制");		
+			}
+			
+			logger.info("------>帐号："+account+", 品牌："+DIM+", 单据类型："+type+", IP地址:"+RemoteIP+"<--------");
+			
+			
+			Map<String,Object> param = new HashMap<String, Object>();
+			param.put("TYPE", type.toUpperCase());
+			param.put("DIM", account.toUpperCase());
+			param.put("ACCOUNT", account.toUpperCase());
+			
+			//验证用户是否有品牌业务数据权限
+			query = "select count(*) from BASE_INTERFACE_USERDIM a " +
+					"where upper(a.account) = upper(:ACCOUNT)  and upper(a.type) = upper(:TYPE) and a.isactive='Y'";
+			count = njdbcTemplate.queryForInt(query, param);
+			if(count==0){
+				return new ExtReturn(result, "用户无权限抽取该类型单据");
+			}
 			
 			/*Set<String> set = ReqMapTemp.keySet();
 			//语句后期执行参数			
@@ -124,8 +631,7 @@ public class BOSInterfaceController {
 			}*/	
 			
 			query = "SELECT MAX(CONTENT) CONTENT FROM BASE_INTERFACE_SQL WHERE TYPE = :TYPE AND ISACTIVE='Y' ";
-			Map<String,Object> param = new HashMap<String, Object>();
-			param.put("TYPE", type.toUpperCase());
+			
 			CONTENT = njdbcTemplate.queryForObject(query, param, String.class);
 			if(CONTENT==null||CONTENT.equals(""))
 				;
@@ -146,14 +652,14 @@ public class BOSInterfaceController {
 										" select id from M_DIM where ATTRIBCODE=:DIM ) ) ";
 					
 					if(type.equalsIgnoreCase("C_STORE_LOG")||type.equalsIgnoreCase("C_STORE_CHKDAY")){
-						content_dim = " DIM = :DIM ";
+						content_dim = " DIM = :DIM or upper(dim) = 'ALL' ";
 					}
 										
 					CONTENT = CONTENT + " and ( " + content_dim +" ) ";
 				}
 				
-				List<Map<String,Object>> list = njdbcTemplate.queryForList(CONTENT, ReqMap); 
-				SqlRowSet rs = njdbcTemplate.queryForRowSet(CONTENT, ReqMap);
+				List<Map<String,Object>> list = njdbcTemplate.queryForList(CONTENT, param); 
+				SqlRowSet rs = njdbcTemplate.queryForRowSet(CONTENT, param);
 				SqlRowSetMetaData data=rs.getMetaData();
 				String[] col_id = data.getColumnNames();
 				String savePath = request.getSession().getServletContext().getRealPath("/resources/upload/admin/Done");

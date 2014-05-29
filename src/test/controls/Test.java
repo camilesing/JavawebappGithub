@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,7 +36,37 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String string = "温州";
+		final int len = 5 ;
+		String str = "test测试";
+		System.out.println(StringUtils.substring(str, 0, len));
+		
+		System.out.println(DigestUtils.md5Hex("wd"));
+		
+		
+		String str1 = "192.168.1.0;192.168.1.1";
+		String str2 = "192.168.1.2";
+		
+		if(str1.contains(str2))
+			System.out.println("true");
+		
+		
+		/*String password = "B";
+		System.out.println("MD5:"+DigestUtils.md5Hex(password));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String addtime =  sdf.format(new Date());
+		SimpleDateFormat format_date_1 = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat format_date_2 = new SimpleDateFormat("yyyyMMdd");
+		
+		try {
+			String dt_str = format_date_2.format(format_date_1.parse("2014-04-16"));
+			System.out.println(dt_str);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		/*String string = "温州";
 		
 		String[] str = string.split("\\|");
 		System.out.println(str.length);
@@ -51,7 +82,7 @@ public class Test {
 			System.out.println("MerPrk.key exists");
 		}else{
 			System.out.println("MerPrk.key not exists");
-		}
+		}*/
 		
 		
 		// java -cp druid-1.0.0.jar com.alibaba.druid.filter.config.ConfigTools you_password

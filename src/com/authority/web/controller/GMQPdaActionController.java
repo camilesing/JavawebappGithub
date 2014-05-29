@@ -144,7 +144,7 @@ public class GMQPdaActionController {
 		} catch (Exception e) {
 			logger.error("Exception: ", e);
 			return new ExceptionReturn(e);
-		}			
+		}
 		
 	}
 	

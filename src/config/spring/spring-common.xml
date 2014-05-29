@@ -46,6 +46,7 @@
 	<!-- 数据连接事务 -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="druid" />
+		<property name="nestedTransactionAllowed" value="true" />
 	</bean>
 	
 	<bean id="datasourcedao" class="com.authority.dao.DataSourceDao" /> 
@@ -59,6 +60,9 @@
   	</bean>
   	
   	<bean id="yqgdRequestdataController" class="com.authority.web.controller.YqgdRequestdataController" />
+  	
+  	<bean id="bosinterfacecontroller" class="com.authority.web.controller.BOSInterfaceController" />
+  	
   	
   	<bean id="jdbcTemplate_henlo" class="org.springframework.jdbc.core.JdbcTemplate">
   		<property name="dataSource" ref="druid_henlo" />
@@ -129,12 +133,18 @@
 	
 	<!-- 定时器开关 -->
 	 	
-	<task:annotation-driven />
+	<!-- <task:annotation-driven />
 		<bean id="TaskYQGD_ChinaPay" class="com.henlo.process.TaskYQGD_ChinaPay"></bean>
 	<task:scheduled-tasks>
 		<task:scheduled ref="TaskYQGD_ChinaPay" method="dataprocess" cron="0 0 1-12 * * ?" />
-	</task:scheduled-tasks>	 
-
+	</task:scheduled-tasks>	 --> 
+	
+	<!-- <task:annotation-driven />
+		<bean id="TaskYF_Interface" class="com.henlo.process.TaskYF_Interface"></bean>
+	<task:scheduled-tasks>
+		<task:scheduled ref="TaskYF_Interface" method="dataprocess" cron="0 2/5 * * * ?" />
+	</task:scheduled-tasks> -->
+ 
 	<!-- 
 	    5/3 * * * * ? 这里表示的是从第五秒开始 ，每三秒执行一次
 		秒     0-59     , - * /  

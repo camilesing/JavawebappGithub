@@ -120,7 +120,7 @@ $(document).ready(function() {
 							dataIndex : 'usrname',
 							width : 80,
 							renderer:formatQtip
-						}, {
+						},{
 							header : '证件号',
 							dataIndex : 'certid',
 							width : 80,
@@ -145,7 +145,7 @@ $(document).ready(function() {
 							dataIndex : 'message',
 							width : 80,
 							renderer:formatQtip
-						}, {
+						},{
 							header : '移动电话',
 							dataIndex : 'mobilephone',
 							width : 80
@@ -155,7 +155,7 @@ $(document).ready(function() {
 							width : 110,
 							renderer : function(v) {
 								return Share.map(v,yqgdrequestdata.wzsjjdealstatus , '');
-							}
+						}
 						}]
 			});
 	

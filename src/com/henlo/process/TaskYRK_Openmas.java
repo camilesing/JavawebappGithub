@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -22,8 +23,10 @@ import org.springframework.web.bind.annotation.InitBinder;
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.httpClient.HttpProtocolHandler;
 import com.alipay.util.httpClient.HttpRequest;
+import com.alipay.util.httpClient.HttpResponse;
 import com.alipay.util.httpClient.HttpResultType;
 import com.authority.common.springmvc.DateConvertEditor;
+import com.authority.pojo.ExtReturn;
 import com.chinamobile.openmas.client.Sms;
 
 @Service
@@ -32,6 +35,9 @@ private static final Logger logger = LoggerFactory.getLogger(TaskYRK_Openmas.cla
 	
 	@Resource(name="jdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
+	
+	@Resource(name="njdbcTemplate")
+	private NamedParameterJdbcTemplate njdbcTemplate;
 	
 	@Value("${openmas.sms}")
 	private String webservice;
@@ -207,4 +213,117 @@ private static final Logger logger = LoggerFactory.getLogger(TaskYRK_Openmas.cla
 			System.out.println(e);
 		}		
 	}	
+	
+	public void server_status(){
+		
+		Boolean success = false ;
+		String callbackfun="", msg="",update="",query="";
+		try {
+			query = "select * from HENLO_SERVER_URL where isdisplay='1'";
+			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+			Map<String,Object> param = new HashMap<String, Object>();
+			for (Map<String, Object> map : list) {
+				String url = map.get("url").toString();
+				String id =  map.get("id").toString();
+				String status = "failed";
+				
+				long startTime=System.currentTimeMillis(); //获取开始时间
+				
+				try {
+					HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+					HttpRequest req = new HttpRequest(HttpResultType.BYTES);
+					//设置编码集
+					req.setCharset(AlipayConfig.input_charset);
+					req.setUrl(url);
+			        HttpResponse rep;
+			        rep = httpProtocolHandler.execute(req,"","");
+					String strResult ="";
+			        if (rep == null) {
+			        	System.out.println("response is null");
+			        }else{
+			        	strResult = rep.getStringResult();
+			        	status = "success";
+			        	System.out.println("strResult:"+strResult);
+			        }
+			        
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+				long endTime=System.currentTimeMillis(); //获取结束时间
+
+				param.clear();
+				update ="update HENLO_SERVER_URL " +
+						"set status =:status,timeout=:timeout,edittime = sysdate " +
+						"where id = :id";
+				
+				param.put("status", status);
+				param.put("timeout", String.valueOf(endTime-startTime));
+				param.put("id", id);
+				
+				njdbcTemplate.update(update, param);
+				
+			}
+			
+			query = "select distinct ADDRESS from HENLO_SERVER_URL where isdisplay='1' and STATUS = 'failed' ";
+			list = jdbcTemplate.queryForList(query);
+			String send_message = "";
+			for (Map<String, Object> map : list) {
+				send_message = send_message + map.get("ADDRESS").toString()+"|";
+			}
+			
+			//------------检测短信发送时间-------------------
+			int startminute=0,endminute=1500;
+			String status ="Y";
+			try{
+				query ="select nvl(VALUE,DEFAULTVALUE) smssendtime from AD_PARAM where name='henlo.smssendtime'";
+				String time = jdbcTemplate.queryForObject(query, String.class); //默认： 08:00-23:00
+				String[] setime= time.split("-");
+				String  starttime[] = setime[0].split(":");
+				startminute = Integer.parseInt(starttime[0])*60+Integer.parseInt(starttime[1]);
+				String  endtime[] = setime[1].split(":");
+				endminute = Integer.parseInt(endtime[0])*60+Integer.parseInt(endtime[1]);
+				
+				//短信是否启用参数
+				query = "select nvl(VALUE,DEFAULTVALUE) smsstatus from AD_PARAM where name='henlo.smsstatus'";
+				status = jdbcTemplate.queryForObject(query,String.class);
+				if(status==null||status.equals("")||status.toLowerCase().equals("true"))
+					status="Y";
+				else
+					status="N";
+				
+			} catch (Exception e){
+				System.out.println(e);
+			}
+			
+			Calendar cal=Calendar.getInstance();
+			cal.setTime(new Date());
+			int nowminute = cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE);
+			if(nowminute>=startminute&&nowminute<=endminute&&status.equals("Y"))
+				status="Y";
+			else
+				status="N";
+			if(status!=null&&status.equals("Y")&&!send_message.equals("")){
+				//-----------发送短信提醒------------------
+				query = "select * from HENLO_SERVER_SMS where isdisplay='1' ";
+				list = jdbcTemplate.queryForList(query);
+				Sms sms = new Sms(webservice);
+				send_message = "检测到服务器访问异常:"+send_message;
+				
+				for (Map<String, Object> map : list) {
+					String addresss = map.get("phonenum").toString();
+					String[] destinationAddresses = addresss.split(",");					
+					sms.SendMessage(destinationAddresses, send_message, extendCode, ApplicationID, Password);
+				}
+				
+			}
+			
+		} catch (Exception e) {
+			msg = e.toString();
+			// TODO: handle exception
+		} 
+		
+	}
+	
+	
 }
