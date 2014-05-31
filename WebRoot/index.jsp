@@ -44,8 +44,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    This is my JSP page... YT <br>
-    
+    This is my JSP page... 1 <br>
+     
     <a href="HelloWorld.do" >HelloWorld</a>
     
     <form:form name="form_common" modelAttribute="form_model" action="${ctx}/form_action/pojo_value" method="post">  
