@@ -306,6 +306,10 @@ public class GMQXiangjyController  {
 					
 				}
 					
+			}else{
+				query = "select nvl(max(TOT_QTY),0) from B_PO_BOXNO where  boxno='"+BOXNO+"'";
+				boxqty =String.valueOf(jdbcTemplate.queryForInt(query));
+				
 			}
 			
 			
