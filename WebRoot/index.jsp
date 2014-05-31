@@ -51,7 +51,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <form:form name="form_common" modelAttribute="form_model" action="${ctx}/form_action/pojo_value" method="post">  
 	    <input type="text" name="username" value="" />  
 	    <input type="text" name="password" value="" />  
-	  	<input type="submit" value="提交" >
+	  	<input type="submit" value="提交" > 
   	</form:form>
   	
   	<form action="" id="json_form" >
