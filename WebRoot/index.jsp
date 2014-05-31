@@ -13,7 +13,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <base href="<%=basePath%>">
+    <base href="<%=basePath%>"> 
     
     <title>My JSP 'index.jsp' starting page</title>
     <script src="${ctx}/resources/jquery/jquery-1.7.1.js" type="text/javascript"></script>

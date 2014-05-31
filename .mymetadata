@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-module
   type="WEB"
-  name="JavawebappGithub"
+  name="Javawebapp"
   id="myeclipse.1339570574489"
   context-root="/Javawebapp"
   j2ee-spec="6.0"
-  archive="JavawebappGithub.war">
+  archive="Javawebapp.war">
   <attributes>
     <attribute name="webrootdir" value="WebRoot" />
   </attributes>
