@@ -195,34 +195,34 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 			update = "update B_PO_BOXNO a set (A.TOT_LINES,A.TOT_QTY)=(select count(*),sum(qty) from b_po_boxitem  b where a.id=B.B_PO_BOXNO_ID ) where ID="+B_PO_BOXNO_ID_;
 			result = jdbcTemplate.update(update); 
 			
-			//更新M_ISSUE_BOX
-			if(IS_CHANG.equals("Y")){
-				update = "update M_ISSUE_BOX set IS_CHANG='Y' where B_PO_BOXNO_ID="+B_PO_BOXNO_ID_;
-				jdbcTemplate.update(update);				
-			}
-				
-			
 			query = "select max(M_ISSUE_TASK_ID) from M_ISSUE_BOX where B_PO_BOXNO_ID="+B_PO_BOXNO_ID_;
 			
 			final String M_ISSUE_TASK_ID = jdbcTemplate.queryForObject(query, String.class);
 			
-			//执行存储过程 m_sale_submit 
-			procedure = "{call m_issue_fa_submit(?,?,?)}";  
-			
-			@SuppressWarnings("unchecked")
-			Map<String,Object> map_m_issue_fa_submit = (HashMap<String, Object>) jdbcTemplate.execute(procedure,new CallableStatementCallback() {  
-	            public Object doInCallableStatement(CallableStatement cs)throws SQLException,DataAccessException {  
-	                cs.setInt(1, Integer.parseInt(M_ISSUE_TASK_ID));
-	                cs.registerOutParameter(2,Types.NUMERIC);//输出参数  
-	                cs.registerOutParameter(3,Types.VARCHAR);//输出参数  
-	                cs.execute();
-	                Map<String,Object> map = new HashMap<String, Object>();  
-	                map.put("r_code", cs.getInt(2));
-	                map.put("r_message", cs.getString(3));
-	                return map;
-	            }
-	        }); 
-			
+			if(M_ISSUE_TASK_ID!=null&&M_ISSUE_TASK_ID.equals(""))
+			{
+				//更新M_ISSUE_BOX
+				if(IS_CHANG.equals("Y")){
+					update = "update M_ISSUE_BOX set IS_CHANG='Y' where B_PO_BOXNO_ID="+B_PO_BOXNO_ID_;
+					jdbcTemplate.update(update);				
+				}
+				//执行存储过程 m_sale_submit 
+				procedure = "{call m_issue_fa_submit(?,?,?)}";  
+				
+				@SuppressWarnings("unchecked")
+				Map<String,Object> map_m_issue_fa_submit = (HashMap<String, Object>) jdbcTemplate.execute(procedure,new CallableStatementCallback() {  
+		            public Object doInCallableStatement(CallableStatement cs)throws SQLException,DataAccessException {  
+		                cs.setInt(1, Integer.parseInt(M_ISSUE_TASK_ID));
+		                cs.registerOutParameter(2,Types.NUMERIC);//输出参数  
+		                cs.registerOutParameter(3,Types.VARCHAR);//输出参数  
+		                cs.execute();
+		                Map<String,Object> map = new HashMap<String, Object>();  
+		                map.put("r_code", cs.getInt(2));
+		                map.put("r_message", cs.getString(3));
+		                return map;
+		            }
+		        }); 
+			}
 			
 			// ============更新 配货发货箱 =========END
 			
