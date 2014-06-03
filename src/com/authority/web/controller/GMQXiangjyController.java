@@ -170,11 +170,19 @@ public class GMQXiangjyController  {
 			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
 			String productcolor ="";
 			if(list.size()==0){
-			}else{				
+				query = "select b.M_PRODUCT_ID,c.value1_code as VALUE,c.value1 as NAME "+ 
+						"from B_PO_BOXNO a,B_PO_BOXITEM b,m_attributesetinstance c "+
+						"where A.id = B.b_Po_Boxno_Id and b.m_attributesetinstance_id=c.id and a.BOXNO='"+BOXNO+"'";
+				
+				list = jdbcTemplate.queryForList(query);
+			}
+			if(list.size()>=0){
+				
 				productcolor = list.get(0).get("M_PRODUCT_ID").toString()+","+
-							   list.get(0).get("VALUE").toString()+","+
-							   list.get(0).get("NAME").toString();
+						   list.get(0).get("VALUE").toString()+","+
+						   list.get(0).get("NAME").toString();
 			}			
+			
 			return new ExtReturn(true, productcolor);
 		}
 		return new ExtReturn(false, "失败！");
