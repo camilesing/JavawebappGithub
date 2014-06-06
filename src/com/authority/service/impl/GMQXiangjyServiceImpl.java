@@ -199,7 +199,7 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 			
 			final String M_ISSUE_TASK_ID = jdbcTemplate.queryForObject(query, String.class);
 			
-			if(M_ISSUE_TASK_ID!=null&&M_ISSUE_TASK_ID.equals(""))
+			if(M_ISSUE_TASK_ID!=null&&!M_ISSUE_TASK_ID.equals(""))
 			{
 				//更新M_ISSUE_BOX
 				if(IS_CHANG.equals("Y")){

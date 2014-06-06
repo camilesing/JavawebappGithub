@@ -422,6 +422,125 @@ public class BOSInterfaceServiceImpl implements BOSInterfaceService {
 		return msg;
 	}
 
+	
+	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+	public String M_RET_PUR(List<String[]> DataArray,Map<String,Object> fieldmatchMap,String Account) {
+		String msg = "";
+		int result = 0;
+		try{
+			String insert ="",query="",update="",delete="";
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String addtime =  sdf.format(new Date());
+			SimpleDateFormat format_date_1 = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat format_date_2 = new SimpleDateFormat("yyyyMMdd");
+			
+			//TBusRetail 抬头明细表 // 先直接插入数据
+			for (String[] strings : DataArray) {
+				
+				Map<String,Object> paramMap = new HashMap<String, Object>();
+				paramMap.put("DOCNO", strings[Integer.parseInt(fieldmatchMap.get("DOCNO").toString())]);
+				paramMap.put("BILLDATE", format_date_2.format(format_date_1.parse(strings[Integer.parseInt(fieldmatchMap.get("BILLDATE").toString())])));
+				paramMap.put("RETSALETYPE", strings[Integer.parseInt(fieldmatchMap.get("RETSALETYPE").toString())]);
+				paramMap.put("C_ORIG_ID", strings[Integer.parseInt(fieldmatchMap.get("C_ORIG_ID").toString())]);
+				paramMap.put("C_STORE_ID", strings[Integer.parseInt(fieldmatchMap.get("C_STORE_ID").toString())]);
+				paramMap.put("DATEOUT",  format_date_2.format(format_date_1.parse(strings[Integer.parseInt(fieldmatchMap.get("DATEOUT").toString())])));
+				paramMap.put("DATEIN",  format_date_2.format(format_date_1.parse(strings[Integer.parseInt(fieldmatchMap.get("DATEIN").toString())])));
+				paramMap.put("STATUSERID", strings[Integer.parseInt(fieldmatchMap.get("STATUSERID").toString())]);
+				paramMap.put("STATUSTIME", strings[Integer.parseInt(fieldmatchMap.get("STATUSTIME").toString())]);
+				paramMap.put("SKU", strings[Integer.parseInt(fieldmatchMap.get("SKU").toString())]); 
+				paramMap.put("QTY", strings[Integer.parseInt(fieldmatchMap.get("QTY").toString())]);
+				paramMap.put("QTYOUT", strings[Integer.parseInt(fieldmatchMap.get("QTYOUT").toString())]);
+				paramMap.put("QTYIN", strings[Integer.parseInt(fieldmatchMap.get("QTYIN").toString())]);
+				paramMap.put("STATUS", "0");
+				paramMap.put("NOTE", "");
+				paramMap.put("ADDWHO", Account);
+				
+				//判断明细插入是否重复
+				insert ="insert into M_RET_PUR_TMP(ID, DOCNO,BILLDATE, RETSALETYPE, C_ORIG_ID, C_STORE_ID, DATEOUT, DATEIN, STATUSERID, STATUSTIME, SKU, QTY, QTYOUT, QTYIN, ADDWHO, ADDTIME, NOTE, STATUS)  " +
+						"select sys_guid() ID, :DOCNO, :BILLDATE, :RETSALETYPE, :C_ORIG_ID, :C_STORE_ID, :DATEOUT, :DATEIN, :STATUSERID, :STATUSTIME, :SKU, :QTY, :QTYOUT, :QTYIN, :ADDWHO,sysdate ADDTIME, :NOTE, :STATUS " +
+						"from dual where not exists(" +
+						"select 'x' from M_RET_PUR_TMP where DOCNO = :DOCNO and STATUS ='1' )";
+				if(njdbcTemplate.update(insert, paramMap)==0){
+					insert ="insert into M_RET_PUR_TMP(ID, DOCNO,BILLDATE, RETSALETYPE, C_ORIG_ID, C_STORE_ID, DATEOUT, DATEIN, STATUSERID, STATUSTIME, SKU, QTY, QTYOUT, QTYIN, ADDWHO, ADDTIME, NOTE, STATUS)  " +
+							"select sys_guid() ID, :DOCNO, :BILLDATE, :RETSALETYPE, :C_ORIG_ID, :C_STORE_ID, :DATEOUT, :DATEIN, :STATUSERID, :STATUSTIME, :SKU, :QTY, :QTYOUT, :QTYIN, :ADDWHO,sysdate ADDTIME, :NOTE, :STATUS " +
+							"from dual ";
+					paramMap.put("NOTE", "采购退货单插入重复");		
+					paramMap.put("STATUS", "2");
+					njdbcTemplate.update(insert, paramMap);
+				}
+				
+			}
+			
+			//循环 m_retail_tmp 表,执行事务----插入零售单，子事务中运行
+			query = "SELECT DISTINCT DOCNO,ADDWHO FROM M_RET_PUR_TMP WHERE STATUS='0' AND ADDWHO =:ADDWHO ";
+			Map<String,Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("ADDWHO", Account);
+			List<Map<String,Object>> list_m_retail_tmp = njdbcTemplate.queryForList(query, paramMap);
+			for (Map<String, Object> map : list_m_retail_tmp) {
+				String DOCNO = map.get("DOCNO").toString();
+				//执行存储过程事务,嵌套事务
+				try {
+					String r_message = M_RET_PUR_CHILD(DOCNO);
+					update = "update M_RET_PUR_TMP set status ='1',note = :NOTE where docno =:DOCNO and addwho =:ADDWHO  and status ='0' ";
+					map.put("NOTE", r_message);
+				} catch (Exception e) {
+					if(e.toString().length()>len)						
+						map.put("NOTE",StringUtils.substring(e.toString(), 0, len));
+					else 
+						map.put("NOTE",e.toString());
+					update = "update M_RET_PUR_TMP set status ='2',note = :NOTE where docno =:DOCNO and addwho =:ADDWHO ";
+					// TODO: handle exception
+				}
+				
+				njdbcTemplate.update(update, map);
+				
+			}
+			
+			result = 1 ;
+		}catch(Exception e){
+			String str = "处理执行过程中出错`请检查数据是否有误或联系管理员";
+			msg = str ;
+			System.out.println(e.toString());
+			logger.error("M_RET_PUR:"+e.toString());
+			throw new RuntimeException(e);
+		}
+		// TODO Auto-generated method stub
+		return result > 0 ? "1" : msg;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.NESTED, rollbackFor = { Exception.class })
+	public String  M_RET_PUR_CHILD(final String DOCNO){
+		String msg = "";
+		int result = 0;
+		try {
+			String procedure = "{call P_BASE_M_RET_PUR(?,?)}";
+			@SuppressWarnings("unchecked")
+			Map<String,Object> MAP_P_BASE_M_RET_PUR = (HashMap<String, Object>) jdbcTemplate.execute(procedure,new CallableStatementCallback() {  
+	            public Object doInCallableStatement(CallableStatement cs)throws SQLException,DataAccessException {  
+	                cs.setString(1, DOCNO);
+	                cs.registerOutParameter(2, OracleTypes.VARCHAR);	
+	                cs.execute();
+	                Map<String,Object> map = new HashMap<String, Object>();  
+	                map.put("r_message", cs.getString(2));
+	                return map;
+	            }
+	        }); 
+			
+			msg = MAP_P_BASE_M_RET_PUR.get("r_message").toString();
+			
+			result = 1;
+			
+		} catch (Exception e) {
+			msg = e.toString();
+			throw new RuntimeException(e);
+			// TODO: handle exception
+		}
+		// TODO Auto-generated method stub
+		return msg;
+	}
+	
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
 	public String M_TRANSFER(List<String[]> DataArray,Map<String,Object> fieldmatchMap,String Account) {

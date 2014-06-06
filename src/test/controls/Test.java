@@ -40,7 +40,7 @@ public class Test {
 		String str = "test测试";
 		System.out.println(StringUtils.substring(str, 0, len));
 		
-		System.out.println(DigestUtils.md5Hex("wd"));
+		System.out.println(DigestUtils.md5Hex("B"));
 		
 		
 		String str1 = "192.168.1.0;192.168.1.1";

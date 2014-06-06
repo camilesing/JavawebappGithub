@@ -357,7 +357,7 @@ public class WebUtils {
 			// 定义邮件服务器的地址
 			WebUtils web = new WebUtils();
 			
-			props.put("mail.smtp.host", "smtp.exmail.qq.com");
+			props.put("mail.smtp.host", "smtp.qq.com");
 			props.put("mail.smtp.port","465" );
 			props.put("mail.smtp.starttls.enable","true" );
 			props.put("mail.smtp.auth", "true");
@@ -515,14 +515,14 @@ public class WebUtils {
 		 String title="服务任务指派[技术中心产品开发平台]";
 		 String body ="测试";
 		 try {
-			//web.execSend(address, title, body);
+			 //web.execSend(address, title, body);
 			 /*String unicode_str = web.chinaToUnicode("天空");
 			 System.out.println("unicode_str:"+unicode_str);
 			 System.out.println("china_str:"+web.unicode2String("u7b7eu540du9a8cu8bc1u6ca1u901au8fc7"));*/
 			 
-			 web.UdpGetClientMacAddr("115.239.210.27");
+			 /*web.UdpGetClientMacAddr("115.239.210.27");
 			 String mac = web.GetRemoteMacAddr();
-			 System.out.println("mac address:"+mac);
+			 System.out.println("mac address:"+mac);*/
 			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
