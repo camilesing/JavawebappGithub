@@ -378,6 +378,11 @@ public class TaskYF_Interface {
 
         return nameValuePair;
     }
+    
+    public void method_test(){
+    	
+    	System.out.println("Test.......");
+    }
 	
 
 }

@@ -2,6 +2,7 @@ package test.controls;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -24,6 +25,7 @@ import com.alipay.util.httpClient.HttpProtocolHandler;
 import com.alipay.util.httpClient.HttpRequest;
 import com.alipay.util.httpClient.HttpResponse;
 import com.alipay.util.httpClient.HttpResultType;
+import com.authority.common.utils.WebUtils;
 import com.authority.common.utils.XmlOperateUtil;
 
 import net.sourceforge.jeval.EvaluationException;
@@ -36,6 +38,21 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		try {
+			Class<?> task = null;
+			WebUtils webUtils = new WebUtils();
+			String classpath = webUtils.readValue("config/others/config.properties","Task.classpath");
+			task = Class.forName(classpath);
+			System.out.println(task.getSimpleName());
+			Method  method = task.getDeclaredMethod("method_test", null);
+			Object task_class = task.newInstance();
+			method.invoke(task_class, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		final int len = 5 ;
 		String str = "test测试";
 		System.out.println(StringUtils.substring(str, 0, len));

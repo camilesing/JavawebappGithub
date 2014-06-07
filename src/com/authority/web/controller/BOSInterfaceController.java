@@ -1,6 +1,7 @@
 package com.authority.web.controller;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import com.alipay.config.AlipayConfig;
 import com.alipay.sign.MD5;
 import com.alipay.util.AlipayCore;
 import com.authority.common.springmvc.DateConvertEditor;
+import com.authority.common.springmvc.SpringContextHolder;
 import com.authority.common.utils.PoiHelper;
 import com.authority.common.utils.WebUtils;
 import com.authority.pojo.BaseUsers;
@@ -40,6 +42,7 @@ import com.authority.pojo.Criteria;
 import com.authority.pojo.ExtReturn;
 import com.authority.service.BOSInterfaceService;
 import com.authority.service.BaseUsersService;
+import com.henlo.process.TaskYF_Interface;
 
 @Controller
 @RequestMapping("/bosinterface")
@@ -407,7 +410,7 @@ public class BOSInterfaceController {
 			String[] col_id = data.getColumnNames();
 			String[] col_name = col_id ;
 			
-			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_RET_SALE_"+xlstime+".xlsx";			
+			String filePath = file.getParentFile().getPath()+File.separator+"Done"+File.separator+"M_RET_PUR_"+xlstime+".xlsx";			
 			if(list.size()>0)
 				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
 		}
@@ -419,7 +422,7 @@ public class BOSInterfaceController {
 			SqlRowSetMetaData data=rs.getMetaData();
 			String[] col_id = data.getColumnNames();
 			String[] col_name = col_id ;
-			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_RET_SALE_"+xlstime+".xlsx";			
+			String filePath = file.getParentFile().getPath()+File.separator+"Failed"+File.separator+"M_RET_PUR_"+xlstime+".xlsx";			
 			if(list.size()>0)
 				PoiHelper.Excel_Generate(list, col_id, col_name, filePath,true);
 		}
@@ -792,6 +795,35 @@ public class BOSInterfaceController {
 		} catch (Exception e) {
 			// TODO: handle exception
 			result = false ;
+		}
+		
+		return new ExtReturn(result, msg);
+	}
+	
+	
+	@RequestMapping("/Task")
+	@ResponseBody
+	public Object Task(HttpSession session, HttpServletRequest request) {
+		//读取该单据的执行语句
+		String query = "",CONTENT="",msg="", filename="",sign="",account="",password="";
+		Boolean result = false ;
+		try {
+			String method_name = request.getParameter("method");
+			Class<?> task = null;
+			WebUtils webUtils = new WebUtils();
+			String classpath = webUtils.readValue("config/others/config.properties","Task.classpath");
+			task = Class.forName(classpath);
+			logger.info("method:"+method_name+", classpath:"+classpath+",classname:"+task.getSimpleName());
+			Object task_class = SpringContextHolder.getBean(task.getSimpleName());
+			Method  method = task.getDeclaredMethod(method_name, null);
+			method.invoke(task_class, null);
+			/*TaskYF_Interface taskYF_Interface = SpringContextHolder.getBean(task.getSimpleName());
+			taskYF_Interface.datadownload();*/
+			msg = method_name +" success ";
+		} catch (Exception e) {
+			// TODO: handle exception
+			result = false ;
+			msg = e.toString();
 		}
 		
 		return new ExtReturn(result, msg);
