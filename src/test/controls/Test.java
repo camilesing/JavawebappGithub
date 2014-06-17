@@ -53,6 +53,10 @@ public class Test {
 		}
 		
 		
+		String Test_path = Test.class.getResource(Test.class.getSimpleName() + ".class").getPath();
+		System.out.println("Test_path:"+Test_path);
+		
+		
 		final int len = 5 ;
 		String str = "test测试";
 		System.out.println(StringUtils.substring(str, 0, len));
@@ -65,6 +69,14 @@ public class Test {
 		
 		if(str1.contains(str2))
 			System.out.println("true");
+		
+		
+		String strs = "w,1;e,2;";
+		String[] list = strs.split(";");
+		for (int i = 0; i < list.length; i++) {
+			String[] list_child = list[i].split(",");
+			System.out.println(list_child[0]+":"+list_child[1]);
+		}
 		
 		
 		/*String password = "B";

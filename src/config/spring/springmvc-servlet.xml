@@ -114,6 +114,7 @@
 			<mvc:mapping path="/pdaaction**/**"/>
 			<mvc:mapping path="/wzsjj**/**" />
 			<mvc:mapping path="/wzgd**/**" />
+			<mvc:mapping path="/bosapp/?*/**" />
 			<bean class="com.authority.web.interseptor.LoginInterceptor"></bean>
 		</mvc:interceptor>
 	</mvc:interceptors>

@@ -486,6 +486,7 @@ public class BOSInterfaceServiceImpl implements BOSInterfaceService {
 					update = "update M_RET_PUR_TMP set status ='1',note = :NOTE where docno =:DOCNO and addwho =:ADDWHO  and status ='0' ";
 					map.put("NOTE", r_message);
 				} catch (Exception e) {
+					logger.error("M_RET_PUR_CHILD:"+e.toString());
 					if(e.toString().length()>len)						
 						map.put("NOTE",StringUtils.substring(e.toString(), 0, len));
 					else 

@@ -89,7 +89,7 @@ public class UserController {
 	/**
 	 * 用户修改密码页面
 	 */
-	@RequestMapping(value = "/changepwd", method = RequestMethod.GET)
+	@RequestMapping(value = "/changepwd")
 	public String changePwd() {
 		return "user/changepwd";
 	}
@@ -144,7 +144,7 @@ public class UserController {
 	/**
 	 * 获取用户的所有角色
 	 */
-	@RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{userId}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object myRole(@PathVariable String userId) {
 		try {
@@ -278,7 +278,7 @@ public class UserController {
 	/**
 	 * 编辑用户
 	 */
-	@RequestMapping(value = "/myinfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/myinfo")
 	public String myinfo() {
 		return "user/myinfo";
 	}

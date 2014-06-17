@@ -39,7 +39,18 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 				response.getWriter().print(WebConstants.TIME_OUT);
 			} else {
 				// 普通页面请求
-				response.sendRedirect(request.getContextPath() + "/");
+				String req_uri=request.getRequestURI(); 
+				if(req_uri.contains("bosapp"))
+					response.sendRedirect(request.getContextPath() + "/bosapp/");
+				else
+					response.sendRedirect(request.getContextPath() + "/");
+				/*System.out.println("request.getRequestURI():"+req_uri);
+				String ctxPath = request.getContextPath(); 
+				System.out.println("request.getContextPath():"+ctxPath);
+				String uri = req_uri.substring(ctxPath.length()+1);
+				String param=request.getQueryString();
+				System.out.println("request.getQueryString():"+param);*/
+				
 			}
 			return false;
 		}

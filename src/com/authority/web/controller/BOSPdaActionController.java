@@ -82,6 +82,8 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
 	}
 	
+	
+	
 	@RequestMapping(value="/login")
 	@ResponseBody	
 	public Object login(@RequestParam String account, @RequestParam String password, HttpSession session, HttpServletRequest request) {

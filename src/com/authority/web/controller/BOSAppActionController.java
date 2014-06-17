@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -43,6 +44,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,7 +59,7 @@ import com.authority.web.interseptor.WebConstants;
 import com.henlo.process.HenloController;
 
 @Controller
-@RequestMapping("/bosappaction")
+@RequestMapping("/bosapp")
 public class BOSAppActionController {
 private static final Logger logger = LoggerFactory.getLogger(BOSAppActionController.class);
 	
@@ -78,6 +80,18 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 	public void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Date.class, new DateConvertEditor());
 		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+	}
+	
+	
+	
+	@RequestMapping(value="",method = RequestMethod.GET)
+	public String bosapp() {
+		return "bosapp/index";
+	}
+	
+	@RequestMapping(value="/page/{url}",method = RequestMethod.GET)
+	public String bosappurl(@PathVariable String url) {
+		return "bosapp/"+url;
 	}
 	
 	@RequestMapping(value="/login",method=RequestMethod.POST)
@@ -453,21 +467,46 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 				date_end="20991231";
 			
 			
-			String INFO = " ( BILLDATE BETWEEN "+date_start+" AND "+date_end+") ";
+			String Info_DATE = " ( BILLDATE BETWEEN "+date_start+" AND "+date_end+") ";
+			String Info_RETAILBILLTYPE = " (RETAILBILLTYPE LIKE '%0%')";
+			String Info_TYPE = "  (TYPE LIKE '%0%') ";
+			String Info_STORE = "  SELECT C_V_RESTORE.ID FROM C_STORE C_V_RESTORE WHERE ( (C_V_RESTORE.AD_CLIENT_ID=37) ) AND ( (C_V_RESTORE.NAME LIKE '%%') ) ";
+			String Info_SALESREP = " SELECT C_V_EMPLOYEE.ID FROM HR_EMPLOYEE C_V_EMPLOYEE WHERE (C_V_EMPLOYEE.C_STORE_ID IS NOT NULL) AND ( (C_V_EMPLOYEE.AD_CLIENT_ID=37) ) AND ( (C_V_EMPLOYEE.NAME LIKE '%%') ) AND (C_V_EMPLOYEE.ISSALER='Y') ";
+			String Info_C_VIP = " SELECT C_VIP.ID FROM C_VIP WHERE ( (C_VIP.AD_CLIENT_ID=37) ) AND ( (C_VIP.CARDNO LIKE '%%') )";
+			String Info_M_PRODUCT_ALIAS = " SELECT M_PRODUCT_ALIAS.ID FROM M_PRODUCT_ALIAS WHERE (M_PRODUCT_ALIAS.ISACTIVE='Y') AND ( (M_PRODUCT_ALIAS.AD_CLIENT_ID=37) ) AND ( (M_PRODUCT_ALIAS.NO LIKE '%%') ) ";
+			String Info_PRODUCT = " SELECT M_PRODUCT.ID FROM M_PRODUCT WHERE ( (M_PRODUCT.AD_CLIENT_ID=37) ) AND ( (M_PRODUCT.NAME LIKE '%%') )";
 			
 			
 			query = "select get_sequences('AD_PINSTANCE') AD_PINSTANCE_ID  from dual ";
 			String AD_PINSTANCE_ID = jdbcTemplate_henlo.queryForObject(query, String.class);
-			System.out.println("AD_PINSTANCE_ID:"+AD_PINSTANCE_ID);
-			insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO) "+
+
+			insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID ,CREATIONDATE, ISACTIVE, RECORD_NO) "+
+					 "select :AD_PINSTANCE_ID, '37' AD_CLIENT_ID,'27' AD_ORG_ID, '2' ORDERNO, '1' AD_PROCESSQUEUE_ID, '53' AD_PROCESS_ID,'893' AD_USER_ID,'M' STATE,'0' RESULT,'' ERRORMSG, '' AD_TABLE_ID, '' RECORD_ID,'893' OWNERID,'893' MODIFIERID, sysdate CREATIONDATE,'Y' ISACTIVE,'' RECORD_NO "+
+					 "from dual ";
+			
+			/*insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO) "+
 					 "select :AD_PINSTANCE_ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO "+
-					 "from AD_PINSTANCE where id='44447' ";
+					 "from AD_PINSTANCE where id='44447' ";*/
 			Map<String,Object> paramMap = new HashMap<String, Object>();
 			paramMap.put("AD_PINSTANCE_ID", AD_PINSTANCE_ID);
-			paramMap.put("INFO", INFO);
 			count = njdbcTemplate_henlo.update(insert, paramMap);
+			
+			System.out.println("AD_PINSTANCE_ID:"+AD_PINSTANCE_ID);
+			
 			if(count>0){
-				insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO) "+
+				String[] Name = {"BILLDATE","RETAILBILLTYPE","TYPE","STORE","SALESREP","C_VIP","M_PRODUCT_ALIAS","PRODUCT"};
+				String[] Info = {Info_DATE,Info_RETAILBILLTYPE,Info_TYPE,Info_STORE,Info_SALESREP,Info_C_VIP,Info_M_PRODUCT_ALIAS,Info_PRODUCT};
+				for (int i = 0; i < Name.length; i++) {
+					insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME ,ISACTIVE ,INFO) "+
+							"select get_sequences('ad_pinstance_para') ID,'37' AD_CLIENT_ID,'27' AD_ORG_ID,:AD_PINSTANCE_ID, :ORDERNO, :NAME, 'Y' ISACTIVE, :INFO "+
+							"from dual";
+					paramMap.put("ORDERNO", i);
+					paramMap.put("NAME", Name[i]);
+					paramMap.put("INFO", Info[i]);
+					njdbcTemplate_henlo.update(insert, paramMap);
+				}
+				
+				/*insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO) "+
 						"select get_sequences('ad_pinstance_para') ID, AD_CLIENT_ID, AD_ORG_ID,:AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO "+
 						"from ad_pinstance_para where  ad_pinstance_id ='44447' and ORDERNO>1000";
 				
@@ -475,7 +514,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 				
 				
 				update = "update AD_PINSTANCE_PARA a set a.info = :INFO where AD_PINSTANCE_ID=:AD_PINSTANCE_ID and name='BILLDATE' ";
-				njdbcTemplate_henlo.update(update, paramMap);
+				njdbcTemplate_henlo.update(update, paramMap);*/
 				
 				if(count>0){
 					final int p_pi_id = Integer.parseInt(AD_PINSTANCE_ID);
@@ -500,6 +539,9 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 										" group by a.BILLDATE,a.C_STORE_ID,B.NAME,VIP_RETAIL_PER,a.RATE "+
 										" order by BILLDATE,C_STORE_NAME ";
 					 list = njdbcTemplate_henlo.queryForList(pro_query, paramMap);
+					 BigDecimal T_QTYCOST = new BigDecimal(0);
+					 BigDecimal T_TOT_AMT_ACTUAL = new BigDecimal(0);
+					 BigDecimal T_TOT_AMT_LIST = new BigDecimal(0);
 					 
 					 for (int i = 0; i < list.size(); i++) {
 							Map<String,Object> listMap = list.get(i);
@@ -516,6 +558,10 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 								map_head.put("VIP_RETAIL_PER", "VIP占比");
 								listArray.add(map_head);
 							}
+							T_QTYCOST = T_QTYCOST.add(new BigDecimal(listMap.get("QTYCOST").toString()));
+							T_TOT_AMT_ACTUAL = T_TOT_AMT_ACTUAL.add(new BigDecimal(listMap.get("TOT_AMT_ACTUAL").toString()));
+							T_TOT_AMT_LIST = T_TOT_AMT_LIST.add(new BigDecimal(listMap.get("TOT_AMT_LIST").toString()));
+							
 							map.put("BILLDATE", listMap.get("BILLDATE").toString());
 							map.put("C_STORE_NAME", listMap.get("C_STORE_NAME").toString());
 							map.put("QTYCOST", listMap.get("QTYCOST").toString());
@@ -525,8 +571,20 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 							map.put("RATE", listMap.get("RATE").toString());
 							map.put("VIP_RETAIL_PER", listMap.get("RATE").toString());
 							listArray.add(map);
-						}
-					 count = list.size();
+					  }
+					 	
+					 	Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+						map_head.put("BILLDATE", "汇总");
+						map_head.put("C_STORE_NAME", "");
+						map_head.put("QTYCOST", T_QTYCOST);
+						map_head.put("TOT_AMT_ACTUAL", T_TOT_AMT_ACTUAL);
+						map_head.put("TOT_AMT_LIST", T_TOT_AMT_LIST);
+						map_head.put("PROFIT", "");
+						map_head.put("RATE", "");
+						map_head.put("VIP_RETAIL_PER", "");
+						listArray.add(map_head);
+						
+					 count = list.size()+1;
 				}
 			}
 			
@@ -563,29 +621,44 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			if(date_end==null||date_end.equals(""))
 				date_end="20991231";
 			
-			String INFO = " ( DATE BETWEEN "+date_start+" AND "+date_end+") ";
-			
+			String Info_DATE = " ( DATE BETWEEN "+date_start+" AND "+date_end+") ";
+			String Info_C_STORE = "SELECT C_V_RESTORE.ID FROM C_STORE C_V_RESTORE WHERE ( (C_V_RESTORE.AD_CLIENT_ID=37) ) AND ( (C_V_RESTORE.ID IN(SELECT C_V_RESTORE.ID FROM C_STORE C_V_RESTORE WHERE ( (C_V_RESTORE.AD_CLIENT_ID=37) ) AND ( (C_V_RESTORE.ISACTIVE = 'Y') ))) )";
 			
 			query = "select get_sequences('AD_PINSTANCE') AD_PINSTANCE_ID  from dual ";
 			String AD_PINSTANCE_ID = jdbcTemplate_henlo.queryForObject(query, String.class);
 			System.out.println("AD_PINSTANCE_ID:"+AD_PINSTANCE_ID);
-			insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO) "+
+			
+			insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID ,CREATIONDATE, ISACTIVE, RECORD_NO) "+
+					 "select :AD_PINSTANCE_ID, '37' AD_CLIENT_ID,'27' AD_ORG_ID, '2' ORDERNO, '1' AD_PROCESSQUEUE_ID, '53' AD_PROCESS_ID,'893' AD_USER_ID,'M' STATE,'0' RESULT,'' ERRORMSG, '' AD_TABLE_ID, '' RECORD_ID,'893' OWNERID,'893' MODIFIERID, sysdate CREATIONDATE,'Y' ISACTIVE,'' RECORD_NO "+
+					 "from dual ";
+			/*insert = "insert into AD_PINSTANCE (ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO) "+
 					 "select :AD_PINSTANCE_ID, AD_CLIENT_ID, AD_ORG_ID, ORDERNO, AD_PROCESSQUEUE_ID, AD_PROCESS_ID, AD_USER_ID, STATE, RESULT, ERRORMSG, AD_TABLE_ID, RECORD_ID, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, RECORD_NO "+
-					 "from AD_PINSTANCE where id='44641' ";
+					 "from AD_PINSTANCE where id='44641' ";*/
+			
 			Map<String,Object> paramMap = new HashMap<String, Object>();
 			paramMap.put("AD_PINSTANCE_ID", AD_PINSTANCE_ID);
-			paramMap.put("INFO", INFO);
 			count = njdbcTemplate_henlo.update(insert, paramMap);
 			if(count>0){
-				insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO) "+
+				String[] Name = {"DATE","C_STORE"};
+				String[] Info = {Info_DATE,Info_C_STORE};
+				for (int i = 0; i < Name.length; i++) {
+					insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME ,ISACTIVE ,INFO) "+
+							"select get_sequences('ad_pinstance_para') ID,'37' AD_CLIENT_ID,'27' AD_ORG_ID,:AD_PINSTANCE_ID, :ORDERNO, :NAME, 'Y' ISACTIVE, :INFO "+
+							"from dual";
+					paramMap.put("ORDERNO", i);
+					paramMap.put("NAME", Name[i]);
+					paramMap.put("INFO", Info[i]);
+					njdbcTemplate_henlo.update(insert, paramMap);
+				}
+				
+				/*insert ="insert into AD_PINSTANCE_PARA (ID, AD_CLIENT_ID, AD_ORG_ID, AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO) "+
 						"select get_sequences('ad_pinstance_para') ID, AD_CLIENT_ID, AD_ORG_ID,:AD_PINSTANCE_ID, ORDERNO, NAME, P_STRING, P_STRING_TO, P_NUMBER, P_NUMBER_TO, P_DATE, P_DATE_TO, INFO_TO, OWNERID, MODIFIERID, CREATIONDATE, MODIFIEDDATE, ISACTIVE, OLDPSTR, P_CLOB, OLDINFO, INFO "+
 						"from ad_pinstance_para where  ad_pinstance_id ='44641' and ORDERNO>1000";
+				count = njdbcTemplate_henlo.update(insert, paramMap);*/
 				
-				count = njdbcTemplate_henlo.update(insert, paramMap);
 				
-				
-				update = "update AD_PINSTANCE_PARA a set a.info = :INFO where AD_PINSTANCE_ID=:AD_PINSTANCE_ID and name='DATE' ";
-				njdbcTemplate_henlo.update(update, paramMap);
+				/*update = "update AD_PINSTANCE_PARA a set a.info = :INFO where AD_PINSTANCE_ID=:AD_PINSTANCE_ID and name='DATE' ";
+				njdbcTemplate_henlo.update(update, paramMap);*/
 				
 				if(count>0){
 					final int p_pi_id = Integer.parseInt(AD_PINSTANCE_ID);
@@ -608,7 +681,10 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 									   "where A.AD_PI_ID=:AD_PINSTANCE_ID  order by A.ORDERNO,M_PRODUCT_NAME ";
 					 
 					list = njdbcTemplate_henlo.queryForList(pro_query, paramMap);
-					 
+					BigDecimal T_Qty = new BigDecimal(0);
+					BigDecimal T_AMT_ACTUAL = new BigDecimal(0);
+					BigDecimal T_QTY_STORAGE = new BigDecimal(0);
+					BigDecimal T_C_DATE = new BigDecimal(0);
 					for (int i = 0; i < list.size(); i++) {
 							Map<String,Object> listMap = list.get(i);
 							Map<String,Object> map = new LinkedHashMap<String,Object>();
@@ -623,6 +699,12 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 								map_head.put("C_DATE", "可周转天数");
 								listArray.add(map_head);
 							}
+							
+							T_Qty = T_Qty.add(new BigDecimal(listMap.get("Qty").toString()));
+							T_AMT_ACTUAL = T_AMT_ACTUAL.add(new BigDecimal(listMap.get("AMT_ACTUAL").toString()));
+							T_QTY_STORAGE = T_QTY_STORAGE.add(new BigDecimal(listMap.get("QTY_STORAGE").toString()));
+							T_C_DATE = T_C_DATE.add(new BigDecimal(listMap.get("C_DATE").toString()));
+							
 							map.put("ORDERNO", listMap.get("ORDERNO").toString());
 							map.put("M_PRODUCT_NAME", listMap.get("M_PRODUCT_NAME").toString());
 							map.put("M_PRODUCT_VALUE", listMap.get("M_PRODUCT_VALUE").toString());
@@ -631,8 +713,20 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 							map.put("QTY_STORAGE", listMap.get("QTY_STORAGE").toString());
 							map.put("C_DATE", listMap.get("C_DATE").toString());
 							listArray.add(map);
-						}
-					 count = list.size();
+					}
+					if(true){
+						Map<String,Object> map_foot = new LinkedHashMap<String,Object>();
+						map_foot.put("ORDERNO", "汇总");
+						map_foot.put("M_PRODUCT_NAME", ".");
+						map_foot.put("M_PRODUCT_VALUE", ".");
+						map_foot.put("QTY", T_Qty);
+						map_foot.put("AMT_ACTUAL", T_AMT_ACTUAL);
+						map_foot.put("QTY_STORAGE", T_QTY_STORAGE);
+						map_foot.put("C_DATE", T_C_DATE);
+						listArray.add(map_foot);
+					}
+					
+					count = list.size()+1;
 				}
 			}
 			
@@ -686,6 +780,8 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			paramMap.put("date_end", date_end);
 			
 			list = njdbcTemplate_henlo.queryForList(query, paramMap);
+			BigDecimal T_QTYSALEOUT = new BigDecimal(0);
+			BigDecimal T_AMTSALEOUT = new BigDecimal(0);
 			
 			for (int i = 0; i < list.size(); i++) {
 				Map<String,Object> listMap = list.get(i);
@@ -697,12 +793,22 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 					map_head.put("AMTSALEOUT", "出库金额");
 					listArray.add(map_head);
 				}
+				T_QTYSALEOUT = T_QTYSALEOUT.add(new BigDecimal(listMap.get("QTYSALEOUT").toString()));
+				T_AMTSALEOUT = T_AMTSALEOUT.add(new BigDecimal(listMap.get("AMTSALEOUT").toString()));
+				
 				map.put("ATTRIBNAME", listMap.get("ATTRIBNAME").toString());
 				map.put("QTYSALEOUT", listMap.get("QTYSALEOUT").toString());
 				map.put("AMTSALEOUT", listMap.get("AMTSALEOUT").toString());
 				listArray.add(map);
 			}
-			count = list.size();
+			
+			Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+			map_head.put("ATTRIBNAME", "汇总");
+			map_head.put("QTYSALEOUT", T_QTYSALEOUT);
+			map_head.put("AMTSALEOUT", T_AMTSALEOUT);
+			listArray.add(map_head);
+			
+			count = list.size()+1;
 			
 			return new ExtReturn(true, listArray,count);
 			
@@ -766,6 +872,8 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			paramMap.put("BILLDATE", date_start);
 			
 			list = njdbcTemplate_henlo.queryForList(query, paramMap);
+			BigDecimal T_QTYSALEOUT = new BigDecimal(0);
+			BigDecimal T_AMTSALEOUT = new BigDecimal(0);
 			
 			for (int i = 0; i < list.size(); i++) {
 				Map<String,Object> listMap = list.get(i);
@@ -785,6 +893,9 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 					map_head.put("AMTSALEOUT_TB", "去年同期金额");*/
 					listArray.add(map_head);
 				}
+				T_QTYSALEOUT = T_QTYSALEOUT.add(new BigDecimal(listMap.get("QTYSALEOUT").toString()));
+				T_AMTSALEOUT = T_AMTSALEOUT.add(new BigDecimal(listMap.get("AMTSALEOUT").toString()));
+				
 				map.put("CST_NAME", listMap.get("CST_NAME").toString());
 				map.put("QTYSALEOUT", listMap.get("QTYSALEOUT").toString());
 				map.put("QTYSALEOUT_HB_", listMap.get("QTYSALEOUT_HB_").toString());
@@ -798,6 +909,21 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 				map.put("AMTSALEOUT_TB", listMap.get("AMTSALEOUT_TB").toString());*/
 				listArray.add(map);
 			}
+			
+			/*Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+			map_head.put("CST_NAME", "汇总");
+			map_head.put("QTYSALEOUT", 0);
+			map_head.put("QTYSALEOUT_HB_", ".");
+			map_head.put("QTYSALEOUT_TB_", ".");
+			map_head.put("AMTSALEOUT", 0);
+			map_head.put("AMTSALEOUT_HB_", ".");
+			map_head.put("AMTSALEOUT_TB_", ".");
+					map_head.put("QTYSALEOUT_HB", "上月数量");
+			map_head.put("AMTSALEOUT_HB", "上月金额");
+			map_head.put("QTYSALEOUT_TB", "去年同期数量");
+			map_head.put("AMTSALEOUT_TB", "去年同期金额");
+			listArray.add(map_head);*/
+			
 			count = list.size();
 			
 			return new ExtReturn(true, listArray,count);
@@ -1049,6 +1175,96 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 		
 	}
 	
+	@RequestMapping( value="/reportview_retail_009",method=RequestMethod.POST)
+	@ResponseBody
+	public Object reportview_retail_009(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="",c_customer_id="";
+		int count = 0;
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> listArray = new ArrayList();
+		
+		try {
+			date_start = request.getParameter("date_start");
+			if(date_start==null||date_start.equals(""))
+				date_start=DateFormatUtils.format(new Date(), "yyyyMMdd");
+			
+			query = "select BILLDATE,NVL(to_char(STATUSTIME,'HH'),'00') Hours,sum(TOT_AMT_ACTUAL)  TOT_AMT_ACTUAL "+
+					"from m_retail a  "+
+					"where A.STATUS ='2' and STATUSTIME is not null and BILLDATE =:BILLDATE "+  
+					"group by BILLDATE,to_char(STATUSTIME,'HH')  "+
+					"order by Hours";
+				
+			Map<String,Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("BILLDATE", date_start);
+			
+			list = njdbcTemplate_henlo.queryForList(query, paramMap);
+			BigDecimal T_TOT_AMT_ACTUAL = new BigDecimal(0);
+			for (int i = 0; i < list.size(); i++) {
+				Map<String,Object> listMap = list.get(i);
+				Map<String,Object> map = new LinkedHashMap<String,Object>();
+				if(i==0){
+					Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+					map_head.put("BILLDATE", "日期");
+					map_head.put("HOURS", "时间段");
+					map_head.put("TOT_AMT_ACTUAL", "成交金额");
+					listArray.add(map_head);
+				}
+				T_TOT_AMT_ACTUAL = T_TOT_AMT_ACTUAL.add(new BigDecimal(listMap.get("TOT_AMT_ACTUAL").toString()));
+				map.put("BILLDATE", listMap.get("BILLDATE").toString());
+				map.put("HOURS", listMap.get("HOURS").toString());
+				map.put("TOT_AMT_ACTUAL", listMap.get("TOT_AMT_ACTUAL").toString());
+				listArray.add(map);
+			}
+			
+			Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+			map_head.put("BILLDATE", "汇总");
+			map_head.put("HOURS", ".");
+			map_head.put("TOT_AMT_ACTUAL", T_TOT_AMT_ACTUAL);
+			listArray.add(map_head);
+			
+			count = list.size()+1;
+			
+			query = "select nvl(a.TOT_AMT_ACTUAL_T,0)||','||nvl(b.TOT_AMT_ACTUAL_Y,0) from ( "+
+					"select sum(TOT_AMT_ACTUAL)  TOT_AMT_ACTUAL_T "+
+					"from m_retail a  "+
+					"where A.STATUS ='2' and STATUSTIME is not null and BILLDATE = :BILLDATE "+ 
+					") a   "+
+					"left join ( "+
+					"select sum(TOT_AMT_ACTUAL)  TOT_AMT_ACTUAL_Y "+
+					"from m_retail a  "+
+					"where A.STATUS ='2' and STATUSTIME is not null and BILLDATE = to_char(to_date(:BILLDATE,'yyyyMMdd')-1,'yyyyMMdd') "+
+					") b on 1=1 ";
+			result = njdbcTemplate_henlo.queryForObject(query, paramMap,String.class);
+			
+			result = String.valueOf(count)+","+result;
+			
+			return new ExtReturn(true, listArray,result);
+			
+		} catch (Exception e) {
+			System.out.println("异常:"+e.toString());
+			return new ExtReturn(false, e.toString());
+		}
+		
+	}
+	
+	
+	@RequestMapping( value="/reportview_retail_010",method=RequestMethod.POST)
+	@ResponseBody
+	public Object reportview_retail_010(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="",c_customer_id="";
+		int count = 0;
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> listArray = new ArrayList();
+		
+		try {
+			return new ExtReturn(true, listArray,result);
+			
+		} catch (Exception e) {
+			System.out.println("异常:"+e.toString());
+			return new ExtReturn(false, e.toString());
+		}
+		
+	}
 	
 	@RequestMapping( value="/reportview_retail_101",method=RequestMethod.POST)
 	@ResponseBody
@@ -1159,7 +1375,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 	public Object news(HttpSession session, HttpServletRequest request,HttpServletResponse response) {
 		try {
 			List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
-			for(int i=1;i<100;i++){
+			for(int i=1;i<11;i++){
 				Map<String,Object> map = new HashMap<String, Object>();
 				map.put("ID", i);
 				map.put("HEAD", "第"+i+" 条信息,From Analog data");
