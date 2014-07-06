@@ -10,7 +10,7 @@
    		   		
    		<div data-role="content" >
             <ul data-role="listview" data-split-icon="gear" data-split-theme="d" data-inset="true" id="reportviewdetail_ul">
-				<li data-role="list-divider" ><span style="color: maroon;">A.销售板块</span></li>
+				<li data-role="list-divider"><span style="color: maroon;">A.销售板块</span></li>
 				<li><a href="reportview_retail_003" data-ajax="false"><span class="ul_li_class">销售排行分析(款)TOP10</span></a></li>
 				<li><a href="reportview_retail_004" data-ajax="false"><span class="ul_li_class">销售出库分析(类别)</span></a></li>
 				<li><a href="reportview_retail_005" data-ajax="false"><span class="ul_li_class">销售出库分析(经销商)</span></a></li>				

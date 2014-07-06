@@ -141,7 +141,7 @@ public class WebUtils {
 			System.out.println("获得列"+i+"对应的表名:"+tableName);
 			System.out.println("获得列"+i+"在数据库中是否为货币型:"+isCurrency);*/
 			
-			}    
+			}
 		}
 		
 		Map<String,Object> metaData=new HashMap<String, Object>();

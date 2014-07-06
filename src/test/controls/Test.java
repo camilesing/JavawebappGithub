@@ -3,6 +3,7 @@ package test.controls;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -38,7 +39,21 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		try {
+		BigDecimal BENZ = new BigDecimal(4);
+		BigDecimal SHANGZ = new BigDecimal(3);
+		
+		BigDecimal HUANB = BENZ.divide(SHANGZ,2,BigDecimal.ROUND_HALF_UP);
+		
+		System.out.println(HUANB.toString());
+		
+		String strs = "w,1;e,2;";
+		String[] list = strs.split(";");
+		for (int i = 0; i < list.length; i++) {
+			String[] list_child = list[i].split(",");
+			System.out.println(list_child[0]+":"+list_child[1]);
+		}
+		
+		/*try {
 			Class<?> task = null;
 			WebUtils webUtils = new WebUtils();
 			String classpath = webUtils.readValue("config/others/config.properties","Task.classpath");
@@ -76,7 +91,7 @@ public class Test {
 		for (int i = 0; i < list.length; i++) {
 			String[] list_child = list[i].split(",");
 			System.out.println(list_child[0]+":"+list_child[1]);
-		}
+		}*/
 		
 		
 		/*String password = "B";

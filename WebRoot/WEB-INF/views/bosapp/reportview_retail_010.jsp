@@ -18,8 +18,7 @@
 			        <div style="margin: 0px 0px 0px 0px;border: 0;padding: 0" >
 			        	<table width=100% >
 			        		<tr>
-			        			<td><span id="Data_T">&nbsp;</span></td>
-			        			<td><span id="Data_Y">&nbsp;</span></td>
+			        			<td><span id="DataResult">&nbsp;</span></td>
 			        		</tr>
 			        	</table>
 			        </div>

@@ -113,7 +113,7 @@ $("#reportview_table").live( "pageinit" , function(event){
 			var end_scale =0;
 			var scale_space = 0;
 			var c_i = 0 ;
-			for(var i=1;i<json.msg.length;i++){
+			for(var i=1;i<json.msg.length-1;i++){
 				c_i = i-1 ;
 				if(c_i>9)
 					c_i = 9;

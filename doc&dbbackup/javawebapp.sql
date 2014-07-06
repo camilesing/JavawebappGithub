@@ -1079,28 +1079,14 @@ Insert into POE.BASE_FIELDS
     FIELD, FIELD_NAME, VALUE_FIELD, DISPLAY_FIELD, ENABLED, 
     SORT)
  Values
-   ('4486B44F66594F92BA3C47113AF8AFCD', 'role', '角色', '3', '片区', 
-    1, 3);
-Insert into POE.BASE_FIELDS
-   (FIELD_ID, 
-    FIELD, FIELD_NAME, VALUE_FIELD, DISPLAY_FIELD, ENABLED, 
-    SORT)
- Values
-   ('15B99952B36242CE824CA5562645AE57', 'role', '角色', '2', '分公司', 
+   ('15B99952B36242CE824CA5562645AE57', 'role', '角色', '2', '普通用户', 
     1, 2);
 Insert into POE.BASE_FIELDS
    (FIELD_ID, 
     FIELD, FIELD_NAME, VALUE_FIELD, DISPLAY_FIELD, ENABLED, 
     SORT)
  Values
-   ('1DE0696B3098424BA21FC1CAA728D273', 'role', '角色', '4', '门店', 
-    1, 4);
-Insert into POE.BASE_FIELDS
-   (FIELD_ID, 
-    FIELD, FIELD_NAME, VALUE_FIELD, DISPLAY_FIELD, ENABLED, 
-    SORT)
- Values
-   ('07B0525B8EE74050A0C81B7C82CEF9B8', 'role', '角色', '1', '营销公司', 
+   ('07B0525B8EE74050A0C81B7C82CEF9B8', 'role', '角色', '1', '管理员', 
     1, 1);
 Insert into POE.BASE_FIELDS
    (FIELD_ID, 

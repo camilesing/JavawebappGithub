@@ -73,8 +73,10 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 								"a.id=( select M_PRODUCT_ID from B_PO_BOXNO where  boxno='"+BOXNO+"')";
 						
 						List<Map<String,Object>> list_m_product = jdbcTemplate.queryForList(query);
+						//查看是否为散货箱，则直接取其装箱数量
+						query = "select count(*) from B_PO_BOXNO where m_sale_id is null and boxno='"+BOXNO+"'";
 						
-						if(list_m_product.size()>0){
+						if(list_m_product.size()>0&&jdbcTemplate.queryForInt(query)>0){
 							String c_sotype_name = list_m_product.get(0).get("c_sotype_name").toString();
 							//装箱数量标准调整
 							query = "select B_BOXQTY from (" +

@@ -1,9 +1,5 @@
 $("#news").live( "pagecreate" , function(event){
-	
 	//alert('pagecreate');
-	
-	
-	
 });
 
 $("#news").live( "pageshow" , function(event){
@@ -35,7 +31,6 @@ $("#news").live( "pageshow" , function(event){
 				if(parseInt(json.o)>0){
 					fun_content_init(json);
 				}
-				
 			//	$.mobile.hidePageLoadingMsg('');
 				$.mobile.loading( "hide" );
 			}
@@ -47,7 +42,7 @@ $("#news").live( "pageshow" , function(event){
 	var fun_content_init = function(json){
 		if(json.success){
 			
-			for(var i=0;i<json.msg.length;i++){
+			/*for(var i=0;i<json.msg.length;i++){
 				var li = "";
 				if(json.msg[i].READ=="NO")	
 					li = "<li ><a href='#deal' data-rel='popup' data-role='button' data-inline='true' newsid='"+json.msg[i].ID+"' ><span style='font-weight:bold;'>"+json.msg[i].HEAD+"</span></a></li>";
@@ -56,9 +51,8 @@ $("#news").live( "pageshow" , function(event){
 				
 				$("#news_ul").append(li);							
 			}
+			
 			$("#news_ul").listview('refresh');
-			
-			
 			
 			//增加链接 事件    
 			$("a").on("click",function(){
@@ -67,7 +61,25 @@ $("#news").live( "pageshow" , function(event){
 					newsid = $(this).attr("newsid");
 					fun_newsdetail(newsid);
 				}					
+			}); */
+			
+			for(var i=0;i<json.msg.length;i++){
+				var li = "";
+				if(json.msg[i].READ=="NO")	
+					li = "<li ><a href='newsdetail'  newsid='"+json.msg[i].ID+"' data-ajax='false' ><span style='font-weight:bold;'>"+json.msg[i].HEAD+"</span></a></li>";
+				else
+					li = "<li ><a href='newsdetail'  newsid='"+json.msg[i].ID+"' data-ajax='false' ><span style='color: red;'>"+json.msg[i].HEAD+"</span></a></li>";
+				
+				$("#news_ul").append(li);							
+			}
+			
+			$("#news_ul").listview('refresh');
+			
+			//增加链接 事件    
+			$("#news_ul").delegate('li a', 'click', function(e) {
+				html5.utils.setParam('newsid', $(this).attr("newsid"));
 			}); 
+			
 		}
 
 	};

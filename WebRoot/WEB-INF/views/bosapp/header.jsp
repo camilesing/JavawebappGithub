@@ -25,6 +25,14 @@
 		.note {
         	font-size: 0.8em;
 		}
+		.notep 
+		 {
+		 	border-bottom:solid 1px #ccc
+		 }
+		 #title 
+		 {
+		 	margin:0px;text-align:center
+		 }
 		.jqplot-yaxis-tick {
 		  white-space: nowrap;
 		}

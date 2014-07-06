@@ -175,12 +175,25 @@ public class GMQXiangjyController  {
 						"where A.id = B.b_Po_Boxno_Id and b.m_attributesetinstance_id=c.id and a.BOXNO='"+BOXNO+"'";
 				
 				list = jdbcTemplate.queryForList(query);
+				
 			}
 			if(list.size()>=0){
+				//是否散货箱
+				query = "select count(*) from B_PO_BOXNO where M_SALE_ID is not null and BOXNO='"+BOXNO+"'";
+				if(jdbcTemplate.queryForInt(query)>0){//散货箱
+					String m_product_id = "";
+					for (Map<String, Object> map : list) {
+						m_product_id = m_product_id+map.get("M_PRODUCT_ID").toString()+";";
+					}
+					productcolor = m_product_id +","+"N,N";
+					
+					
+				}else{
+					productcolor = list.get(0).get("M_PRODUCT_ID").toString()+","+
+							   list.get(0).get("VALUE").toString()+","+
+							   list.get(0).get("NAME").toString();
+				}
 				
-				productcolor = list.get(0).get("M_PRODUCT_ID").toString()+","+
-						   list.get(0).get("VALUE").toString()+","+
-						   list.get(0).get("NAME").toString();
 			}			
 			
 			return new ExtReturn(true, productcolor);
@@ -267,7 +280,10 @@ public class GMQXiangjyController  {
 					"a.id=( select M_PRODUCT_ID from B_PO_BOXNO where  boxno='"+BOXNO+"')";
 			
 			List<Map<String,Object>> list_m_product = jdbcTemplate.queryForList(query);
-			if(list_m_product.size()>0){
+			//查看是否为散货箱，则直接取其装箱数量
+			query = "select count(*) from B_PO_BOXNO where m_sale_id is null and boxno='"+BOXNO+"'";
+			
+			if(list_m_product.size()>0&&jdbcTemplate.queryForInt(query)>0){
 				String c_sotype_name = list_m_product.get(0).get("c_sotype_name").toString();
 				//装箱数量标准调整
 				query = "select B_BOXQTY from (" +

@@ -3896,6 +3896,7 @@ $.Label = $.extend($.Component, {
 			}
 		},
 		getPercent:function(v,T){
+			//edit by poe
 			if(this.get('showdouble'))
 				return v+","+(v / (T||this.total||1) * 100).toFixed(this.get('decimalsnum'))+'%';
 			else	

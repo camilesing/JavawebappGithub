@@ -127,7 +127,22 @@
 				return_fun(json);
 			}
 		});		
-
+	}
 	
-		
-}
+	var html5 = {
+		    author: 'Henlo',
+		    version: '1.0',
+		    website: 'http://www.henlo.net'
+		}
+	html5.utils = {
+	    setParam: function(name, value) {
+	        localStorage.setItem(name, value)
+	    },
+	    getParam: function(name) {
+	        return localStorage.getItem(name)
+	    }
+	}
+	
+	html5.utils.setParam('ProjectUrl', "/Javawebapp")
+	
+	

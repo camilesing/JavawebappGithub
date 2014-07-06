@@ -82,8 +82,8 @@ public class WebQudviewController  {
 	@Resource(name="njdbcTemplate")
 	private NamedParameterJdbcTemplate njdbcTemplate;
 	
-	@Resource(name="datasourcedao")
-	private DataSourceDao datasourcedao;
+	/*@Resource(name="datasourcedao")
+	private DataSourceDao datasourcedao;*/
 	
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {

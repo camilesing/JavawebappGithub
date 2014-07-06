@@ -35,11 +35,11 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public String m_outitem_ac(String docno, String tiaom,String qty) {
+	public String m_outitem_ac(String docno, String tiaom,String qty,String type) {
 		String query = "",insert="",update="",result="";
 		try {
 			//更新表 m_outitem 中的数量
-			update ="update m_outitem a set A.QTYOUT = A.QTYOUT + to_number(:qty) "+ 
+			update ="update m_outitem a set A.QTYOUT = to_number(:qty) "+ 
 					"where exists( "+
 					"    select 'x' from M_PRODUCT_ALIAS b where A.M_PRODUCTALIAS_ID=B.ID and B.NO = :tiaom "+
 					") and exists( "+
@@ -56,13 +56,18 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 					"and C.NO=:tiaom "+
 					")";
 			
+			//如果是插入的话，则执行视图插入的模式
+			if(type.equalsIgnoreCase("insert")){
+				update = insert;
+			} 
+			
 			
 			Map<String,Object> Param = new HashMap<String, Object>();
 			Param.put("docno", docno);
 			Param.put("tiaom", tiaom);
 			Param.put("qty", qty);
 			
-			if(njdbcTemplate.update(insert, Param)==0)
+			if(njdbcTemplate.update(update, Param)==0)
 				return "条码不存在";
 			
 			//执行 m_out_am
@@ -81,7 +86,7 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 	            }
 	        }); */
 			
-			result = "Y;";
+			result = "Y;提交成功";
 			
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -145,10 +150,16 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 	
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public String m_initem_ac(String docno, String tiaom,String qty) {
+	public String m_initem_ac(String docno, String tiaom,String qty,String type) {
 		String query = "",insert="",update="",result="";
 		try {
 			//更新表 m_initem 中的数量
+			update ="update m_initem a set A.QTYIN = to_number(:qty) "+ 
+					"where exists( "+
+					"    select 'x' from M_PRODUCT_ALIAS b where A.M_PRODUCTALIAS_ID=B.ID and B.NO = :tiaom "+
+					") and exists( "+
+					"    select 'x' from m_in c where A.M_IN_ID=C.ID and C.DOCNO = :docno and c.isactive='Y'"+
+					") ";
 			
 			insert ="insert into m_initem(AD_CLIENT_ID,AD_ORG_ID,M_IN_ID,M_PRODUCT_ID,M_ATTRIBUTESETINSTANCE_ID,QTYIN) "+
 					"select AD_CLIENT_ID,AD_ORG_ID,M_IN_ID,M_PRODUCT_ID,M_ATTRIBUTESETINSTANCE_ID, :qty  "+
@@ -160,13 +171,17 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 					"and C.NO=:tiaom "+
 					") and rownum=1";
 			
+			//如果是插入的话，则执行视图插入的模式
+			if(type.equalsIgnoreCase("insert")){
+				update = insert;
+			} 
 			
 			Map<String,Object> Param = new HashMap<String, Object>();
 			Param.put("docno", docno);
 			Param.put("tiaom", tiaom);
 			Param.put("qty", qty);
 			
-			if(njdbcTemplate.update(insert, Param)==0)
+			if(njdbcTemplate.update(update, Param)==0)
 				return "条码不存在";
 			
 			/*//执行 m_in_am
@@ -185,7 +200,7 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 	            }
 	        }); */
 			
-			result = "Y;";
+			result = "Y;提交成功";
 			
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -235,6 +250,62 @@ public class BOSPdaServiceImpl implements BOSPdaService {
 	        }); 
 			
 			result = MAP_M_IN_SUBMIT.get("r_message").toString()  ;
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw new RuntimeException(e);
+		}
+		
+		// TODO Auto-generated method stub
+		return "Y;"+result;
+	}
+	
+	
+	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+	public String m_inventory_submit(String rowdetail) {
+		String query = "",insert="",update="",result="",docno_pre="";
+		try {
+			String[] rows = rowdetail.split(";"); //每一行的数据
+			for (String str : rows) { //location,sku,qty
+				String[] row = str.split(",");
+				if(row.length>1){
+					String docno = row[0];
+					String location = row[1];
+					String sku = row[2];
+					String qty = row[3];
+					
+					if(!docno_pre.equals("")&&!docno_pre.equalsIgnoreCase(docno)){
+						//执行 m_inventory_shelfitem_update;M_INVENTORY_AM; M_INVENTORY_SUBMIT
+						
+						
+						
+						
+						
+						
+					}else{
+						//插入数据到 M_INVENTORY
+						insert = "insert into M_INVENTORY_SHELFITEM()";
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+					}
+					
+					
+					
+					docno_pre = docno; //记录上一个 DOCNO
+				}
+				
+			}
+			
 			
 		} catch (Exception e) {
 			// TODO: handle exception

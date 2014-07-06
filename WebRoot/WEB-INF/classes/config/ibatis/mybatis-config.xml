@@ -12,35 +12,35 @@
 	</plugins>
 		-->
 	<mappers>
-		<mapper resource="sqlmap/common_SqlMap.xml" />
-		<mapper resource="sqlmap/BaseModulesMapper.xml" />
-		<mapper resource="sqlmap/BaseRoleModuleMapper.xml" />
-		<mapper resource="sqlmap/BaseRolesMapper.xml" />
-		<mapper resource="sqlmap/BaseUserRoleMapper.xml" />
-		<mapper resource="sqlmap/BaseUsersMapper.xml" />
-		<mapper resource="sqlmap/BaseFieldsMapper.xml" />
-		<mapper resource="sqlmap/WebMessageMapper.xml" />
-		<mapper resource="sqlmap/CommonModulesMapper.xml" />
-		<mapper resource="sqlmap/WebQudviewMapper.xml" />
-		<mapper resource="sqlmap/BaseUsersWeixinMapper.xml" />
+		<mapper resource="config/sqlmap/common_SqlMap.xml" />
+		<mapper resource="config/sqlmap/BaseModulesMapper.xml" />
+		<mapper resource="config/sqlmap/BaseRoleModuleMapper.xml" />
+		<mapper resource="config/sqlmap/BaseRolesMapper.xml" />
+		<mapper resource="config/sqlmap/BaseUserRoleMapper.xml" />
+		<mapper resource="config/sqlmap/BaseUsersMapper.xml" />
+		<mapper resource="config/sqlmap/BaseFieldsMapper.xml" />
+		<mapper resource="config/sqlmap/WebMessageMapper.xml" />
+		<mapper resource="config/sqlmap/CommonModulesMapper.xml" />
+		<mapper resource="config/sqlmap/WebQudviewMapper.xml" />
+		<mapper resource="config/sqlmap/BaseUsersWeixinMapper.xml" />
 		
 		<!-- 温州交警网接口开发 -->
-		<mapper resource="sqlmap/WzsjjcarregisterMapper.xml" />
-		<mapper resource="sqlmap/WzsjjcarpeccancyMapper.xml" />
-		<mapper resource="sqlmap/WzsjjSmssendMapper.xml" />
-		<mapper resource="sqlmap/WzsjjSmsreturnMapper.xml" />
+		<mapper resource="config/sqlmap/WzsjjcarregisterMapper.xml" />
+		<mapper resource="config/sqlmap/WzsjjcarpeccancyMapper.xml" />
+		<mapper resource="config/sqlmap/WzsjjSmssendMapper.xml" />
+		<mapper resource="config/sqlmap/WzsjjSmsreturnMapper.xml" />
 		<!-- 温州广电接口开发 -->
-		<mapper resource="sqlmap/WzgdKehjbxxMapper.xml" />
-		<mapper resource="sqlmap/WzgdShoulywnrMapper.xml" />
-		<mapper resource="sqlmap/WzgdSmsreturnMapper.xml" />
-		<mapper resource="sqlmap/WzgdSmssendMapper.xml" />
+		<mapper resource="config/sqlmap/WzgdKehjbxxMapper.xml" />
+		<mapper resource="config/sqlmap/WzgdShoulywnrMapper.xml" />
+		<mapper resource="config/sqlmap/WzgdSmsreturnMapper.xml" />
+		<mapper resource="config/sqlmap/WzgdSmssendMapper.xml" />
 		<!-- 乐清广电接口 -->
-		<mapper resource="sqlmap/YqgdRequestdataMapper.xml" />
-		<mapper resource="sqlmap/YqgdTradedataMapper.xml" />
-		<mapper resource="sqlmap/YqgdResponsedataMapper.xml" />
-		<mapper resource="sqlmap/YqgdSmsreturnMapper.xml" />
-		<mapper resource="sqlmap/YqgdSmssendMapper.xml" />
-		<mapper resource="sqlmap/YqgdBankcodeMapper.xml" />
-		<mapper resource="sqlmap/YqgdRequestsmsMapper.xml"/>
+		<mapper resource="config/sqlmap/YqgdRequestdataMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdTradedataMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdResponsedataMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdSmsreturnMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdSmssendMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdBankcodeMapper.xml" />
+		<mapper resource="config/sqlmap/YqgdRequestsmsMapper.xml"/>
 	</mappers>
 </configuration>
