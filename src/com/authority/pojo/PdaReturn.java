@@ -6,6 +6,7 @@ public class PdaReturn {
 	
 	private String message;
 	
+	private String other ;
 	
 	public PdaReturn(){
 		
@@ -15,7 +16,13 @@ public class PdaReturn {
 	public PdaReturn(String status,String message){
 		this.status=status;
 		this.message=message;
-	}	
+	}
+	
+	public PdaReturn(String status,String message,String other){
+		this.status=status;
+		this.message=message;
+		this.other = other;
+	}
 	
 	public String getStatus() {
 		return status;
@@ -29,5 +36,15 @@ public class PdaReturn {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+	public String getOther() {
+		return other;
+	}
+
+	public void setOther(String other) {
+		this.other = other;
+	}
+	
+	
 	
 }

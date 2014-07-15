@@ -118,7 +118,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 		try {
 			String c_store_id = request.getParameter("c_store_id").toString();
 			String query = "select distinct ID,TRUENAME||'*'||substr(email,0,(case when instr(EMAIL,'@')=0 then length(email) else instr(EMAIL,'@')-1 end)) name " +
-					"from USERS where C_STORE_ID='"+c_store_id+"'";
+					"from USERS where C_STORE_ID='"+c_store_id+"' and pda='Y' ";
 			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
 			if(list.size()==0){
 				return new PdaReturn("N","");
@@ -570,6 +570,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 			String query = "",mastercode="",insert="",delete="";
 			String docno = request.getParameter("docno").toUpperCase();
 			String listTmp = request.getParameter("list").toUpperCase();
+			String error = "";
 			
 			String[] list = listTmp.split(";");
 			for (int i = 0; i < list.length; i++) {
@@ -603,12 +604,13 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 						delete = "delete from B_BOXNOMASTERCODE where id ='"+b_boxnomastercode_id+"'";
 						jdbcTemplate.update(delete);
 						continue_ornot = 0;
+						error = mastercode;
 						break;
 					}
 				}
 			}
 			
-			if(continue_ornot==1){
+		   if(continue_ornot==1){
 				query = "select id  from B_BOXNOCHK where boxno='"+docno+"' ";
 				final String pid = jdbcTemplate.queryForObject(query, String.class);
 				
@@ -627,7 +629,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 		        });
 				return new PdaReturn("Y", "单据提交成功");
 			}else{
-				return new PdaReturn("N", "单据提交失败,请重试");
+				return new PdaReturn("N", error+"单据提交失败,请重试");
 			}
 			
 		}catch(Exception e){
@@ -701,7 +703,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 			
 			query = "select A.DOCNO,C.NO SKU " +
 					"from M_inventory a,M_inventoryItem b,M_PRODUCT_ALIAS c  "+
-					"where A.ID=b.M_INVENTORY_ID and b.M_PRODUCTALIAS_ID = c.ID and A.STATUS='1' and a.c_store_id=:store ";
+					"where A.ID=b.M_INVENTORY_ID and b.M_PRODUCTALIAS_ID = c.ID and A.STATUS='1' and a.isactive='Y' and a.c_store_id=:store ";
 			
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("store", store);
@@ -753,23 +755,37 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 	@ResponseBody	
 	public Object m_inventory_datadown(HttpSession session, HttpServletRequest request) {
 		try {
-			String query= "",delete="",update="",insert="",ReturnStr="";
+			String query= "",delete="",update="",insert="",ReturnStr="",ReturnMproduct="";
 			String store = request.getParameter("store").toString();
 			
-			query = "select A.DOCNO,A.BILLDATE,b.DESCRIPTION DOCTYPE,C.NAME C_STORE,A.STATUS "+ 
+			query = "select A.DOCNO,A.BILLDATE,b.DESCRIPTION,C.NAME C_STORE,A.STATUS,a.DOCTYPE "+ 
 					"from M_INVENTORY a  "+
 					"left join ( "+
 					"    select b2.value,B2.DESCRIPTION from AD_LIMITVALUE_GROUP b1,AD_LIMITVALUE b2 "+ 
 					"    where B1.ID = B2.AD_LIMITVALUE_GROUP_ID "+
 					") b on A.DOCTYPE = b.value "+
 					"left join c_store c on A.C_STORE_ID = C.ID "+
-					"where A.STATUS='1' and a.c_store_id='"+store+"'";
+					"where A.STATUS='1' and a.isactive='Y' and a.c_store_id='"+store+"'";
 			List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
 			for (Map<String, Object> map : list) {
 				ReturnStr = ReturnStr+map.get("DOCNO").toString()+","+map.get("BILLDATE").toString()+","+
-							map.get("DOCTYPE").toString()+","+map.get("C_STORE").toString()+","+map.get("STATUS").toString()+";";
+							map.get("DESCRIPTION").toString()+","+map.get("C_STORE").toString()+","+map.get("STATUS").toString()+";";
+				
+				//若为历史抽盘，则顺带下载款号信息
+				if(map.get("DOCTYPE").toString().equalsIgnoreCase("IHS")){
+					query = "select to_char(get_fitler_sql(product_filter)) from M_INVENTORY where docno='"+map.get("DOCNO").toString()+"'";
+					String product_filter = jdbcTemplate.queryForObject(query, String.class);
+					query = "select name from m_product where id "+product_filter;
+					List<Map<String,Object>> listProduct = jdbcTemplate.queryForList(query);
+					for (Map<String, Object> map2 : listProduct) {
+						ReturnMproduct = ReturnMproduct+map.get("DOCNO").toString()+","+map2.get("name").toString()+";";
+					}
+				}
 			}
-			return new PdaReturn("Y",ReturnStr);
+			
+			logger.info("m_inventory_datadown:"+query);			
+			
+			return new PdaReturn("Y",ReturnStr,ReturnMproduct);
 		} catch (Exception e) {
 			// TODO: handle exception
 			logger.error("Exception: ", e);
@@ -782,7 +798,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 	public Object m_inventory_dataupload(HttpSession session, HttpServletRequest request) {
 		try {
 			String query= "",delete="",update="",insert="",ReturnStr="",create="";
-			String store="",opr="000",opdate="",account="",deviceid="",devicename="",rowdetail="",rownum="",status="Y";
+			String store="",opr="000",opdate="",account="",deviceid="",devicename="",rowdetail="",rownum="",status="Y",code="";
 			
 			store  = request.getParameter("store");
 			account = request.getParameter("account");
@@ -790,6 +806,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 			devicename = request.getParameter("devicename");
 			rowdetail = request.getParameter("rowdetail");
 			rownum = request.getParameter("rownum");			
+			code  = request.getParameter("code");
 			
 			String[] rows = rowdetail.split(";"); //每一行的数据
 			
@@ -846,13 +863,15 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 					Map<String,Object> param = new HashMap<String, Object>();
 					param.clear();
 					param.put("DOCNO", row[0]);
-					param.put("SHELFNO", row[1]);
+					param.put("SHELFNO", code+"#"+row[1]);
 					param.put("NO", row[2]);
 					param.put("QTY", row[3]);
 					param.put("OWNERID", account);
 					
 					njdbcTemplate.update(insert, param);									
 				}
+				
+				ReturnStr = "上传成功";
 				
 			}
 			
@@ -1067,6 +1086,13 @@ private static final Logger logger = LoggerFactory.getLogger(BOSPdaActionControl
 			result = StringUtils.substring(e.toString(), start);
 			return new PdaReturn("N", result);
 		}
+	}
+	
+	@RequestMapping(value = "/timesyn")
+	@ResponseBody
+	public Object timesysn(HttpSession session, HttpServletRequest request){
+		String sql="select to_char(sysdate-8/24,'YYYYMMDDHH24MISS') time from dual  ";
+		return jdbcTemplate.queryForList(sql).get(0);				
 	}
 	
 	@RequestMapping(value="/datadownload")

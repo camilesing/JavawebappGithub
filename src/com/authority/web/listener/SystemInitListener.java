@@ -26,7 +26,7 @@ public class SystemInitListener implements ServletContextListener {
 		Criteria criteria = new Criteria();
 		criteria.setOrderByClause(" field desc ,sort asc ");
 		criteria.put("enabled", "1");
-		servletContext.setAttribute("fields", baseFieldsService.selectAllByExample(criteria));
+		//servletContext.setAttribute("fields", baseFieldsService.selectAllByExample(criteria));
 		
 		/**监控文件*/		
 		/*String classpath=Classpathlocation.class.getResource("").getPath();

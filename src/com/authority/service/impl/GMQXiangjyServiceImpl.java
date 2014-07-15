@@ -224,6 +224,31 @@ public class GMQXiangjyServiceImpl implements GMQXiangjyService {
 		                return map;
 		            }
 		        }); 
+			}else{
+				//散货箱
+				Object object = list.get(0);
+				Map<String,Object> list_child = JSON.parseObject(object.toString());
+				String BOXNO = list_child.get("BOXNO").toString();
+				query = "select max(M_SALE_ID) from B_PO_BOXNO where M_SALE_ID is not null and BOXNO='"+BOXNO+"'";
+				final String M_SALE_ID = jdbcTemplate.queryForObject(query, String.class);
+				
+				//执行存储过程 m_sale_submit 
+				procedure = "{call M_SALESHX_SUBMIT(?,?,?)}";  
+				
+				@SuppressWarnings("unchecked")
+				Map<String,Object> map_m_saleshx_submit = (HashMap<String, Object>) jdbcTemplate.execute(procedure,new CallableStatementCallback() {  
+		            public Object doInCallableStatement(CallableStatement cs)throws SQLException,DataAccessException {  
+		                cs.setInt(1, Integer.parseInt(M_SALE_ID));
+		                cs.registerOutParameter(2,Types.NUMERIC);//输出参数  
+		                cs.registerOutParameter(3,Types.VARCHAR);//输出参数  
+		                cs.execute();
+		                Map<String,Object> map = new HashMap<String, Object>();  
+		                map.put("r_code", cs.getInt(2));
+		                map.put("r_message", cs.getString(3));
+		                return map;
+		            }
+		        }); 
+				
 			}
 			
 			// ============更新 配货发货箱 =========END

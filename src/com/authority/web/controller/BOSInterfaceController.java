@@ -806,7 +806,7 @@ public class BOSInterfaceController {
 	public Object Task(HttpSession session, HttpServletRequest request) {
 		//读取该单据的执行语句
 		String query = "",CONTENT="",msg="", filename="",sign="",account="",password="";
-		Boolean result = false ;
+		Boolean result = true ;
 		try {
 			String method_name = request.getParameter("method");
 			Class<?> task = null;
