@@ -16,11 +16,21 @@ $("#login").live( "pageinit" , function(event){
 				}
 			});
 			$("#quickBtn").click(function(event){
+				
+				$.mobile.loading( 'show', {
+					  text: "Loading ...",
+					  textVisible: true,
+					  theme: "b",
+					  textonly: false,
+					  html: ""
+				});
+				
 				var weixinid = $("#weixinid").val();
 				var ProjectUrl = $("#loginForm").attr("ProjectUrl");
 				if(weixinid!=""){
 					var Param ={
-							weixinid : weixinid
+							weixinid : weixinid,
+							quick : "Y"
 						}
 					$.ajax({
 						type: "post",
@@ -31,7 +41,7 @@ $("#login").live( "pageinit" , function(event){
 								window.location.href = ProjectUrl+"/bosapp/page/home";
 								//$.mobile.changePage( "home" , { transition : "pop" ,changeHash: true ,  reloadPage : true  });
 							}else {
-								myDialog( "提示" , "绑定登陆失败,请重新绑定或通过用户名密码登陆" , "返&nbsp;&nbsp;&nbsp;&nbsp;回" );
+								myDialog( "提示" , "快速登陆失败,请先通过用户名密码登陆" , "返&nbsp;&nbsp;&nbsp;&nbsp;回" );
 								$.mobile.changePage($("#my-dialog") ,{ transition : "pop" ,changeHash: true ,reloadPage : true } );
 							}
 						},
@@ -40,7 +50,12 @@ $("#login").live( "pageinit" , function(event){
 							$.mobile.changePage( $("#networkError") , { transition : "pop" ,changeHash: true ,  reloadPage : true  });
 						}
 					});
+				}else{
+					myDialog( "提示" , "获取微信ID失败" , "返&nbsp;&nbsp;&nbsp;&nbsp;回" );
+					$.mobile.changePage($("#my-dialog") ,{ transition : "pop" ,changeHash: true ,reloadPage : true } );
 				}
+				
+				$.mobile.loading( 'hide');
 				
 				return false;
 			});
@@ -49,17 +64,29 @@ $("#login").live( "pageinit" , function(event){
 			$("#loginBtn").click(function(event){
 				var name = $("#userName").val();
 				var pwd = $("#userPwd").val();
+				var weixinid = $("#weixinid").val();
 				
 				if( name.length <= 0 || pwd.length <= 0 ){
 					$.mobile.changePage( $("#loginError") , { transition : "pop" ,changeHash: true ,  reloadPage : true  });
 					return false;
 				}				
+				
+				$.mobile.loading( 'show', {
+					  text: "Loading ...",
+					  textVisible: true,
+					  theme: "b",
+					  textonly: false,
+					  html: ""
+				});
 								
 				var url = $("#loginForm").attr("action");
 				var ProjectUrl = $("#loginForm").attr("ProjectUrl");
 				var Param = {
 						account : name,
-						password : $.md5(pwd) 
+						//password : $.md5(pwd)
+						password : pwd,
+						weixinid : weixinid,
+						quick : "N"
 					};
 				
 				$.ajax({
@@ -86,6 +113,8 @@ $("#login").live( "pageinit" , function(event){
 					}
 				});
 				
+				$.mobile.loading( 'hide');
+				
 				return false;
 			}); //end loginBtn Event
 						
@@ -94,8 +123,7 @@ $("#login").live( "pageinit" , function(event){
 				$("#userName").empty();
 				$("#userPwd").empty();
 				$("#userName").focus();
-			});
-			
+			}); 
 			
 });
 

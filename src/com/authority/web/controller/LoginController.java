@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.authority.common.springmvc.DateConvertEditor;
+import com.authority.common.utils.WebUtils;
 import com.authority.pojo.BaseRoles;
 import com.authority.pojo.BaseUsers;
 import com.authority.pojo.BaseUsersWeixin;
@@ -97,9 +98,15 @@ public class LoginController {
 	@ResponseBody
 	public Object logout(HttpSession session, Locale locale) {
 		try {
+			Object weixinid = session.getAttribute("weixinid");
+			weixinid = weixinid==null?"":weixinid;
+			String msg = "退出系统成功!";
+			if(!weixinid.toString().equalsIgnoreCase(""))
+				msg = weixinid.toString() ;
 			session.removeAttribute(WebConstants.CURRENT_USER);
 			session.invalidate();
-			return new ExtReturn(true, "退出系统成功！");
+			return new ExtReturn(true,msg);
+			
 			// return new ExtReturn(true,
 			// messageSource.getMessage("common.login", null, locale));
 			// return new ExtReturn(true,
@@ -152,6 +159,8 @@ public class LoginController {
 			if ("01".equals(result)) {
 				BaseUsers baseUser = (BaseUsers) criteria.get("baseUser");
 				session.setAttribute(WebConstants.CURRENT_USER, baseUser);
+				session.setAttribute("username", "admin");
+				
 				
 				String user_role="";
 				String sql_role="select A.ROLE_NAME from BASE_ROLES a,BASE_USER_ROLE b where A.ROLE_ID=B.ROLE_ID and B.USER_ID=?";
@@ -234,34 +243,97 @@ public class LoginController {
 			Criteria criteria = new Criteria();
 			String result ="";
 			String weixinid = request.getParameter("weixinid");
-			if(weixinid!=null){
+			String quick  = request.getParameter("quick");
+			quick = quick==null?"":quick;
+			weixinid = weixinid==null?"":weixinid;
+			Map<String,Object> Param = new HashMap<String, Object>();
+			Param.put("WEIXINID", weixinid);
+			
+//			System.out.println("weixinid:"+weixinid+" quick:"+quick);
+			
+			if(quick.equalsIgnoreCase("Y")){
 				//1.根据 weixinid 查询所判定的用户
-				criteria.put("weixinid", weixinid);
-				criteria.put("isdisplay", "1");
-				List<BaseUsersWeixin> list_baseUsersWeixin = baseUsersWeixinService.selectByExample(criteria);
-				if(list_baseUsersWeixin.size()>0){
-					//读取绑定用户
-					BaseUsers baseUser =  this.baseUsersService.selectByPrimaryKey(list_baseUsersWeixin.get(0).getUserId());
-					session.setAttribute(WebConstants.CURRENT_USER, baseUser);
+				//读取绑定用户
+				String query = "select count(*) from HENLO_WEIXINUSER a where a.weixinid = :WEIXINID and exists(" +
+						"select 'x' from users b where a.userid= b.email and b.webapp='Y') and a.isactive='Y' ";
+				
+				if(njdbcTemplate.queryForInt(query,Param)>0)
+					result ="01";
+				if ("01".equals(result)) {
+					session.setAttribute(WebConstants.CURRENT_USER, weixinid);
+					session.setAttribute("weixinid", weixinid);
 					
-					String user_role="";
-					String sql_role="select A.ROLE_NAME from BASE_ROLES a,BASE_USER_ROLE b where A.ROLE_ID=B.ROLE_ID and B.USER_ID=?";
-					Object[] args={baseUser.getUserId()};
-					if(null==(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class))
-						;
-					else
-						user_role=(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class);
+					query = "select max(C_CUSTOMERUP_ID) from USERS a where exists(" +
+							"select 'x' from HENLO_WEIXINUSER b where a.email = b.userid and b.isactive='Y' ) and webapp='Y' ";				
+					session.setAttribute("C_CUSTOMERUP_ID", jdbcTemplate.queryForObject(query, String.class));
 					
-					session.setAttribute(WebConstants.CURRENT_USER_ROLE, user_role);				
+					query = "select max(C_CUSTOMER_ID) from USERS a where exists(" +
+							"select 'x' from HENLO_WEIXINUSER b where a.email = b.userid and b.isactive='Y' ) and webapp='Y' ";			
+					session.setAttribute("C_CUSTOMER_ID", jdbcTemplate.queryForObject(query, String.class));
+
+					return new ExtReturn(true, "success");
 					
-					success = true;
+				}else{
+					return new ExtReturn(false, "快速登录失败");
+				}
+			}else{
+				String account = request.getParameter("account");
+				String password= request.getParameter("password");
+				
+				//用户验证
+				if (StringUtils.isBlank(account)) {
+					return new ExtReturn(false, "帐号不能为空！");
+				}
+				if (StringUtils.isBlank(password)) {
+					return new ExtReturn(false, "密码不能为空！");
+				}
+				WebUtils webUtils = new WebUtils();
+				String login_email = webUtils.readValue("config/others/config.properties","lne.login_email");
+				
+				account = account+login_email;
+				String query = "select count(*) from USERS where email='"+account+"' and PASSWORDHASH='"+password+"' and WEBAPP='Y' ";
+				
+				if(jdbcTemplate.queryForInt(query)>0)
+					result ="01";
+				
+				if ("01".equals(result)) {
+					session.setAttribute(WebConstants.CURRENT_USER, account);
 					
-					logger.info("{}登陆成功", baseUser.getRealName());
+					query = "select C_CUSTOMERUP_ID from USERS where email='"+account+"'";				
+					session.setAttribute("C_CUSTOMERUP_ID", jdbcTemplate.queryForObject(query, String.class));
+					
+					query = "select C_CUSTOMER_ID from USERS where email='"+account+"'";				
+					session.setAttribute("C_CUSTOMER_ID", jdbcTemplate.queryForObject(query, String.class));
+					
+					//删除原绑定用户，重新绑定
+					if(!weixinid.equals("")){
+						String delete = "delete from HENLO_WEIXINUSER a where a.weixinid = :WEIXINID ";
+						njdbcTemplate.update(delete, Param);
+						
+						String insert = "insert into HENLO_WEIXINUSER(ID,USERID,WEIXINID,ISACTIVE) SELECT SYS_GUID(),:USERID,:WEIXINID,'Y' FROM DUAL ";
+						Param.put("USERID", account);
+						
+						njdbcTemplate.update(insert, Param);
+						
+						session.setAttribute("weixinid", weixinid);
+					}
+					//bos
+					query = "select a.id,a.C_STORE_ID||';'||b.Name Store  " +
+							"from USERS a " +
+							"left join C_STORE b on a.C_STORE_ID = b.ID " +
+							"where a.email ='"+account+"'";
+					List<Map<String,Object>> list = jdbcTemplate.queryForList(query);
+					Map<String,Object> map =  list.get(0);
+					
+					return new ExtReturn(true, "success");
+					
+				} else if ("00".equals(result)) {
+					return new ExtReturn(false, "用户名或密码错误！");
+				} else {
+					return new ExtReturn(false, result);
 				}
 				
-			}
-			
-			return new ExtReturn(success, msg);			
+			}			
 			
 		} catch (Exception e) {
 			// TODO: handle exception

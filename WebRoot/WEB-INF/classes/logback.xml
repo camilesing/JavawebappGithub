@@ -6,9 +6,16 @@
 
 	<!-- 输出到窗口 -->
 	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">  
+			<evaluator name="loggingTaskEval">  
+				<expression>message.contains("Checking for connections")</expression>  
+			</evaluator>  
+			<OnMismatch>NEUTRAL</OnMismatch>  
+			<OnMatch>DENY</OnMatch>  
+		</filter>
         <encoder>
             <pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
-        </encoder>
+        </encoder>        
     </appender>
     
     <!-- 时间滚动输出 level为 DEBUG 日志 -->

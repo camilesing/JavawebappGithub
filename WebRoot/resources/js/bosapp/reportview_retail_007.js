@@ -14,20 +14,22 @@ $("#reportview_table").live( "pageinit" , function(event){
 		theme: 'android-ics light', //皮肤样式
         display: 'modal', //显示方式 
         mode: 'scroller', //日期选择模式
-        dateOrder: 'yyyymm',
-        dateFormat: 'yyyymm',
+        dateOrder: 'yyyymmdd',
+        dateFormat: 'yyyymmdd',
 		lang:'zh',
         startYear:currYear - 10, //开始年份
         endYear:currYear + 10 //结束年份
 	};
 	
 	$("#date_start").val('').scroller('destroy').scroller($.extend(opt['date'], opt['default']));
+	$("#date_end").val('').scroller('destroy').scroller($.extend(opt['date'], opt['default']));
 	
 	updateTable = function(){
 		var project_path = $("#reportview_table").attr("project_path");
 		var url_init = project_path + "/bosapp/reportview_retail_007";
 		var date_start = $("#date_start").val();
-		var param = {"date_start":date_start};
+		var date_end = $("#date_end").val();
+		var param = {"date_start":date_start,"date_end":date_end};
 		
 		if( !checkIsNull(date_start) ){
 			$.mobile.changePage( $("#searchWhereIsNullErrorDialog") ,{ transition : "pop" ,changeHash: true ,reloadPage : true } );

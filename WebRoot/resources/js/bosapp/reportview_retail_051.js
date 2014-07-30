@@ -14,8 +14,8 @@ $("#reportview_table").live( "pageinit" , function(event){
 		theme: 'android-ics light', //皮肤样式
         display: 'modal', //显示方式 
         mode: 'scroller', //日期选择模式
-        dateOrder: 'yyyymm',
-        dateFormat: 'yyyymm',
+        dateOrder: 'yyyymmdd',
+        dateFormat: 'yyyymmdd',
 		lang:'zh',
         startYear:currYear - 10, //开始年份
         endYear:currYear + 10 //结束年份
@@ -26,7 +26,7 @@ $("#reportview_table").live( "pageinit" , function(event){
 	
 	updateTable = function(){
 		var project_path = $("#reportview_table").attr("project_path");
-		var url_init = project_path + "/bosapp/reportview_retail_005";
+		var url_init = project_path + "/bosapp/reportview_retail_051";
 		var date_start = $("#date_start").val();
 		var param = {"date_start":date_start};
 		
@@ -97,6 +97,8 @@ $("#reportview_table").live( "pageinit" , function(event){
 							var td = "<td >"+jsonobj[x]+"</td>";
 							tr = tr+td;
 						}	
+						
+						
 					}
 					tr = tr +"</tr>";
 					table.append(tr);			

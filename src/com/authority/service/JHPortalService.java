@@ -5,9 +5,9 @@ import java.util.Map;
 
 public interface JHPortalService {
 	
-	String Oracle2Sqlserver(List<Map<String,Object>> listData,String listColumn,String tableName);
+	String Oracle2Sqlserver(List<Map<String,Object>> listData,String listColumn,String tableName, String PRIMARY_KEY);
 	
 	
-	String Sqlserver2Oracle(List<Map<String,Object>> listData,String listColumn,String tableName);
+	String Sqlserver2Oracle(List<Map<String,Object>> listData,String listColumn,String tableName, String PRIMARY_KEY);
 
 }

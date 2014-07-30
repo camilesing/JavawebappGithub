@@ -10,8 +10,8 @@
 
 	<!-- 配置 wallfilter -->
 
-	<bean id="wall-filter-config" class="com.alibaba.druid.wall.WallConfig" init-method="init">
-      	 <!-- 指定配置装载的目录  -->
+	<!-- <bean id="wall-filter-config" class="com.alibaba.druid.wall.WallConfig" init-method="init">
+      	 指定配置装载的目录 
       <property name="dir" value="META-INF/druid/wall/oracle" />
       <property name="multiStatementAllow" value="false" />      
 	</bean>
@@ -20,7 +20,7 @@
 		<property name="config" ref="wall-filter-config" />
 		<property name="logViolation" value="true" />
 		<property name="throwException" value="false" /> 
-	</bean>
+	</bean> -->
 
 	
 	<bean id="druid" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
@@ -63,46 +63,6 @@
     	<property name="connectionProperties" value="config.decrypt=true" />
 	</bean>
 	
-		
-	<!-- <bean id="druid2" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
-	    基本属性 url、user、password
-	    <property name="url" value="${sqlserver.jdbc.url}" />
-	    <property name="username" value="${sqlserver.jdbc.username}" />
-	    <property name="password" value="${sqlserver.jdbc.password}" />
-	      
-	    配置初始化大小、最小、最大
-	    <property name="initialSize" value="2" />
-	    <property name="minIdle" value="2" /> 
-	    <property name="maxActive" value="10" />
-	    配置获取连接等待超时的时间
-	    <property name="maxWait" value="60000" />
-	    配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-	    <property name="timeBetweenEvictionRunsMillis" value="60000" />
-	    配置一个连接在池中最小生存的时间，单位是毫秒
-	    <property name="minEvictableIdleTimeMillis" value="300000" />
-	    <property name="validationQuery" value="SELECT 'x' " />
-	    <property name="testWhileIdle" value="true" />
-	    <property name="testOnBorrow" value="false" />
-	    <property name="testOnReturn" value="false" />
-	    打开PSCache，并且指定每个连接上PSCache的大小 
-	    	用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false
-	   
-	    <property name="poolPreparedStatements" value="true" />
-	    <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
-	    配置监控统计拦截的filters
-	    <property name="filters" value="stat,config"/>
-	    配置其他拦截信息
-	    <property name="proxyFilters">
-			<list>
-              <ref bean="wall-filter"/>              
-			</list>
-      	</property>
-	    			    
-	    <property name="removeAbandoned" value="true" /> 打开removeAbandoned功能
-    	<property name="removeAbandonedTimeout" value="1800" /> 1800秒，也就是30分钟
-    	<property name="logAbandoned" value="false" /> 关闭abanded连接时输出错误日志
-    	<property name="connectionProperties" value="config.decrypt=true" />
-	</bean> -->
 	
 	<!-- <bean id="druid_henlo" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
 	    基本属性 url、user、password

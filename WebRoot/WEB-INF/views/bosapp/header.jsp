@@ -14,6 +14,9 @@
   <head>
     <title>${ProjectName}</title>    
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+	<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+	<META HTTP-EQUIV="expires" CONTENT="0">
     <style type="text/css">
 		.aBtnStyle{
 			margin: 2px 2px  2px 2px;

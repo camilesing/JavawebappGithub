@@ -16,7 +16,7 @@
 			      <td>统计年月</td>
 			      <td><input type="text" name="date_start" id="date_start" /></td>
 			      <td>-</td>
-			      <td>-</td>
+			      <td><input type="text" name="date_end" id="date_end" /></td>
 			    </tr> 
 			</table>
 			<div data-role="collapsible-set" data-theme="c" data-content-theme="d" >

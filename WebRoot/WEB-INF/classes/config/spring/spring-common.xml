@@ -85,6 +85,8 @@
   	
   	<bean id="jhportalcontroller" class="com.authority.web.controller.JHPortalController" />
   	
+  	<bean id="rtportalcontroller" class="com.authority.web.controller.RTPortalController" />
+  	
 	
 	<!-- define the SqlSessionFactory class="org.mybatis.spring.SqlSessionFactoryBean" -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -149,18 +151,25 @@
 	
 	<!-- 定时器开关 -->
 	 	
-	<!-- <task:annotation-driven />
-	<bean id="TaskJHPortal" class="com.henlo.process.TaskJHPortal"></bean>
+	<task:annotation-driven />
+	<bean id="TaskRTPortal" class="com.henlo.process.TaskRTPortal"></bean>
+	<task:scheduled-tasks>
+		<task:scheduled ref="TaskRTPortal" method="dataiotask"  cron="0 2/5 * * * ?" />
+		<task:scheduled ref="TaskRTPortal" method="smssendtask" cron="0 2/6 * * * ?" />
+		<task:scheduled ref="TaskRTPortal" method="smsreport"   cron="0 2/30 * * * ?" />
+	</task:scheduled-tasks>
+	
+	<!-- <bean id="TaskJHPortal" class="com.henlo.process.TaskJHPortal"></bean>
 	<task:scheduled-tasks>
 		<task:scheduled ref="TaskJHPortal" method="dataprocess" cron="0 0 0-23 * * ?" />
-	</task:scheduled-tasks> -->
+	</task:scheduled-tasks>  -->
 	
 	<!-- <bean id="TaskYQGD_ChinaPay" class="com.henlo.process.TaskYQGD_ChinaPay"></bean>
 	<task:scheduled-tasks>
 		<task:scheduled ref="TaskYQGD_ChinaPay" method="dataprocess" cron="0 0 1-12 * * ?" />
 	</task:scheduled-tasks> -->
 	
-	<!-- <task:annotation-driven />
+	<!-- 
 		<bean id="TaskYF_Interface" class="com.henlo.process.TaskYF_Interface"></bean>
 	<task:scheduled-tasks>
 		<task:scheduled ref="TaskYF_Interface" method="dataprocess" cron="0 2/5 * * * ?" />

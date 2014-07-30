@@ -25,9 +25,21 @@
 			        <div id='ichartjs_content' style="margin: 0px 0px 0px 0px;border: 0;padding: 0" >点击加载按钮</div>
 			    </div>
 			    <div data-role="collapsible" >
-			        <h3>详细数据</h3>
+			        <h3>库存周转天数</h3>
 			        <span id="reportview_table_count"></span>			
-					<table style="BORDER-RIGHT: #linen 1px dashed; BORDER-TOP: #linen 1px dashed; BORDER-LEFT: #linen 1px dashed; BORDER-BOTTOM: #linen 1px dashed; BORDER-COLLAPSE: collapse;font-size: 11px" borderColor=#linen height=40 cellPadding=1 width=100% align=center border=1 id="reportview_table_id" >
+					<table style="BORDER-RIGHT: #linen 1px dashed; BORDER-TOP: #linen 1px dashed; BORDER-LEFT: #linen 1px dashed; BORDER-BOTTOM: #linen 1px dashed; BORDER-COLLAPSE: collapse;font-size: 11px" borderColor=#linen height=40 cellPadding=1 width=100% align=center border=1 id="reportview_table_id_01" >
+							
+			        </table> 
+			    </div>
+			    <div data-role="collapsible" >
+			        <h3>订单结构分析</h3>
+					<table style="BORDER-RIGHT: #linen 1px dashed; BORDER-TOP: #linen 1px dashed; BORDER-LEFT: #linen 1px dashed; BORDER-BOTTOM: #linen 1px dashed; BORDER-COLLAPSE: collapse;font-size: 11px" borderColor=#linen height=40 cellPadding=1 width=100% align=center border=1 id="reportview_table_id_02" >
+							
+			        </table> 
+			    </div>
+			    <div data-role="collapsible" >
+			        <h3>盈利分析</h3>
+					<table style="BORDER-RIGHT: #linen 1px dashed; BORDER-TOP: #linen 1px dashed; BORDER-LEFT: #linen 1px dashed; BORDER-BOTTOM: #linen 1px dashed; BORDER-COLLAPSE: collapse;font-size: 11px" borderColor=#linen height=40 cellPadding=1 width=100% align=center border=1 id="reportview_table_id_03" >
 							
 			        </table> 
 			    </div>

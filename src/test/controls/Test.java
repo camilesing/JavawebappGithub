@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.NameValuePair;
@@ -34,12 +35,54 @@ import net.sourceforge.jeval.Evaluator;
 
 public class Test {
 	
-	private static final String BASE_URL = "http://111.1.15.134/stardy/";
+	private static final String BASE_URL = "http://ums.zj165.com:8888/sms/Api/";
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		BigDecimal BENZ = new BigDecimal(4);
+		/*Random r = new Random();
+		for (int i = 0; i < 10; i++) {
+			int r_int = r.nextInt(1000000);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+			String addtime =  sdf.format(new Date());
+			System.out.println("r_db:"+addtime+StringUtils.leftPad(String.valueOf(r_int), 6, "0"));
+		}
+		
+		String Str = "result=6&description=号码中含有无效号码或不在规定的号段&faillist=1";
+		String[] Strs = Str.split("&");
+		for (String string : Strs) {
+			String[] tmp = string.split("=");
+			if(tmp[0].equalsIgnoreCase("faillist")){
+				if(tmp.length>1){
+					String[] faillist = tmp[1].split(",");
+					for (String failphone : faillist) {
+						System.out.println("----failphone:"+failphone);
+					}
+				}
+				
+			}
+		}*/
+		
+		
+		try {
+			try {
+				int i =1/0;
+			} catch (Exception e) {
+				System.out.println("异常1");
+				throw new RuntimeException(e+"Test");
+				// TODO: handle exception
+			}finally{
+				System.out.println("finally");
+			}
+			
+		} catch (Exception e) {
+			System.out.println("异常2"+e);
+			// TODO: handle exception
+		}
+		
+		
+		
+		/*BigDecimal BENZ = new BigDecimal(4);
 		BigDecimal SHANGZ = new BigDecimal(3);
 		
 		BigDecimal HUANB = BENZ.divide(SHANGZ,2,BigDecimal.ROUND_HALF_UP);
@@ -51,7 +94,8 @@ public class Test {
 		for (int i = 0; i < list.length; i++) {
 			String[] list_child = list[i].split(",");
 			System.out.println(list_child[0]+":"+list_child[1]);
-		}
+		}*/
+		
 		
 		/*try {
 			Class<?> task = null;

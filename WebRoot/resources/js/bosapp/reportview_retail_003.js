@@ -30,7 +30,9 @@ $("#reportview_table").live( "pageinit" , function(event){
 		var date_end = $("#date_end").val();
 		var param = {"date_start":date_start,"date_end":date_end};
 		//清理现有的列表
-		$("#reportview_table_id").empty();
+		$("#reportview_table_id_01").empty();
+		$("#reportview_table_id_02").empty();
+		$("#reportview_table_id_03").empty();
 		$("#reportview_table_count").html("");
 		$("#ichartjs_content").html("");
 		
@@ -61,11 +63,102 @@ $("#reportview_table").live( "pageinit" , function(event){
 	var fun_reportview_table_init = function(json){
 		if(json.success){
 			//清理现有的列表
-			var table = $("#reportview_table_id");
+			var table_01 = $("#reportview_table_id_01");
+			var table_02 = $("#reportview_table_id_02");
+			var table_03 = $("#reportview_table_id_03");
 			//添加表头
 			$("#reportview_table_count").html("数据："+json.o+" 条");		
 			
-			//遍历json数组
+			var tr_01_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY_STORAGE","C_DATE"];
+			var tr_02_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY","TOT_PRECOST","AMT_ACTUAL","MAOL"];
+			var tr_03_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY","MAOL","PRECOST","ACTUAL"];
+			
+			for(var i=0;i<json.msg.length;i++){
+				if(i==0){
+					var tr_01 ="<thead><tr >";
+					var tr_02 ="<thead><tr >";
+					var tr_03 ="<thead><tr >";
+					var jsonobj = json.msg[i];
+					for(var x in jsonobj){
+						
+						for(var y in tr_01_list){
+							if(x==tr_01_list[y]){
+								var th = "<th >"+jsonobj[x]+"</th>";
+								tr_01 = tr_01+th;
+							}
+						}	
+						
+						for(var y in tr_02_list){
+							if(x==tr_02_list[y]){
+								var th = "<th >"+jsonobj[x]+"</th>";
+								tr_02 = tr_02+th;
+							}
+						}
+						
+						for(var y in tr_03_list){
+							if(x==tr_03_list[y]){
+								var th = "<th >"+jsonobj[x]+"</th>";
+								tr_03 = tr_03+th;
+							}
+						}
+						
+					}
+					tr_01 = tr_01 +"</tr></thead>";
+					tr_02 = tr_02 +"</tr></thead>";
+					tr_03 = tr_03 +"</tr></thead>";
+					
+					table_01.append(tr_01);
+					table_01.append("<tbody></tbody>");
+					
+					table_02.append(tr_02);
+					table_02.append("<tbody></tbody>");
+					
+					table_03.append(tr_03);
+					table_03.append("<tbody></tbody>");
+				}else{						
+					var tr_01 ="<tr>";
+					var tr_02 ="<tr>";
+					var tr_03 ="<tr>";
+					
+					var jsonobj = json.msg[i];
+					for(var x in jsonobj){
+						
+						for(var y in tr_01_list){
+							if(x==tr_01_list[y]){
+								var td = "<td >"+jsonobj[x]+"</td>";
+								tr_01 = tr_01+td;
+							}
+						}
+						
+						for(var y in tr_02_list){
+							if(x==tr_02_list[y]){
+								var td = "<td >"+jsonobj[x]+"</td>";
+								tr_02 = tr_02+td;
+							}
+						}
+						
+						for(var y in tr_03_list){
+							if(x==tr_03_list[y]){
+								var td = "<td >"+jsonobj[x]+"</td>";
+								tr_03 = tr_03+td;
+							}
+						}
+						
+					}
+					
+					tr_01 = tr_01 +"</tr>";
+					table_01.append(tr_01);		
+					
+					tr_02 = tr_02 +"</tr>";
+					table_02.append(tr_02);	
+					
+					tr_03 = tr_03 +"</tr>";
+					table_03.append(tr_03);	
+				}
+			}
+			
+			
+			/*//遍历json数组
 			for(var i=0;i<json.msg.length;i++){
 				if(i==0){
 					var tr ="<thead><tr >"
@@ -87,7 +180,8 @@ $("#reportview_table").live( "pageinit" , function(event){
 					tr = tr +"</tr>";
 					table.append(tr);			
 				}
-			}
+			}*/
+			
 			//$("#reportview_table_id" ).table("refresh");
 			
 		}else {

@@ -1,12 +1,12 @@
 <%@ page language="java"  pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%>
 <%@include file="header.jsp" %>
 	
-<script type="text/javascript" src="${ctx}/resources/js/bosapp/reportview_retail_006.js" ></script>
+<script type="text/javascript" src="${ctx}/resources/js/bosapp/reportview_retail_051.js" ></script>
 
    <div data-role="page" id="reportview_table" project_path="${ctx}"> 
    		<div data-role="header" data-theme="b">
         	<a href="reportview" data-ajax="false">返回</a>
-   			<h1 align="center"> 门店销售排行(TOP20) </h1>
+   			<h1 align="center"> 销售汇总  </h1>
             <a href="#" id="refreshTable" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-refresh">加载数据</a>
    		</div>
    		   		
@@ -20,22 +20,11 @@
 			    </tr> 
 			</table>
 			<div data-role="collapsible-set" data-theme="c" data-content-theme="d" >
-			    <div data-role="collapsible" data-collapsed="false">
-			        <h3>图表</h3>
-			        <div id='ichartjs_content' style="margin: 0px 0px 0px 0px;border: 0;padding: 0" >点击加载按钮</div>
-			    </div>
-			    <div data-role="collapsible" >
-			        <h3>详细数据</h3>
-			        <span id="reportview_table_count"></span>			
+			    <span id="reportview_table_count"></span>			
 					<table style="BORDER-RIGHT: #linen 1px dashed; BORDER-TOP: #linen 1px dashed; BORDER-LEFT: #linen 1px dashed; BORDER-BOTTOM: #linen 1px dashed; BORDER-COLLAPSE: collapse;font-size: 11px" borderColor=#linen height=40 cellPadding=1 width=100% align=center border=1 id="reportview_table_id" >
 							
-			        </table> 
-			    </div>
+			        </table>
 			</div>
-			
-			
-			
-	        
            
    		</div> <!--  end content -->
    		

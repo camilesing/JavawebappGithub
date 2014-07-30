@@ -10,9 +10,9 @@
    		</div>
    		
    		<div data-role="content" >
-			<h3 id="newsdetail_title" align="center">1111111</h3>
+			<h3 id="newsdetail_title" align="center">&nbsp;</h3>
 			<p class="notep"></p>
-			<p id="newsdetail_content">1111111</p>
+			<p id="newsdetail_content">信息努力加载中……</p>
    		</div> <!--  end content -->
    		
    		<jsp:include page="divFooter.jsp"></jsp:include>  <!--  end footer -->

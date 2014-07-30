@@ -52,7 +52,8 @@ $(document).on("pageinit","#home",function(){
 					//ShowLoading();
 				},					
 				success: function(json, textStatus){
-					window.location.href = "${ctx}/bosapp";
+					//WeixinJSBridge.call('closeWindow');
+					window.location.href = "${ctx}/bosapp?weixinid="+json.msg;
 				},
 				complete: function(XMLHttpRequest, textStatus){
 					//HideLoading();
