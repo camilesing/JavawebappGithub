@@ -66,7 +66,7 @@ $(document).ready(function() {
 				reader : new Ext.data.JsonReader({// 数据读取器
 					totalProperty : 'results', // 记录总数
 					root : 'rows' // Json中的列表数据根节点
-				}, ['id', 'openbank', 'cardtype','cardno', 'usrname','certid','transamt','chulzt','responsecode','transstat','message','mobilephone']),
+				}, ['id', 'openbank', 'cardtype','cardno', 'usrname','transamt','chulzt','responsecode','transstat','message','mobilephone','addtime','edittime']),
 				listeners : {
 					'load' : function(store, records, options) {
 						yqgdrequestdata.alwaysFun();
@@ -113,7 +113,7 @@ $(document).ready(function() {
 						},{
 							header : '卡号',
 							dataIndex : 'cardno',
-							width : 80,
+							width : 100,
 							renderer:formatQtip
 						},{
 							header : '持卡人',
@@ -121,29 +121,14 @@ $(document).ready(function() {
 							width : 80,
 							renderer:formatQtip
 						},{
-							header : '证件号',
-							dataIndex : 'certid',
-							width : 80,
-							renderer:formatQtip
-						},{
-							header : '交易金额',
+							header : '交易金额(分)',
 							dataIndex : 'transamt',
-							width : 80,
-							renderer:formatQtip
-						},{
-							header : '回复状态',
-							dataIndex : 'responsecode',
-							width : 80,
-							renderer:formatQtip
-						},{
-							header : '代扣状态',
-							dataIndex : 'transstat',
 							width : 80,
 							renderer:formatQtip
 						},{
 							header : '回复信息',
 							dataIndex : 'message',
-							width : 80,
+							width : 120,
 							renderer:formatQtip
 						},{
 							header : '移动电话',
@@ -152,11 +137,20 @@ $(document).ready(function() {
 						},{
 							header : '处理状态',
 							dataIndex : 'chulzt',
-							width : 110,
+							width : 60,
 							renderer : function(v) {
 								return Share.map(v,yqgdrequestdata.wzsjjdealstatus , '');
+							}
+						},{
+							header : '请求时间',
+							dataIndex : 'addtime',
+							width : 100
+						},{
+							header : '最后答复时间',
+							dataIndex : 'edittime',
+							width : 100
 						}
-						}]
+						]
 			});
 	
 	
@@ -212,7 +206,7 @@ $(document).ready(function() {
 				url : yqgdrequestdata.requestdata,
 				timeout : 300000,
 				params : {
-					reqstr : '中国工商银行|0|6212261203005120596|陈锋|01|330381198501273671|乐清广电扣费|1|18857846128|2;中国工商银行|0|900758403049921840|测试|01|120221198606121502|乐清广电扣费|300|18857846128|1'
+					reqstr : '中国工商银行|0|6212261203005120596|陈锋|01|330381198501271234|乐清广电扣费|1|18857846128|2;中国工商银行|0|900758403049921840|测试|01|120221198606121502|乐清广电扣费|300|18857846128|1'
 				},
 				callback : function(json) {
 					yqgdrequestdata.store.reload();
@@ -315,7 +309,7 @@ $(document).ready(function() {
 				emptyText : '持卡人',
 				style : 'margin-left: 5px;'
 			});
-	/** 顶部工具栏 */
+	/** 顶部工具栏 
 	yqgdrequestdata.tbar = [ yqgdrequestdata.requestdataAction,'-',
 	                         yqgdrequestdata.pay_backstageAction,'-',
 	                         yqgdrequestdata.clearAction,'-',
@@ -324,6 +318,8 @@ $(document).ready(function() {
 	                         yqgdrequestdata.requestdataqueryAction,'-',
 	                         yqgdrequestdata.requestsmsqueryAction,'-',
 	                         yqgdrequestdata.searchField];
+	*/
+	yqgdrequestdata.tbar = [ yqgdrequestdata.searchField];
 	/** 底部工具条 */
 	yqgdrequestdata.bbar = new Ext.PagingToolbar({
 				pageSize : yqgdrequestdata.pageSize,

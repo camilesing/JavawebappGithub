@@ -3,6 +3,10 @@ package com.authority.pojo;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.authority.common.jackjson.CustomDateTimeSerializer;
+
 /**
  * 广电原始数据请求
  */
@@ -286,6 +290,7 @@ public class YqgdRequestdata implements Serializable {
         this.message = message;
     }
 
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
     public Date getAddtime() {
         return addtime;
     }
@@ -310,6 +315,7 @@ public class YqgdRequestdata implements Serializable {
         this.addip = addip;
     }
 
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
     public Date getEdittime() {
         return edittime;
     }

@@ -171,7 +171,14 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from YQGD_REQUESTDATA
+    from (
+    select ID, OPENBANK, CARDTYPE, CARDNO, USRNAME, CERTTYPE, CERTID, TRANSAMT, PURPOSE, CHULZT, 
+    RESPONSECODE, TRANSSTAT,nvl(b.DESCRIPTION_,MESSAGE) MESSAGE, ADDTIME, ADDWHO, ADDIP, EDITTIME, EDITWHO, EDITIP, 
+    ISDISPLAY, MOBILEPHONE, BATCHNUMBER 
+    from YQGD_REQUESTDATA 
+    left join (select A.TRANSSTAT TRANSSTAT_ ,A.TYPE||'|'||A.DESCRIPTION  DESCRIPTION_  from YQGD_RESPONSECODE a ) b
+    on YQGD_REQUESTDATA.TRANSSTAT = b.TRANSSTAT_
+    )
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>

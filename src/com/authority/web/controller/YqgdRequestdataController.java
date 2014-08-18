@@ -298,6 +298,7 @@ public class YqgdRequestdataController {
 						rdI_YqgdRequestdata.setBatchnumber(BATCHNUMBER);
 						rdI_YqgdRequestdata.setChulzt("1");
 						rdI_YqgdRequestdata.setAddip(WebUtils.getIpAddr(request));
+						rdI_YqgdRequestdata.setAddtime(new Date());
 						rdI_YqgdRequestdata.setIsdisplay("1");
 						
 						Criteria CriS_YqgdRequestdata = new Criteria();
@@ -319,10 +320,10 @@ public class YqgdRequestdataController {
 							 			String strResult = trade_request(Param) ;
 							 	        if (strResult == null) {
 							 	        	//加入失败的行列
-							 	        	Message = Message+str+"|99 Chinapay Server failed;";
+							 	        	Message = Message+str+"|99|Chinapay Server failed;";
 							 	        	//将原先记录更新为无效   或者 设置为待重复请求状态  比如 11 ----待确认
 							 	        	rdI_YqgdRequestdata.setIsdisplay("0");
-							 	        	rdI_YqgdRequestdata.setMessage("|99 Chinapay Server failed;");
+							 	        	rdI_YqgdRequestdata.setMessage("|99|Chinapay Server failed;");
 							 	        	yqgdRequestdataService.updateByPrimaryKeySelective(rdI_YqgdRequestdata);							 	        	
 							 	        	
 							 	        }else{
@@ -338,22 +339,22 @@ public class YqgdRequestdataController {
 							 	        
 									} catch (Exception e) {
 										System.out.println(e);
-										Message = Message+str+"|99 HTTP_Exception failed ;";
+										Message = Message+str+"|99|HTTP_Exception failed ;";
 										// TODO: handle exception
 									}
 									
 								}else{
-									Message = Message+str+"|99 yqgdTradedataService_I failed;";
+									Message = Message+str+"|99|yqgdTradedataService_I failed;";
 								}
 							}else{
-								Message = Message+str+"|99 yqgdRequestdataService_I failed;";
+								Message = Message+str+"|99|yqgdRequestdataService_I failed;";
 							}
 							
 						}else{
-							Message = Message+str+"|99 record already exists;";
+							Message = Message+str+"|99|record already exists;";
 						}
 					}else{
-						Message = Message+str+"|99 Request_Length error;";
+						Message = Message+str+"|99|Request_Length error;";
 					}
 					
 				}
@@ -405,9 +406,11 @@ public class YqgdRequestdataController {
 					List<YqgdRequestdata>  list =  yqgdRequestdataService.selectByExample(record);
 					if(list.size()>0){
 						YqgdRequestdata rdS_YqgdRequestdata = list.get(0);
-						message = message+str+"|"+rdS_YqgdRequestdata.getResponsecode()+" "+(rdS_YqgdRequestdata.getMessage()==null?"":rdS_YqgdRequestdata.getMessage())+";";
+						String purpose = rdS_YqgdRequestdata.getPurpose();
+						String transamt =rdS_YqgdRequestdata.getTransamt();
+						message = message+str+"|"+(purpose==null?"":purpose)+ "|"+(transamt==null?"":transamt)+"|"+rdS_YqgdRequestdata.getResponsecode()+" "+(rdS_YqgdRequestdata.getMessage()==null?"":rdS_YqgdRequestdata.getMessage())+";";
 					}else{
-						message = message+str+"|99 record not exists";
+						message = message+str+"|99|record not exists";
 					}
 					
 				}
@@ -506,7 +509,7 @@ public class YqgdRequestdataController {
 				 			
 				 	        if (strResult == null) {
 				 	        	//加入失败的行列
-				 	        	Message = Message+str+"|99 Chinapay Server failed;";
+				 	        	Message = Message+str+"|99|Chinapay Server failed;";
 				 	        }else{
 				 	        	//验证结果签名是否有效
 				 	        	flag = verifyAuthToken(strResult);
@@ -516,12 +519,12 @@ public class YqgdRequestdataController {
 				 	        
 						} catch (Exception e) {
 							System.out.println(e);
-							Message = Message+str+"|99 HTTP_Exception failed ;";
+							Message = Message+str+"|99|HTTP_Exception failed ;";
 							// TODO: handle exception
 						}
 						
 					}else{
-						Message = Message+str+"|99 yqgdTradedataService_I failed;";
+						Message = Message+str+"|99|yqgdTradedataService_I failed;";
 					}					
 				}else{
 					return new ExtReturn(false,"状态有误");
@@ -590,7 +593,7 @@ public class YqgdRequestdataController {
 		        
 		        if (strResult == null) {
 	 	        	//加入失败的行列
-	 	        	Message = Message+str+"|99 Chinapay Server failed;";
+	 	        	Message = Message+str+"|99|Chinapay Server failed;";
 	 	        }else{
 	 	        	//验证结果签名是否有效
 	 	        	flag = verifyAuthToken(strResult);
@@ -1208,15 +1211,15 @@ public class YqgdRequestdataController {
 	 	        			yqgdRequestdataService.updateByPrimaryKeySelective(rdI_YqgdRequestdata);
 	 	        			
 	 	        		}else{
-	 	        			Message = "|99 verifyAuthToken failed;";
+	 	        			Message = "|99|verifyAuthToken failed;";
 	 	        		}
         				
         			}else{
-        				Message = "|99 yqgdTradedataService_U failed;";
+        				Message = "|99|yqgdTradedataService_U failed;";
         			}
         			
         		}else{
-        			Message = "|99 yqgdResponsedataService_I failed;";
+        			Message = "|99|yqgdResponsedataService_I failed;";
         		}
         		
         	}
