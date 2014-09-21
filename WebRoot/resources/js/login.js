@@ -115,7 +115,7 @@ $(document).ready(function () {
 
     // 状态栏HTMl
     login.bbarHtml = "<a href='javascript:login.resetPassword();'>忘记密码？</a>";
-    if ('true' == 'true') {
+    if ('false' == 'true') {
     	login.bbarHtml = login.bbarHtml
     				+ "&nbsp;&nbsp;<a href='javascript:login.registerUser();'>注册</a>";
     }

@@ -63,6 +63,7 @@ public class Test {
 			}
 		}*/
 		
+		System.out.println(DigestUtils.md5Hex("1"));
 		
 		try {
 			try {

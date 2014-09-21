@@ -149,7 +149,7 @@
 		</property>
 	</bean>
 	
-	<!-- 定时器开关 -->
+	<!-- 定时器开关 
 	 	
 	<task:annotation-driven />
 	<bean id="TaskRTPortal" class="com.henlo.process.TaskRTPortal"></bean>
@@ -158,6 +158,7 @@
 		<task:scheduled ref="TaskRTPortal" method="smssendtask" cron="0 2/6 * * * ?" />
 		<task:scheduled ref="TaskRTPortal" method="smsreport"   cron="0 2/30 * * * ?" />
 	</task:scheduled-tasks>
+	-->
 	
 	<!-- <bean id="TaskJHPortal" class="com.henlo.process.TaskJHPortal"></bean>
 	<task:scheduled-tasks>

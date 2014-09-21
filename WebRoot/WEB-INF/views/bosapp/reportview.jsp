@@ -18,8 +18,10 @@
 	            	<!-- 总部板块 -->
 					<li data-role="list-divider"><span style="color: maroon;">A.总部销售板块</span></li>
 					<li><a href="reportview_retail_004" data-ajax="false"><span class="ul_li_class">销售出库分析(类别)</span></a></li>
-					<li><a href="reportview_retail_005" data-ajax="false"><span class="ul_li_class">销售出库分析(经销商)</span></a></li>
+					<li><a href="reportview_retail_005" data-ajax="false"><span class="ul_li_class">销售出库分析(同环比)</span></a></li>
+					<li><a href="reportview_retail_012" data-ajax="false"><span class="ul_li_class">销售出库分析(经销商)</span></a></li>
 					<li><a href="reportview_retail_011" data-ajax="false"><span class="ul_li_class">销售订单分析(经销商)</span></a></li>
+					<li><a href="reportview_retail_013" data-ajax="false"><span class="ul_li_class">销售排行分析(款)TOP10</span></a></li>
 					<li data-role="list-divider"><span style="color: maroon;">B.总部零售板块</span></li>
 					<li><a href="reportview_retail_003" data-ajax="false"><span class="ul_li_class">零售排行(款)TOP10</span></a></li>
 					<li><a href="reportview_retail_001" data-ajax="false"><span class="ul_li_class">零售汇总报表</span></a></li>

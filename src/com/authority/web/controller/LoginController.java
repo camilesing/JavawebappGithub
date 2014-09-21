@@ -503,6 +503,84 @@ public class LoginController {
 			return new ExceptionReturn(e);
 		}
 	}
+	
+	/**
+	 * 华峰用户登录_PDA
+	 */
+	@RequestMapping(value = "/login_winceapp", method = RequestMethod.POST)
+	@ResponseBody
+	public Object login_winceapp(@RequestParam String username, @RequestParam String password, HttpSession session, HttpServletRequest request) {
+		try {
+			if (StringUtils.isBlank(username)) {
+				return new PdaReturn("N", "帐号不能为空！");
+			}
+			if (StringUtils.isBlank(password)) {
+				return new PdaReturn("N", "密码不能为空！");
+			}
+			Criteria criteria = new Criteria();
+			criteria.put("account", username);
+			criteria.put("passwordIn", password);
+			criteria.put("loginip", this.getIpAddr(request));
+			String result = this.baseUsersService.selectByBaseUser(criteria);
+			if ("01".equals(result)) {
+				BaseUsers baseUser = (BaseUsers) criteria.get("baseUser");
+				session.setAttribute(WebConstants.CURRENT_USER, baseUser);
+				
+				String user_role="";
+				String sql_role="select A.ROLE_NAME from BASE_ROLES a,BASE_USER_ROLE b where A.ROLE_ID=B.ROLE_ID and B.USER_ID=?";
+				Object[] args={baseUser.getUserId()};
+				if(null==(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class))
+					;
+				else
+					user_role=(String)jdbcTemplate.queryForObject(sql_role, args, java.lang.String.class);
+				
+				session.setAttribute(WebConstants.CURRENT_USER_ROLE, user_role);				
+				
+				logger.info("{}登陆成功", baseUser.getRealName());
+				//获取配置信息
+				String  message = "",query="" ;
+				List<Map<String,Object>> list = null;
+				//1 . users
+				query = "select account,REAL_NAME,ROLE_NAME,ROLE_DESC from v_base_users where account='"+username+"'";
+				list  = jdbcTemplate.queryForList(query);
+				Map<String,Object> map = list.get(0);
+				message = "users,"+map.get("ACCOUNT").toString()+","+map.get("REAL_NAME").toString()+","+password+","+map.get("ROLE_NAME").toString()+","+map.get("ROLE_DESC").toString()+";";
+				
+				//2 . role_module 角色（部门） 权限
+				query = "select ROLE_NAME, PARENT_MODULE_URL, PARENT_MODULE_NAME, MODULE_URL, MODULE_NAME " +
+						"from v_role_module where ROLE_NAME ='"+map.get("ROLE_NAME").toString()+"'" ;
+				list.clear();
+				list = jdbcTemplate.queryForList(query);
+				for (Map<String, Object> maplist : list) {
+					message = message +"role_module,"+
+							maplist.get("ROLE_NAME").toString()+","+
+							maplist.get("PARENT_MODULE_URL").toString()+","+
+							maplist.get("PARENT_MODULE_NAME").toString()+","+
+							maplist.get("MODULE_URL").toString()+","+
+							maplist.get("MODULE_NAME").toString()+";";
+				}
+				
+				//3 . requrl 请求地址信息
+				query = "select DISPLAY_FIELD, VALUE_FIELD " +
+						"from V_BASE_FIELDS " ;
+				list.clear();
+				list = jdbcTemplate.queryForList(query);
+				for (Map<String, Object> maplist : list) {
+					message = message +"requrl,"+
+							maplist.get("DISPLAY_FIELD").toString()+","+
+							maplist.get("VALUE_FIELD").toString()+";";
+				}
+				return new PdaReturn("Y",StringUtils.removeEnd(message, ";"));
+			} else if ("00".equals(result)) {
+				return new PdaReturn("N","用户名或者密码错误!");
+			} else {
+				return new PdaReturn("N",result);
+			}
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			return new ExceptionReturn(e);
+		}
+	}
 
 	/**
 	 * 取得客户端真实ip

@@ -90,7 +90,7 @@ $("#reportview_table").live( "pageinit" , function(event){
 				}else{
 					var tr_01 ="<tr>";
 					var jsonobj = json.msg[i];
-					tr_01 = tr_01+"<td >"+(i+1)+"</td>";
+					tr_01 = tr_01+"<td >"+(i)+"</td>";
 					for(var x in jsonobj){
 						for(var y in tr_01_list){
 							if(x==tr_01_list[y]){

@@ -25,14 +25,12 @@ $("#reportview_table").live( "pageinit" , function(event){
 	
 	updateTable = function(){
 		var project_path = $("#reportview_table").attr("project_path");
-		var url_init = project_path + "/bosapp/reportview_retail_003";
+		var url_init = project_path + "/bosapp/reportview_retail_013";
 		var date_start = $("#date_start").val();
 		var date_end = $("#date_end").val();
 		var param = {"date_start":date_start,"date_end":date_end};
 		//清理现有的列表
 		$("#reportview_table_id_01").empty();
-		$("#reportview_table_id_02").empty();
-		$("#reportview_table_id_03").empty();
 		$("#reportview_table_count").html("");
 		$("#ichartjs_content").html("");
 		
@@ -64,23 +62,18 @@ $("#reportview_table").live( "pageinit" , function(event){
 		if(json.success){
 			//清理现有的列表
 			var table_01 = $("#reportview_table_id_01");
-			var table_02 = $("#reportview_table_id_02");
-			var table_03 = $("#reportview_table_id_03");
 			//添加表头
 			$("#reportview_table_count").html("数据："+json.o+" 条");		
-			
-			var tr_01_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY_STORAGE","C_DATE"];
-			var tr_02_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY","TOT_PRECOST","AMT_ACTUAL","MAOL"];
-			var tr_03_list = ["ORDERNO","M_PRODUCT_NAME","M_PRODUCT_VALUE","QTY","MAOL","PRECOST","ACTUAL"];
+		
+			var tr_01_list = ["M_PRODUCT_NAME","QTY","AMTLISTSALE","AMTSALE","MAOL"];
 			
 			for(var i=0;i<json.msg.length;i++){
 				if(i==0){
 					var tr_01 ="<thead><tr >";
-					var tr_02 ="<thead><tr >";
-					var tr_03 ="<thead><tr >";
 					var jsonobj = json.msg[i];
+					tr_01 = tr_01+"<th >TOP(10)</th> "; //加序号
+					
 					for(var x in jsonobj){
-						
 						for(var y in tr_01_list){
 							if(x==tr_01_list[y]){
 								var th = "<th >"+jsonobj[x]+"</th>";
@@ -88,101 +81,29 @@ $("#reportview_table").live( "pageinit" , function(event){
 							}
 						}	
 						
-						for(var y in tr_02_list){
-							if(x==tr_02_list[y]){
-								var th = "<th >"+jsonobj[x]+"</th>";
-								tr_02 = tr_02+th;
-							}
-						}
-						
-						for(var y in tr_03_list){
-							if(x==tr_03_list[y]){
-								var th = "<th >"+jsonobj[x]+"</th>";
-								tr_03 = tr_03+th;
-							}
-						}
-						
 					}
 					tr_01 = tr_01 +"</tr></thead>";
-					tr_02 = tr_02 +"</tr></thead>";
-					tr_03 = tr_03 +"</tr></thead>";
 					
 					table_01.append(tr_01);
 					table_01.append("<tbody></tbody>");
 					
-					table_02.append(tr_02);
-					table_02.append("<tbody></tbody>");
-					
-					table_03.append(tr_03);
-					table_03.append("<tbody></tbody>");
-				}else{						
+				}else{
 					var tr_01 ="<tr>";
-					var tr_02 ="<tr>";
-					var tr_03 ="<tr>";
-					
 					var jsonobj = json.msg[i];
+					tr_01 = tr_01+"<td >"+(i)+"</td>";
 					for(var x in jsonobj){
-						
 						for(var y in tr_01_list){
 							if(x==tr_01_list[y]){
 								var td = "<td >"+jsonobj[x]+"</td>";
 								tr_01 = tr_01+td;
 							}
 						}
-						
-						for(var y in tr_02_list){
-							if(x==tr_02_list[y]){
-								var td = "<td >"+jsonobj[x]+"</td>";
-								tr_02 = tr_02+td;
-							}
-						}
-						
-						for(var y in tr_03_list){
-							if(x==tr_03_list[y]){
-								var td = "<td >"+jsonobj[x]+"</td>";
-								tr_03 = tr_03+td;
-							}
-						}
-						
 					}
 					
 					tr_01 = tr_01 +"</tr>";
 					table_01.append(tr_01);		
-					
-					tr_02 = tr_02 +"</tr>";
-					table_02.append(tr_02);	
-					
-					tr_03 = tr_03 +"</tr>";
-					table_03.append(tr_03);	
 				}
 			}
-			
-			
-			/*//遍历json数组
-			for(var i=0;i<json.msg.length;i++){
-				if(i==0){
-					var tr ="<thead><tr >"
-					var jsonobj = json.msg[i];
-					for(var x in jsonobj){
-						var th = "<th >"+jsonobj[x]+"</th>";
-						tr = tr+th;
-					}
-					tr = tr +"</tr></thead>";
-					table.append(tr);
-					table.append("<tbody></tbody>");
-				}else{						
-					var tr ="<tr>"
-					var jsonobj = json.msg[i];
-					for(var x in jsonobj){
-						var td = "<td >"+jsonobj[x]+"</td>";
-						tr = tr+td;
-					}
-					tr = tr +"</tr>";
-					table.append(tr);			
-				}
-			}*/
-			
-			//$("#reportview_table_id" ).table("refresh");
 			
 		}else {
 			$("#reportview_table_div_id").html('数据读取有误');							
@@ -207,7 +128,7 @@ $("#reportview_table").live( "pageinit" , function(event){
 				render : 'ichartjs_content',
 				data: data,
 				title:{
-	                  text:"零售排行(款) TOP10",
+	                  text:"销售排行(款) TOP10",
 	                  color:"#111111",
 	                  fontsize:20,
 	                  font:"微软雅黑",
