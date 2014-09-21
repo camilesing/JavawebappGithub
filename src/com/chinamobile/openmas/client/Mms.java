@@ -20,11 +20,11 @@ public class Mms {
 		stub = new MmsImplementationStub(serviceUrl);
 	}
 	/**
-	 * ·¢ËÍ²ÊĞÅ
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍÎ¨Ò»±êÊ¶
+	 * å‘é€å½©ä¿¡
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @return è¿”å›å½©ä¿¡å‘é€å”¯ä¸€æ ‡è¯†
 	 */
 	public String SendMessage(String[] destinationAddresses, String subject, String content) 
 	{
@@ -48,12 +48,12 @@ public class Mms {
 	}
 	
 	/**
-	 * ·¢ËÍ²ÊĞÅ
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍÎ¨Ò»±êÊ¶
+	 * å‘é€å½©ä¿¡
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @return è¿”å›å½©ä¿¡å‘é€å”¯ä¸€æ ‡è¯†
 	 */
 	public String SendMessage(String[] destinationAddresses, String subject, String content,String extendCode)
 	{
@@ -78,14 +78,14 @@ public class Mms {
 	}
 	
 	/**
-	 * ·¢ËÍ²ÊĞÅ
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password Ó¦ÓÃÃÜÂë
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍÎ¨Ò»±êÊ¶
+	 * å‘é€å½©ä¿¡
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @param applicationId åº”ç”¨ID
+	 * @param password åº”ç”¨å¯†ç 
+	 * @return è¿”å›å½©ä¿¡å‘é€å”¯ä¸€æ ‡è¯†
 	 */
 	public String SendMessage(String[] destinationAddresses, String subject, String content,String extendCode,String applicationId,String password) 
 	{
@@ -112,15 +112,15 @@ public class Mms {
 	}
 	
 	/**
-	 * ·¢ËÍ²ÊĞÅ
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password Ó¦ÓÃÃÜÂë
-	 * @param expectSendTime ÆÚÍû·¢ËÍÊ±¼ä
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍÎ¨Ò»±êÊ¶
+	 * å‘é€å½©ä¿¡
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @param applicationId åº”ç”¨ID
+	 * @param password åº”ç”¨å¯†ç 
+	 * @param expectSendTime æœŸæœ›å‘é€æ—¶é—´
+	 * @return è¿”å›å½©ä¿¡å‘é€å”¯ä¸€æ ‡è¯†
 	 */
 	public String SendMessage(String[] destinationAddresses, String subject, String content,String extendCode,String applicationId,String password,java.util.Calendar expectSendTime)
 	{
@@ -148,9 +148,9 @@ public class Mms {
 	}
 	
 	/**
-	 * »ñÈ¡²ÊĞÅ·¢ËÍ×´Ì¬
-	 * @param messageId ²ÊĞÅID
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍ×´Ì¬
+	 * è·å–å½©ä¿¡å‘é€çŠ¶æ€
+	 * @param messageId å½©ä¿¡ID
+	 * @return è¿”å›å½©ä¿¡å‘é€çŠ¶æ€
 	 */
 	public DeliveryReport[]  GetDeliveryReport(String messageId)
 	{
@@ -185,11 +185,11 @@ public class Mms {
 	}
 	
 	/**
-	 * »ñÈ¡²ÊĞÅ·¢ËÍ×´Ì¬
-	 * @param messageId ²ÊĞÅID
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password Ó¦ÓÃÃÜÂë
-	 * @return ·µ»Ø²ÊĞÅ·¢ËÍ×´Ì¬
+	 * è·å–å½©ä¿¡å‘é€çŠ¶æ€
+	 * @param messageId å½©ä¿¡ID
+	 * @param applicationId åº”ç”¨ID
+	 * @param password åº”ç”¨å¯†ç 
+	 * @return è¿”å›å½©ä¿¡å‘é€çŠ¶æ€
 	 */
 	public DeliveryReport[]  GetDeliveryReport(String messageId,String applicationId, String password)
 	{
@@ -225,9 +225,9 @@ public class Mms {
 	}
 	
 	/**
-	 * ½ÓÊÕÉÏĞĞ²ÊĞÅ
-	 * @param messageId ²ÊĞÅID
-	 * @return ·µ»ØÉÏĞĞ²ÊĞÅ
+	 * æ¥æ”¶ä¸Šè¡Œå½©ä¿¡
+	 * @param messageId å½©ä¿¡ID
+	 * @return è¿”å›ä¸Šè¡Œå½©ä¿¡
 	 */
 	public MmsMessage GetMessage(String messageId) 
 	{
@@ -265,10 +265,10 @@ public class Mms {
 		return mmsMessage;
 	}
 	/**
-	 * ½ÓÊÕÉÏĞĞ²ÊĞÅ
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password Ó¦ÓÃÃÜÂë
-	 * @return ·µ»ØÉÏĞĞ²ÊĞÅ
+	 * æ¥æ”¶ä¸Šè¡Œå½©ä¿¡
+	 * @param applicationId åº”ç”¨ID
+	 * @param password åº”ç”¨å¯†ç 
+	 * @return è¿”å›ä¸Šè¡Œå½©ä¿¡
 	 */
 	public MmsMessage[] GetMessages(String applicationId, String password)
 	{
@@ -313,14 +313,14 @@ public class Mms {
 	}
 	
 	/**
-	 * ĞÂÔö²ÊĞÅ·¢ËÍÈÎÎñ
-	 * @param periodType ÈÎÎñÖÜÆÚ£¨Äê¡¢ÔÂ¡¢ÖÜ¡¢ÈÕ£©
-	 * @param periodValue ÖÜÆÚÖµ
-	 * @param periodTime ÈÎÎñÊ±¼ä£¨Ê±·ÖÃë£©
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @return ·µ»ØÈÎÎñÎ¨Ò»±êÊ¶
+	 * æ–°å¢å½©ä¿¡å‘é€ä»»åŠ¡
+	 * @param periodType ä»»åŠ¡å‘¨æœŸï¼ˆå¹´ã€æœˆã€å‘¨ã€æ—¥ï¼‰
+	 * @param periodValue å‘¨æœŸå€¼
+	 * @param periodTime ä»»åŠ¡æ—¶é—´ï¼ˆæ—¶åˆ†ç§’ï¼‰
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @return è¿”å›ä»»åŠ¡å”¯ä¸€æ ‡è¯†
 	 * @throws MessageException
 	 */
 	public String AddTask(int periodType, PeriodValue periodValue,PeriodTime periodTime, String[] destinationAddresses,String subject, String content) throws MessageException
@@ -329,7 +329,7 @@ public class Mms {
 		{}
 		else
 		{
-			throw new MessageException("ÀàĞÍ(periodType)±ØĞëÔÚ0~3Ö®¼ä¡£");
+			throw new MessageException("ç±»å‹(periodType)å¿…é¡»åœ¨0~3ä¹‹é—´ã€‚");
 		}
 		MmsImplementationStub.AddTask1 request = new MmsImplementationStub.AddTask1();
 		MmsImplementationStub.ArrayOfstring array=new MmsImplementationStub.ArrayOfstring();
@@ -377,15 +377,15 @@ public class Mms {
 	}
 	
 	/**
-	 * ĞÂÔö²ÊĞÅ·¢ËÍÈÎÎñ
-	 * @param periodType ÈÎÎñÖÜÆÚ£¨Äê¡¢ÔÂ¡¢ÖÜ¡¢ÈÕ£©
-	 * @param periodValue ÖÜÆÚÖµ
-	 * @param periodTime ÈÎÎñÊ±¼ä£¨Ê±·ÖÃë£©
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @return ·µ»ØÈÎÎñÎ¨Ò»±êÊ¶
+	 * æ–°å¢å½©ä¿¡å‘é€ä»»åŠ¡
+	 * @param periodType ä»»åŠ¡å‘¨æœŸï¼ˆå¹´ã€æœˆã€å‘¨ã€æ—¥ï¼‰
+	 * @param periodValue å‘¨æœŸå€¼
+	 * @param periodTime ä»»åŠ¡æ—¶é—´ï¼ˆæ—¶åˆ†ç§’ï¼‰
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @return è¿”å›ä»»åŠ¡å”¯ä¸€æ ‡è¯†
 	 * @throws MessageException
 	 */
 	public String AddTask(int periodType, PeriodValue periodValue,PeriodTime periodTime, String[] destinationAddresses,String subject, String content,String extendCode) throws MessageException
@@ -394,7 +394,7 @@ public class Mms {
 		{}
 		else
 		{
-			throw new MessageException("ÀàĞÍ(periodType)±ØĞëÔÚ0~3Ö®¼ä¡£");
+			throw new MessageException("ç±»å‹(periodType)å¿…é¡»åœ¨0~3ä¹‹é—´ã€‚");
 		}
 		MmsImplementationStub.AddTask2 request = new MmsImplementationStub.AddTask2();
 		MmsImplementationStub.ArrayOfstring array=new MmsImplementationStub.ArrayOfstring();
@@ -443,17 +443,17 @@ public class Mms {
 	}
 	
 	/**
-	 * ĞÂÔö²ÊĞÅ·¢ËÍÈÎÎñ
-	 * @param periodType ÈÎÎñÖÜÆÚ£¨Äê¡¢ÔÂ¡¢ÖÜ¡¢ÈÕ£©
-	 * @param periodValue ÖÜÆÚÖµ
-	 * @param periodTime ÈÎÎñÊ±¼ä£¨Ê±·ÖÃë£©
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password  Ó¦ÓÃÃÜÂë
-	 * @return ·µ»ØÈÎÎñÎ¨Ò»±êÊ¶
+	 * æ–°å¢å½©ä¿¡å‘é€ä»»åŠ¡
+	 * @param periodType ä»»åŠ¡å‘¨æœŸï¼ˆå¹´ã€æœˆã€å‘¨ã€æ—¥ï¼‰
+	 * @param periodValue å‘¨æœŸå€¼
+	 * @param periodTime ä»»åŠ¡æ—¶é—´ï¼ˆæ—¶åˆ†ç§’ï¼‰
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @param applicationId åº”ç”¨ID
+	 * @param password  åº”ç”¨å¯†ç 
+	 * @return è¿”å›ä»»åŠ¡å”¯ä¸€æ ‡è¯†
 	 * @throws MessageException
 	 */
 	public String AddTask(int periodType, PeriodValue periodValue,PeriodTime periodTime, String[] destinationAddresses,String subject, String content,String extendCode,String applicationId,String password) throws MessageException
@@ -462,7 +462,7 @@ public class Mms {
 		{}
 		else
 		{
-			throw new MessageException("ÀàĞÍ(periodType)±ØĞëÔÚ0~3Ö®¼ä¡£");
+			throw new MessageException("ç±»å‹(periodType)å¿…é¡»åœ¨0~3ä¹‹é—´ã€‚");
 		}
 		MmsImplementationStub.AddTask3 request = new MmsImplementationStub.AddTask3();
 		MmsImplementationStub.ArrayOfstring array=new MmsImplementationStub.ArrayOfstring();
@@ -513,19 +513,19 @@ public class Mms {
 	}
 	
 	/**
-	 * ĞÂÔö²ÊĞÅ·¢ËÍÈÎÎñ
-	 * @param periodType ÈÎÎñÖÜÆÚ£¨Äê¡¢ÔÂ¡¢ÖÜ¡¢ÈÕ£©
-	 * @param periodValue ÖÜÆÚÖµ
-	 * @param periodTime ÈÎÎñÊ±¼ä£¨Ê±·ÖÃë£©
-	 * @param destinationAddresses ½ÓÊÕ·½µØÖ·ÁĞ±í(¿ÉÒ»´Î·¢ËÍ¸ø¶àÈË)
-	 * @param subject Ö÷Ìâ
-	 * @param content ²ÊĞÅÄÚÈİ£¨·ûºÏ²ÊĞÅ¹æ·¶µÄxmlÎÄµµ£©
-	 * @param extendCode À©Õ¹ºÅÂë
-	 * @param applicationId Ó¦ÓÃID
-	 * @param password  Ó¦ÓÃÃÜÂë
-	 * @param beginTime ¿ªÊ¼Ê±¼ä
-	 * @param endTime ½áÊøÊ±¼ä
-	 * @return ·µ»ØÈÎÎñÎ¨Ò»±êÊ¶
+	 * æ–°å¢å½©ä¿¡å‘é€ä»»åŠ¡
+	 * @param periodType ä»»åŠ¡å‘¨æœŸï¼ˆå¹´ã€æœˆã€å‘¨ã€æ—¥ï¼‰
+	 * @param periodValue å‘¨æœŸå€¼
+	 * @param periodTime ä»»åŠ¡æ—¶é—´ï¼ˆæ—¶åˆ†ç§’ï¼‰
+	 * @param destinationAddresses æ¥æ”¶æ–¹åœ°å€åˆ—è¡¨(å¯ä¸€æ¬¡å‘é€ç»™å¤šäºº)
+	 * @param subject ä¸»é¢˜
+	 * @param content å½©ä¿¡å†…å®¹ï¼ˆç¬¦åˆå½©ä¿¡è§„èŒƒçš„xmlæ–‡æ¡£ï¼‰
+	 * @param extendCode æ‰©å±•å·ç 
+	 * @param applicationId åº”ç”¨ID
+	 * @param password  åº”ç”¨å¯†ç 
+	 * @param beginTime å¼€å§‹æ—¶é—´
+	 * @param endTime ç»“æŸæ—¶é—´
+	 * @return è¿”å›ä»»åŠ¡å”¯ä¸€æ ‡è¯†
 	 * @throws MessageException
 	 */
 	public String AddTask(int periodType, PeriodValue periodValue,PeriodTime periodTime, String[] destinationAddresses,String subject, String content,String extendCode,String applicationId,String password,java.util.Calendar beginTime,java.util.Calendar endTime) throws MessageException
@@ -534,7 +534,7 @@ public class Mms {
 		{}
 		else
 		{
-			throw new MessageException("ÀàĞÍ(periodType)±ØĞëÔÚ0~3Ö®¼ä¡£");
+			throw new MessageException("ç±»å‹(periodType)å¿…é¡»åœ¨0~3ä¹‹é—´ã€‚");
 		}
 		MmsImplementationStub.AddTask4 request = new MmsImplementationStub.AddTask4();
 		MmsImplementationStub.ArrayOfstring array=new MmsImplementationStub.ArrayOfstring();
@@ -586,8 +586,8 @@ public class Mms {
 		}
 	}
 	/**
-	 * ÈÎÎñÒÆ³ı
-	 * @param taskId ÈÎÎñÎ¨Ò»±êÊ¶
+	 * ä»»åŠ¡ç§»é™¤
+	 * @param taskId ä»»åŠ¡å”¯ä¸€æ ‡è¯†
 	 */
 	public void RemoveTask(String taskId) 
 	{
@@ -603,9 +603,9 @@ public class Mms {
 	}
 	
 	/**
-	 * ÈÎÎñÒÆ³ı
-	 * @param taskId ÈÎÎñÎ¨Ò»±êÊ¶
-	 * @param password Ó¦ÓÃÃÜÂë
+	 * ä»»åŠ¡ç§»é™¤
+	 * @param taskId ä»»åŠ¡å”¯ä¸€æ ‡è¯†
+	 * @param password åº”ç”¨å¯†ç 
 	 */
 	public void RemoveTask(String taskId,String password) 
 	{
