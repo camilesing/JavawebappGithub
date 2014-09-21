@@ -18,7 +18,7 @@ public class Mms {
 	public Mms(String serviceUrl) throws AxisFault 
 	{
 		stub = new MmsImplementationStub(serviceUrl);
-	}
+	} 
 	/**
 	 * 发送彩信
 	 * @param destinationAddresses 接收方地址列表(可一次发送给多人)
