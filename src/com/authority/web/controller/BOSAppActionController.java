@@ -624,9 +624,9 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 	 * @return
 	 * @throws IOException
 	 */
-	@RequestMapping( value="/reportview_retail_002",method=RequestMethod.POST)
+	@RequestMapping( value="/reportview_retail_003",method=RequestMethod.POST)
 	@ResponseBody
-	public Object reportview_retail_002(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+	public Object reportview_retail_003(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="";
 		int count = 0;
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
@@ -716,9 +716,9 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 								map_head.put("ORDERNO", "排名");
 								map_head.put("M_PRODUCT_NAME", "款号");
 								map_head.put("M_PRODUCT_VALUE", "品名");
-								map_head.put("QTY", "销售数量");
+								map_head.put("QTY", "零售数量");
 								map_head.put("TOT_PRECOST", "成本金额");
-								map_head.put("AMT_ACTUAL", "销售金额");
+								map_head.put("AMT_ACTUAL", "零售金额");
 								map_head.put("MAOL", "毛利");
 								map_head.put("PRECOST", "成本单价");
 								map_head.put("ACTUAL", "成交单价");
@@ -862,7 +862,7 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 	}
 	
 	/**
-	 * 销售出库分析(经销商)
+	 * 销售出库分析(同环比)
 	 * @param session
 	 * @param request
 	 * @param response
@@ -879,8 +879,12 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 		
 		try {
 			date_start = request.getParameter("date_start");
+			date_end = request.getParameter("date_end");
 			if(date_start==null||date_start.equals(""))
-				date_start=DateFormatUtils.format(new Date(), "yyyyMM");
+				date_start="17990101";
+			
+			if(date_end==null||date_end.equals(""))
+				date_end="20991231";
 			
 			query = "SELECT CST.NAME CST_NAME, M1.C_CUSTOMER_ID,M1.BILLDATE, "+
 					"M1.QTYSALEOUT, "+
@@ -984,6 +988,81 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 		
 	}
 	
+	/**
+	 * 销售出库分析(经销商)
+	 * @param session
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping( value="/reportview_retail_012",method=RequestMethod.POST)
+	@ResponseBody
+	public Object reportview_retail_012(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="";
+		int count = 0;
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> listArray = new ArrayList();
+		
+		try {
+			date_start = request.getParameter("date_start");
+			date_end = request.getParameter("date_end");
+			if(date_start==null||date_start.equals(""))
+				date_start="17990101";
+			
+			if(date_end==null||date_end.equals(""))
+				date_end="20991231";
+			
+			query = "SELECT CST.NAME CST_NAME, M1.C_CUSTOMER_ID, "+
+					"M1.QTYSALEOUT,  "+
+					"M1.AMTSALEOUT,  "+
+					"nvl(CUS.FEEREMAIN,0) FEEREMAIN "+ 
+					"FROM (  "+
+					"SELECT C_CUSTOMER_ID,SUM(QTYSALEOUT)-SUM(QTYRETSALEIN) QTYSALEOUT,SUM(AMTSALEOUT)-SUM(AMTRETSALEIN) AMTSALEOUT FROM ( "+ 
+					"select A.BILLDATE,A.C_CUSTOMER_ID,A.C_STORE_ID,A.C_DEST_ID,A.QTYSALEOUT,A.AMTSALEOUT,A.AMTLISTSALEOUT,A.AMTLISTRETSALEIN ,A.QTYRETSALEIN,A.AMTRETSALEIN,A.DISCOUNTSALE,A.DISCOUNTRETSALE "+ 
+					"from RP_SALE001 A  where C_CUSTOMERUP_ID = :C_CUSTOMERUP_ID and BILLDATE BETWEEN :date_start AND :date_end "+
+					") D GROUP BY C_CUSTOMER_ID ORDER BY C_CUSTOMER_ID  "+
+					") M1  "+
+					"LEFT JOIN C_CUSTOMER CST ON M1.C_CUSTOMER_ID = CST.ID "+  
+					"LEFT JOIN V_FA_CUSTOMER CUS ON  M1.C_CUSTOMER_ID=CUS.id  "; 
+			
+			String c_customer_id = session.getAttribute("C_CUSTOMER_ID").toString();
+			
+			Map<String,Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("date_start", date_start);
+			paramMap.put("date_end", date_end);
+			paramMap.put("C_CUSTOMERUP_ID", c_customer_id);
+			
+			list = njdbcTemplate.queryForList(query, paramMap);
+			
+			for (int i = 0; i < list.size(); i++) {
+				Map<String,Object> listMap = list.get(i);
+				Map<String,Object> map = new LinkedHashMap<String,Object>();
+				if(i==0){
+					Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+					map_head.put("CST_NAME", "经销商");
+					map_head.put("QTYSALEOUT", "出库数量");
+					map_head.put("AMTSALEOUT", "出库金额");
+					map_head.put("FEEREMAIN", "账户余额");
+					listArray.add(map_head);
+				}
+
+				map.put("CST_NAME", listMap.get("CST_NAME").toString());
+				map.put("QTYSALEOUT", listMap.get("QTYSALEOUT").toString());
+				map.put("AMTSALEOUT", listMap.get("AMTSALEOUT").toString());
+				map.put("FEEREMAIN", listMap.get("FEEREMAIN").toString());
+				listArray.add(map);
+			}			
+			
+			count = list.size();
+			
+			return new ExtReturn(true, listArray,count);
+			
+		} catch (Exception e) {
+			return new ExtReturn(false, e.toString());
+		}
+		
+	}
 	
 	/**
 	 * 销售订单分析(经销商)
@@ -1059,36 +1138,11 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 		
 	}
 	
-	@RequestMapping( value="/reportview_retail_012",method=RequestMethod.POST)
-	@ResponseBody
-	public Object reportview_retail_012(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
-		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="";
-		int count = 0;
-		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
-		List<Map<String, Object>> listArray = new ArrayList();
-		
-		try {
-			date_start = request.getParameter("date_start");
-			date_end = request.getParameter("date_end");
-			if(date_start==null||date_start.equals(""))
-				date_start="17990101";
-			
-			if(date_end==null||date_end.equals(""))
-				date_end="20991231";
-			
-			
-			
-			return new ExtReturn(true, listArray,count);
-			
-		} catch (Exception e) {
-			return new ExtReturn(false, e.toString());
-		}
-		
-	}
 	
-	@RequestMapping( value="/reportview_retail_013",method=RequestMethod.POST)
+	
+	@RequestMapping( value="/reportview_retail_000",method=RequestMethod.POST)
 	@ResponseBody
-	public Object reportview_retail_013(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+	public Object reportview_retail_000(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="";
 		int count = 0;
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
@@ -1623,13 +1677,14 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			
 			String c_customer_id = session.getAttribute("C_CUSTOMER_ID").toString();
 
-			query  ="select C_CUSTOMER_NAME,FEEREMAIN,sum(QTYSALEOUT-QTYRETSALEIN) QTY,SUM(AMTLISTSALEOUT-AMTLISTRETSALEIN) AMTLISTSALE ,SUM(AMTSALEOUT-AMTRETSALEIN) AMTSALE "+
+			query  ="select C_CUSTOMER_NAME,FEEREMAIN,sum(QTYSALEOUT-QTYRETSALEIN) QTY,sum(QTYSALEOUT*PERCOST-QTYRETSALEIN*PERCOST) AMTLISTSALE ,SUM(AMTSALEOUT-AMTRETSALEIN) AMTSALE  "+
 					"FROM ( "+
-					"select C.NAME C_CUSTOMER_NAME,d.FEEREMAIN , B.NAME C_STORE_NAME,a.M_PRODUCT_ID, QTYSALEOUT,QTYRETSALEIN ,AMTLISTSALEOUT , AMTLISTRETSALEIN, PRICEACTUAL , AMTSALEOUT,AMTRETSALEIN "+
+					"select C.NAME C_CUSTOMER_NAME,d.FEEREMAIN , B.NAME C_STORE_NAME,a.M_PRODUCT_ID,e.PERCOST, QTYSALEOUT,QTYRETSALEIN ,AMTLISTSALEOUT , AMTLISTRETSALEIN, PRICEACTUAL , AMTSALEOUT,AMTRETSALEIN "+
 					"from RP_SALE001 a "+
 					"left join C_STORE b on A.C_STORE_ID=B.ID "+
 					"left join C_CUSTOMER c on A.C_CUSTOMER_ID = C.ID "+
-					"left join V_FA_CUSTOMER d on A.C_CUSTOMER_ID =D.C_CUSTOMER_ID "+
+					"left join V_FA_CUSTOMER d on A.C_CUSTOMER_ID =D.C_CUSTOMER_ID " +
+					"left join FA_PRODUCT_CUSMONTHCOST e on A.M_PRODUCT_ID=E.M_PRODUCT_ID and A.C_CUSTOMERUP_ID=E.C_CUSTOMER_ID "+
 					"where a.C_CUSTOMERUP_ID = :C_CUSTOMERUP_ID and A.BILLDATE between :DATE_START and :DATE_END  "+
 					") GROUP BY C_CUSTOMER_NAME,FEEREMAIN" ;
 			
@@ -1696,6 +1751,112 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 		
 	}
 	
+	/**
+	 * 销售订单分析(经销商)
+	 * @param session
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping( value="/reportview_retail_013",method=RequestMethod.POST)
+	@ResponseBody
+	public Object reportview_retail_013(HttpSession session, HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String result = "",query="",insert="",procedure="",callbackfun="",docno="",oper="",update ="",store="",date_start="",date_end="";
+		int count = 0;
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> listArray = new ArrayList();
+		
+		try {
+			date_start = request.getParameter("date_start");
+			date_end = request.getParameter("date_end");
+			if(date_start==null||date_start.equals(""))
+				date_start="17990101";
+			
+			if(date_end==null||date_end.equals(""))
+				date_end="20991231";
+			
+			String c_customer_id = session.getAttribute("C_CUSTOMER_ID").toString();
+
+			query  ="select M_PRODUCT_NAME,sum(QTY) QTY,SUM(AMTLISTSALE) AMTLISTSALE,SUM(AMTSALE) AMTSALE FROM (" +
+					"select C_CUSTOMER_NAME,FEEREMAIN,M_PRODUCT_NAME,nvl(sum(QTYSALEOUT-QTYRETSALEIN),0) QTY,nvl(SUM(AMTLISTSALEOUT-AMTLISTRETSALEIN),0) AMTLISTSALE ,nvl(SUM(AMTSALEOUT-AMTRETSALEIN),0) AMTSALE "+
+					"FROM ( "+
+					"select C.NAME C_CUSTOMER_NAME,d.FEEREMAIN , B.NAME C_STORE_NAME,E.NAME M_PRODUCT_NAME, QTYSALEOUT,QTYRETSALEIN ,AMTLISTSALEOUT , AMTLISTRETSALEIN, PRICEACTUAL , AMTSALEOUT,AMTRETSALEIN "+
+					"from RP_SALE001 a "+
+					"left join C_STORE b on A.C_STORE_ID=B.ID "+
+					"left join C_CUSTOMER c on A.C_CUSTOMER_ID = C.ID "+
+					"left join V_FA_CUSTOMER d on A.C_CUSTOMER_ID =D.C_CUSTOMER_ID " +
+					"left join M_PRODUCT e on A.M_PRODUCT_ID = E.ID "+
+					"where a.C_CUSTOMERUP_ID = :C_CUSTOMERUP_ID and A.BILLDATE between :DATE_START and :DATE_END  "+
+					") GROUP BY C_CUSTOMER_NAME,FEEREMAIN,M_PRODUCT_NAME " +
+					") GROUP BY M_PRODUCT_NAME " +
+					"ORDER BY QTY DESC " ;
+			
+			Map<String,Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("DATE_START", date_start);
+			paramMap.put("DATE_END", date_end);
+			paramMap.put("C_CUSTOMERUP_ID", c_customer_id);
+			
+			list = njdbcTemplate.queryForList(query, paramMap);
+			BigDecimal T_QTY = new BigDecimal(0);
+			BigDecimal T_AMTLISTSALE = new BigDecimal(0);
+			BigDecimal T_AMTSALE = new BigDecimal(0);
+			BigDecimal T_FEEREMAIN = new BigDecimal(0);
+			BigDecimal T_MAOL = new BigDecimal(0);
+			
+			for (int i = 0; i < list.size(); i++) {
+				Map<String,Object> listMap = list.get(i);
+				Map<String,Object> map = new LinkedHashMap<String,Object>();
+				if(i==0){
+					Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+					//map_head.put("C_CUSTOMER_NAME", "客户");
+					//map_head.put("FEEREMAIN", "账户余额");
+					map_head.put("M_PRODUCT_NAME", "款号");
+					map_head.put("QTY", "数量");
+					map_head.put("AMTLISTSALE", "成本金额");
+					map_head.put("AMTSALE", "成交金额");
+					map_head.put("MAOL", "毛利");
+					listArray.add(map_head);
+				}
+				T_QTY = T_QTY.add(new BigDecimal(listMap.get("QTY").toString()));
+				T_AMTLISTSALE = T_AMTLISTSALE.add(new BigDecimal(listMap.get("AMTLISTSALE").toString()));
+				T_AMTSALE = T_AMTSALE.add(new BigDecimal(listMap.get("AMTSALE").toString()));
+				//T_FEEREMAIN = T_FEEREMAIN.add(new BigDecimal(listMap.get("FEEREMAIN").toString()));
+				
+				BigDecimal MAOL = new BigDecimal(0);
+				MAOL = new BigDecimal(listMap.get("AMTSALE").toString()).subtract(new BigDecimal(listMap.get("AMTLISTSALE").toString()));
+				
+				T_MAOL = T_MAOL.add(MAOL);
+				
+				//map.put("C_CUSTOMER_NAME", listMap.get("C_CUSTOMER_NAME").toString());
+				//map.put("FEEREMAIN", listMap.get("FEEREMAIN").toString());
+				map.put("M_PRODUCT_NAME", listMap.get("M_PRODUCT_NAME").toString());
+				map.put("QTY", listMap.get("QTY").toString()); 
+				map.put("AMTLISTSALE", listMap.get("AMTLISTSALE").toString());
+				map.put("AMTSALE", listMap.get("AMTSALE").toString());
+				map.put("MAOL", MAOL.toString());
+				listArray.add(map);
+			}
+			
+			Map<String,Object> map_head = new LinkedHashMap<String,Object>();
+			//map_head.put("C_CUSTOMER_NAME", "汇总");
+			//map_head.put("FEEREMAIN", T_FEEREMAIN);
+			map_head.put("M_PRODUCT_NAME", "汇总");
+			map_head.put("QTY", T_QTY);
+			map_head.put("AMTLISTSALE", T_AMTLISTSALE);
+			map_head.put("AMTSALE", T_AMTSALE);
+			map_head.put("MAOL", T_MAOL);
+			listArray.add(map_head);
+			
+			count = list.size()+1;
+			
+			return new ExtReturn(true, listArray,count);
+			
+		} catch (Exception e) {
+			return new ExtReturn(false, e.toString());
+		}
+		
+	}
 	
 	/**
 	 * 销售订单分析(经销商)
@@ -1724,17 +1885,20 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			
 			String c_customer_id = session.getAttribute("C_CUSTOMER_ID").toString();
 
-			query  ="select C_CUSTOMER_NAME,FEEREMAIN,M_PRODUCT_NAME,nvl(sum(QTYSALEOUT-QTYRETSALEIN),0) QTY,nvl(SUM(AMTLISTSALEOUT-AMTLISTRETSALEIN),0) AMTLISTSALE ,nvl(SUM(AMTSALEOUT-AMTRETSALEIN),0) AMTSALE "+
+			query  ="select M_PRODUCT_NAME,sum(QTY) QTY,SUM(AMTLISTSALE) AMTLISTSALE,SUM(AMTSALE) AMTSALE FROM (" +
+					"select C_CUSTOMER_NAME,FEEREMAIN,M_PRODUCT_NAME,nvl(sum(QTYSALEOUT-QTYRETSALEIN),0) QTY,nvl(sum(QTYSALEOUT*PERCOST-QTYRETSALEIN*PERCOST),0) AMTLISTSALE ,nvl(SUM(AMTSALEOUT-AMTRETSALEIN),0) AMTSALE "+
 					"FROM ( "+
-					"select C.NAME C_CUSTOMER_NAME,d.FEEREMAIN , B.NAME C_STORE_NAME,E.NAME M_PRODUCT_NAME, QTYSALEOUT,QTYRETSALEIN ,AMTLISTSALEOUT , AMTLISTRETSALEIN, PRICEACTUAL , AMTSALEOUT,AMTRETSALEIN "+
+					"select C.NAME C_CUSTOMER_NAME,d.FEEREMAIN , B.NAME C_STORE_NAME,E.NAME M_PRODUCT_NAME,F.PERCOST, QTYSALEOUT,QTYRETSALEIN ,AMTLISTSALEOUT , AMTLISTRETSALEIN, PRICEACTUAL , AMTSALEOUT,AMTRETSALEIN "+
 					"from RP_SALE001 a "+
 					"left join C_STORE b on A.C_STORE_ID=B.ID "+
 					"left join C_CUSTOMER c on A.C_CUSTOMER_ID = C.ID "+
 					"left join V_FA_CUSTOMER d on A.C_CUSTOMER_ID =D.C_CUSTOMER_ID " +
-					"left join M_PRODUCT e on A.M_PRODUCT_ID = E.ID "+
+					"left join M_PRODUCT e on A.M_PRODUCT_ID = E.ID " +
+					"left join FA_PRODUCT_CUSMONTHCOST f on A.M_PRODUCT_ID=f.M_PRODUCT_ID and A.C_CUSTOMERUP_ID=f.C_CUSTOMER_ID "+
 					"where a.C_CUSTOMERUP_ID = :C_CUSTOMERUP_ID and A.BILLDATE between :DATE_START and :DATE_END  "+
 					") GROUP BY C_CUSTOMER_NAME,FEEREMAIN,M_PRODUCT_NAME " +
-					"order by QTY desc" ;
+					") GROUP BY M_PRODUCT_NAME " +
+					"ORDER BY QTY DESC " ;
 			
 			Map<String,Object> paramMap = new HashMap<String, Object>();
 			paramMap.put("DATE_START", date_start);
@@ -1753,8 +1917,8 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 				Map<String,Object> map = new LinkedHashMap<String,Object>();
 				if(i==0){
 					Map<String,Object> map_head = new LinkedHashMap<String,Object>();
-					map_head.put("C_CUSTOMER_NAME", "客户");
-					map_head.put("FEEREMAIN", "账户余额");
+					//map_head.put("C_CUSTOMER_NAME", "客户");
+					//map_head.put("FEEREMAIN", "账户余额");
 					map_head.put("M_PRODUCT_NAME", "款号");
 					map_head.put("QTY", "数量");
 					map_head.put("AMTLISTSALE", "成本金额");
@@ -1765,17 +1929,17 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 				T_QTY = T_QTY.add(new BigDecimal(listMap.get("QTY").toString()));
 				T_AMTLISTSALE = T_AMTLISTSALE.add(new BigDecimal(listMap.get("AMTLISTSALE").toString()));
 				T_AMTSALE = T_AMTSALE.add(new BigDecimal(listMap.get("AMTSALE").toString()));
-				T_FEEREMAIN = T_FEEREMAIN.add(new BigDecimal(listMap.get("FEEREMAIN").toString()));
+				//T_FEEREMAIN = T_FEEREMAIN.add(new BigDecimal(listMap.get("FEEREMAIN").toString()));
 				
 				BigDecimal MAOL = new BigDecimal(0);
 				MAOL = new BigDecimal(listMap.get("AMTSALE").toString()).subtract(new BigDecimal(listMap.get("AMTLISTSALE").toString()));
 				
 				T_MAOL = T_MAOL.add(MAOL);
 				
-				map.put("C_CUSTOMER_NAME", listMap.get("C_CUSTOMER_NAME").toString());
-				map.put("FEEREMAIN", listMap.get("FEEREMAIN").toString());
+				//map.put("C_CUSTOMER_NAME", listMap.get("C_CUSTOMER_NAME").toString());
+				//map.put("FEEREMAIN", listMap.get("FEEREMAIN").toString());
 				map.put("M_PRODUCT_NAME", listMap.get("M_PRODUCT_NAME").toString());
-				map.put("QTY", listMap.get("QTY").toString());
+				map.put("QTY", listMap.get("QTY").toString()); 
 				map.put("AMTLISTSALE", listMap.get("AMTLISTSALE").toString());
 				map.put("AMTSALE", listMap.get("AMTSALE").toString());
 				map.put("MAOL", MAOL.toString());
@@ -1783,9 +1947,9 @@ private static final Logger logger = LoggerFactory.getLogger(BOSAppActionControl
 			}
 			
 			Map<String,Object> map_head = new LinkedHashMap<String,Object>();
-			map_head.put("C_CUSTOMER_NAME", "汇总");
-			map_head.put("FEEREMAIN", T_FEEREMAIN);
-			map_head.put("M_PRODUCT_NAME", ".");
+			//map_head.put("C_CUSTOMER_NAME", "汇总");
+			//map_head.put("FEEREMAIN", T_FEEREMAIN);
+			map_head.put("M_PRODUCT_NAME", "汇总");
 			map_head.put("QTY", T_QTY);
 			map_head.put("AMTLISTSALE", T_AMTLISTSALE);
 			map_head.put("AMTSALE", T_AMTSALE);
